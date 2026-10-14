@@ -203,7 +203,7 @@ html, body {
   position: fixed;
   inset: 0;
   z-index: 999999;
-  background: linear-gradient(180deg, #F9F2E7 0%, #F1E5D3 100%);
+  background: var(--bg-app);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -266,11 +266,12 @@ html, body {
 .loading-progress-track {
   width: 100%;
   height: 14px;
-  background: #E8DCCB;
+  background: var(--bg-tray);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-pill);
   overflow: hidden;
   padding: 2px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 
 .loading-progress-fill {
@@ -293,12 +294,13 @@ html, body {
 
 .loading-tip-box {
   margin-top: 20px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-card);
   padding: 10px 16px;
   border-radius: 14px;
   font-size: 13px;
   color: var(--text-hint);
-  border: 1px solid var(--border-subtle);
+  border: 1.5px solid var(--border-card);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .btn-start-play {
@@ -637,7 +639,7 @@ html, body {
    ========================================================== */
 .special-dish-card {
   position: relative;
-  background: linear-gradient(135deg, #FFFDF6 0%, #FFF4DD 50%, #FFE9BD 100%);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(217, 119, 6, 0.06) 100%), var(--bg-card);
   border: 2px solid var(--accent-gold);
   border-radius: 16px;
   padding: 12px 16px;
@@ -670,7 +672,7 @@ html, body {
   gap: 6px;
   font-size: 13px;
   font-weight: 800;
-  color: var(--accent-caramel);
+  color: var(--accent-gold);
 }
 
 .special-dish-tag .star-icon {
@@ -735,8 +737,8 @@ html, body {
 
 .nav-grid-btn {
   position: relative;
-  background: rgba(255, 255, 255, 0.45);
-  border: 1.5px solid rgba(220, 200, 180, 0.5);
+  background: var(--bg-card-subtle);
+  border: 1.5px solid var(--border-subtle);
   border-radius: 12px;
   padding: 9px 4px 10px 4px;
   display: flex;
@@ -749,7 +751,8 @@ html, body {
 }
 
 .nav-grid-btn:hover {
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--bg-card);
+  border-color: var(--border-card);
   transform: translateY(-1px);
 }
 
@@ -953,12 +956,12 @@ html, body {
    CỤM NÚT HÀNH ĐỘNG CHÍNH (PREP CTA ACTION DECK) & TẠM TÍNH
    ========================================================== */
 .kho-cta-action-deck {
-  background: linear-gradient(180deg, #FFFDF8 0%, #FBF6EE 100%);
+  background: var(--bg-card);
   border: 1.5px solid var(--border-card);
   border-radius: 16px;
   padding: 12px;
   margin-bottom: 14px;
-  box-shadow: 0 4px 14px rgba(70, 45, 20, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1007,11 +1010,12 @@ html, body {
 
 .btn-brew-action.btn-brewed-done,
 .btn-brew-action:disabled {
-  background: #E5DDD3;
-  color: #8C7B6D;
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
   box-shadow: none;
   cursor: default;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .btn-open-day-prominent {
@@ -1055,8 +1059,8 @@ html, body {
 
 /* Thanh Tạm Tính Mua Hàng & Ngân Quỹ Ví */
 .kho-subtotal-bar {
-  background: #F3EAE0;
-  border: 1px dashed #D6C2AB;
+  background: var(--bg-card-subtle);
+  border: 1px dashed var(--border-card);
   border-radius: 10px;
   padding: 8px 12px;
   display: flex;
@@ -2183,12 +2187,12 @@ html, body {
 
 /* Đơn Hàng Shipper Trực Tiếp Trong Ca Bán */
 .open-mode-shipper-card {
-  background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%);
-  border: 1.5px solid #F5C542;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 100%), var(--bg-card);
+  border: 1.5px solid var(--accent-gold);
   border-radius: 14px;
   padding: 10px 14px;
   margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(245, 197, 66, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   animation: shipperSlideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -2206,7 +2210,7 @@ html, body {
 .shipper-tag {
   font-size: 12px;
   font-weight: 800;
-  color: #B25E00;
+  color: var(--accent-gold);
 }
 
 .shipper-price {
@@ -2217,7 +2221,7 @@ html, body {
 
 .shipper-desc {
   font-size: 11px;
-  color: #6D4C41;
+  color: var(--text-muted);
   margin: 4px 0 8px;
 }
 
@@ -3531,8 +3535,8 @@ html, body {
    8. REVIEW CARDS & INTERACTIVE CUSTOMER CONVERSATION
    ========================================================== */
 .reviews-rating-header {
-  background: linear-gradient(135deg, #FFFDF8 0%, #FFF5E6 100%);
-  border: 1.5px solid #F3C68F;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-card);
   border-radius: var(--radius-card);
   padding: 14px 16px;
   margin-bottom: 14px;
@@ -3540,6 +3544,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  box-shadow: var(--shadow-card);
 }
 
 .rating-score-box {
@@ -3552,7 +3557,7 @@ html, body {
 .rating-big-num {
   font-size: 32px;
   font-weight: 900;
-  color: #B45309;
+  color: var(--accent-gold);
   line-height: 1;
 }
 
@@ -3670,27 +3675,28 @@ html, body {
   font-style: italic;
   line-height: 1.45;
   margin: 2px 0;
-  padding: 6px 10px;
-  background: #FAF7F2;
+  padding: 8px 12px;
+  background: var(--bg-card-subtle);
   border-radius: 8px;
-  border-left: 3px solid #E5A83B;
+  border-left: 3px solid var(--accent-gold);
 }
 
 /* KHỐI PHẢN HỒI CỦA CHỦ TIỆM */
 .owner-reply-bubble {
-  background: #FFF8E7;
-  border: 1px solid #F5D58B;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-card);
+  border-left: 3px solid #E67E22;
   border-radius: 10px;
   padding: 8px 10px;
   font-size: 11.5px;
-  color: #78350F;
+  color: var(--text-main);
   line-height: 1.4;
   margin-top: 4px;
 }
 
 .owner-reply-title {
   font-weight: 800;
-  color: #92400E;
+  color: #E67E22;
   margin-bottom: 2px;
   display: flex;
   align-items: center;
@@ -3699,12 +3705,13 @@ html, body {
 
 /* KHỐI KHÁCH HỒI ĐÁP LẠI */
 .customer-comeback-bubble {
-  background: #F0FDF4;
-  border: 1px solid #BBF7D0;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-card);
+  border-left: 3px solid #2ECC71;
   border-radius: 10px;
   padding: 8px 10px;
   font-size: 11.5px;
-  color: #166534;
+  color: var(--text-main);
   line-height: 1.4;
   margin-top: 4px;
   animation: fadeInComeback 0.3s ease;
@@ -3717,7 +3724,7 @@ html, body {
 
 .customer-comeback-title {
   font-weight: 800;
-  color: #15803D;
+  color: #2ECC71;
   margin-bottom: 2px;
   display: flex;
   align-items: center;
@@ -3747,7 +3754,8 @@ html, body {
   font-family: inherit;
   font-size: 12px;
   outline: none;
-  background: #FAF8F5;
+  background: var(--bg-card-subtle);
+  color: var(--text-title);
   transition: all 0.2s;
 }
 
@@ -3833,13 +3841,13 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #FFF9F2 0%, #FFF2E5 100%);
-  border: 1.5px solid #E5C3A6;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-card);
   border-radius: var(--radius-card);
   padding: 8px 14px;
   margin-bottom: 12px;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.08);
+  box-shadow: var(--shadow-card);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -3989,11 +3997,11 @@ html, body {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: linear-gradient(135deg, #FFFDF8 0%, #FFF5E6 100%);
-  border: 2px solid #F3C68F;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-gold);
   border-radius: 16px;
   padding: 12px 14px;
-  box-shadow: 0 4px 12px rgba(229, 168, 59, 0.15);
+  box-shadow: 0 4px 12px rgba(229, 168, 59, 0.2);
 }
 
 .owner-current-avatar-wrap {
@@ -4121,10 +4129,10 @@ html, body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  background: #FDF9F3;
+  background: var(--bg-card-subtle);
   border-radius: 12px;
   padding: 10px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
 }
 
 .owner-stat-box {
@@ -4151,9 +4159,9 @@ html, body {
    LIVING DINING ROOM ENHANCEMENTS
    ========================================================== */
 .dining-table-box.is-eating {
-  background: #FFFDF9;
+  background: var(--bg-card);
   border: 2px solid #F5C542;
-  box-shadow: 0 4px 12px rgba(245, 197, 66, 0.2);
+  box-shadow: 0 4px 12px rgba(245, 197, 66, 0.25);
   animation: tableGlow 2s infinite ease-in-out;
 }
 
@@ -4164,7 +4172,7 @@ html, body {
 }
 
 .dining-table-box.is-dirty {
-  background: #FFF8F0;
+  background: var(--bg-card-subtle);
   border: 1.5px dashed #D6895A;
 }
 
@@ -4474,12 +4482,12 @@ html, body {
    SÂN KHẤU PHÒNG ĂN TRỰC TIẾP TRONG CHẾ ĐỘ MỞ BÁN (OPEN MODE)
    ========================================================== */
 .open-live-dining-stage {
-  background: #FFFDF8;
-  border: 2px solid #E8D5C4;
+  background: var(--bg-card);
+  border: 2px solid var(--border-card);
   border-radius: 16px;
   padding: 12px;
   margin-bottom: 14px;
-  box-shadow: 0 4px 14px rgba(90, 42, 24, 0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .open-stage-header {
@@ -5229,11 +5237,11 @@ html, body {
     display: flex;
     gap: 6px;
     margin-bottom: 8px;
-    background: #EFE4D2;
+    background: var(--bg-tray);
     padding: 3px;
     border-radius: var(--radius-pill);
-    border: 1.5px solid #DFCBA7;
-    box-shadow: inset 0 2px 4px rgba(60, 35, 15, 0.08);
+    border: 1.5px solid var(--border-card);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
   }
 
   .btn-open-view-tab {
@@ -5244,7 +5252,7 @@ html, body {
     font-family: inherit;
     font-size: 12px;
     font-weight: 800;
-    color: #7A533E;
+    color: var(--text-muted);
     background: transparent;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -5334,10 +5342,10 @@ html, body {
   display: inline-flex;
   gap: 3px;
   margin-left: auto;
-  background: #EFE4D2;
+  background: var(--bg-tray);
   padding: 2px;
   border-radius: var(--radius-pill);
-  border: 1px solid #DFCBA7;
+  border: 1px solid var(--border-card);
 }
 
 .btn-mini-size {
@@ -5349,7 +5357,7 @@ html, body {
   font-family: inherit;
   font-size: 11px;
   font-weight: 800;
-  color: #7A533E;
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s;
   display: flex;
@@ -5358,7 +5366,7 @@ html, body {
 }
 
 .btn-mini-size.active {
-  background: #382315;
+  background: var(--accent-berry);
   color: #FFF;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
@@ -5400,8 +5408,8 @@ html, body {
 }
 
 .btn-dock-tab {
-  background: #FAF5EE;
-  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-card-subtle);
+  border: 1.5px solid var(--border-card);
   border-radius: var(--radius-pill);
   padding: 6px 11px;
   font-family: inherit;
