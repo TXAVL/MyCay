@@ -466,6 +466,8 @@ export class SpicyNoodleGame {
       onConfirm: () => {
         localStorage.removeItem("mycay_save_data");
         localStorage.removeItem("mycay_seen_version");
+        localStorage.removeItem("mycay_coachmark_seen");
+        localStorage.removeItem("mycay_first_name_set");
         location.reload();
       }
     });

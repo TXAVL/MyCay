@@ -6,8 +6,14 @@
 import { txaversion } from "./txaversion.js";
 import { NameValidator } from "./filter.js";
 import { SpicyNoodleGame } from "./game.js";
+import { txatheme } from "./txatheme.js";
+import { txacoachmark } from "./txacoachmark.js";
+import { GameUIModal } from "./modal.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Khởi tạo Theme giao diện
+  txatheme.init();
+
   // Khởi tạo Game Engine
   const game = new SpicyNoodleGame();
   window.game = game;
@@ -18,6 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadingPercent = document.getElementById("loading-percent");
   const loadingTip = document.getElementById("loading-tip-text");
   const btnStartPlay = document.getElementById("btn-start-play");
+
+  const btnQuickTheme = document.getElementById("btn-quick-theme");
+  const btnTriggerCoachmark = document.getElementById("btn-trigger-coachmark");
+  const btnReplayCoachmark = document.getElementById("btn-replay-coachmark");
+  const settingsThemeContainer = document.getElementById("settings-theme-container");
 
   const nameModal = document.getElementById("modal-name-prompt");
   const nameInput = document.getElementById("input-shop-name");
@@ -86,6 +97,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 100);
 
+  // Kiểm tra quy trình mở tiệm lần đầu & hướng dẫn tân thủ
+  function checkFirstTimeFlow() {
+    const isFirstNameSetup = !localStorage.getItem("mycay_first_name_set");
+    if (isFirstNameSetup) {
+      setTimeout(openNamePrompt, 400);
+    } else if (txacoachmark.checkShouldShow()) {
+      setTimeout(() => {
+        new txacoachmark().start();
+      }, 500);
+    }
+  }
+
   // Nhấn nút vào quán sau khi load xong
   if (btnStartPlay) {
     btnStartPlay.addEventListener("click", () => {
@@ -100,6 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const verCheck = txaversion.checkNewVersion();
         if (verCheck.isNew) {
           setTimeout(showVersionModal, 500);
+        } else {
+          checkFirstTimeFlow();
         }
       }, 450);
     });
@@ -165,6 +190,15 @@ document.addEventListener("DOMContentLoaded", () => {
       game.renderChalkboardBanner();
       game.sound.playCoinChime();
       nameModal.style.display = "none";
+      localStorage.setItem("mycay_first_name_set", "true");
+
+      GameUIModal.showToast(`Biển hiệu "${val}" đã được treo lên! Khai trương hồng phát! 🎉`, "success", "🏮");
+
+      if (txacoachmark.checkShouldShow()) {
+        setTimeout(() => {
+          new txacoachmark().start();
+        }, 400);
+      }
     });
   }
 
@@ -174,6 +208,33 @@ document.addEventListener("DOMContentLoaded", () => {
     btnRenameFromSettings.addEventListener("click", () => {
       settingsModal.style.display = "none";
       openNamePrompt();
+    });
+  }
+
+  // Đổi nhanh Theme Anime ở thanh Header
+  if (btnQuickTheme) {
+    btnQuickTheme.addEventListener("click", () => {
+      const nextTheme = txatheme.cycleTheme();
+      GameUIModal.showToast(`Đã đổi theme: ${nextTheme.name}`, "info", nextTheme.icon);
+    });
+  }
+
+  // Nút mở Spotlight Coachmark từ Header
+  if (btnTriggerCoachmark) {
+    btnTriggerCoachmark.addEventListener("click", () => {
+      game.sound.playButtonClick();
+      new txacoachmark().start();
+    });
+  }
+
+  // Nút xem lại Coachmark từ Cài đặt
+  if (btnReplayCoachmark) {
+    btnReplayCoachmark.addEventListener("click", () => {
+      settingsModal.style.display = "none";
+      game.sound.playButtonClick();
+      setTimeout(() => {
+        new txacoachmark().start();
+      }, 200);
     });
   }
 
@@ -190,6 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
       txaversion.markAsSeen();
       versionModal.style.display = "none";
       game.sound.playButtonClick();
+      checkFirstTimeFlow();
     });
   }
 
@@ -197,6 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btnCloseVersionIcon.addEventListener("click", () => {
       versionModal.style.display = "none";
       game.sound.playButtonClick();
+      checkFirstTimeFlow();
     });
   }
 
@@ -211,10 +274,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Khởi tạo danh sách Theme Options trong Modal Settings
+  function initThemeOptions() {
+    if (!settingsThemeContainer) return;
+    settingsThemeContainer.innerHTML = txatheme.renderThemeOptionsHTML();
+    settingsThemeContainer.querySelectorAll(".theme-card-option").forEach(card => {
+      card.addEventListener("click", () => {
+        const themeId = card.getAttribute("data-theme-id");
+        txatheme.setTheme(themeId, true);
+        const themeObj = txatheme.THEMES.find(t => t.id === themeId);
+        if (themeObj) {
+          GameUIModal.showToast(`Đã áp dụng theme: ${themeObj.name}`, "success", themeObj.icon);
+        }
+      });
+    });
+  }
+
   // 5. Cài đặt Game (Settings Modal)
   if (btnOpenSettings) {
     btnOpenSettings.addEventListener("click", () => {
       updateSettingsUI();
+      initThemeOptions();
       settingsModal.style.display = "flex";
       game.sound.playButtonClick();
     });

@@ -21,3 +21,4 @@ Thumbs.db
 # Temporary folders
 tmp/
 temp/
+.wrangler/

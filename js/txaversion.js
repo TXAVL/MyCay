@@ -3,48 +3,41 @@
 
 export class txaversion {
   constructor(version, versionCode, releaseDate, features = []) {
-    this.version = version; // Ví dụ: "1.0.0"
-    this.versionCode = versionCode; // Ví dụ: 100
+    this.version = version; // Ví dụ: "1.3.0"
+    this.versionCode = versionCode; // Ví dụ: 130
     this.releaseDate = releaseDate;
     this.features = features; // Danh sách { title, desc, icon, badge }
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.2.0 - Đại Tiệc Mì Cay & Quán Ăn Tấp Nập)
+  // Khai báo phiên bản hiện tại của game (Bản 1.3.0 - Đại Tiệc Đa Sắc Theme & Hướng Dẫn txacoachmark)
   static get CURRENT_VERSION() {
-    return new txaversion("1.2.0", 120, "13/10/2026", [
+    return new txaversion("1.3.0", 130, "14/10/2026", [
       {
-        title: "Sân Khấu Phố Xá & Khách Dạo Phố Tấp Nập",
-        desc: "Dòng khách hoạt hình (Mèo Linh, Shiba Duy, Gấu Nâu, Thỏ Chiaki) dạo bước trên vỉa hè trước quán, hít hà mùi nước dùng và ngắm nghía tiệm mì!",
-        icon: "🏮",
-        badge: "Cực Hot 🔥",
+        title: "Bộ Sưu Tập 5 Giao Diện Theme Tuyệt Sắc",
+        desc: "Thỏa sức biến hóa tiệm mì với 5 phong cách: Ấm Áp Cozy truyền thống, Phố Đêm Tokyo (Dark Mode huyền ảo), Hoa Anh Đào Pastel ngọt ngào, Lửa Cay Habanero rực cháy và Trà Xanh Matcha thanh tịnh!",
+        icon: "🎨",
+        badge: "Đại Tiệc Mới 🔥",
         badgeType: "hot"
       },
       {
-        title: "Khu Bàn Ăn Trực Diện & Khách Ăn Mì Xì Xèo",
-        desc: "Không còn giấu trong pop-up! Thực khách ngồi ăn xì xèo ngay trên màn hình chính, hơi nóng bốc lên nghi ngút, xuýt xoa cay bốc khói, ăn xong thả tim và để lại tiền tip!",
-        icon: "🍜",
-        badge: "Trực quan ✨",
+        title: "Hệ Thống Hướng Dẫn Spotlight txacoachmark",
+        desc: "Bé Mèo Mochi trực tiếp dắt tay Bếp Trưởng qua từng góc quán: cách ninh nước dùng 7 cấp, xem menu bảng đen, quản lý 8 khu vực và bấm mở cửa đón khách!",
+        icon: "🧭",
+        badge: "Độc quyền 🌟",
         badgeType: "visual"
       },
       {
-        title: "Đánh Giá Sao Động 1–5 Sao & Khách Phản Hồi",
-        desc: "Điểm sao và review tính toán theo chất lượng niêu mì và thời gian chờ. Phục vụ nhanh nhận 5 sao, để khách chờ quá lâu nhận 1 sao giận dữ!",
-        icon: "⭐",
-        badge: "Chân thực 🌟",
+        title: "Nghi Thức Khai Trương & Đặt Tên Quán",
+        desc: "Quy trình khai trương chuẩn chỉ! Ngay sau khi đọc tin mới, Bếp Trưởng sẽ được mời đặt tên tiệm mỳ để khắc lên biển hiệu gỗ trước khi chính thức vào bếp!",
+        icon: "🏮",
+        badge: "Khai trương 🎉",
         badgeType: "star"
       },
       {
-        title: "Chủ Quán Nhập Phản Hồi & Khách Tương Tác Lại",
-        desc: "Chủ quán tự do nhập phản hồi hoặc chọn mẫu nhanh. Khách hòa giải tăng +1⭐ khi chủ quán xin lỗi chân thành, hoặc gửi thêm tiền tip khi khen ngợi!",
-        icon: "💬",
-        badge: "Tương tác 💖",
-        badgeType: "chat"
-      },
-      {
-        title: "Lưu Lượng Khách Phụ Thuộc Vào Điểm Sao",
-        desc: "Độ nổi tiếng càng cao khách càng vào quán nườm nượp tấp nập, điểm thấp quán sẽ vắng khách để nhắc nhở nâng cao tay nghề!",
-        icon: "🔥",
-        badge: "Cơ chế mới 📈",
+        title: "Nút Đổi Theme Nhanh & Bảng Màu Trực Quan",
+        desc: "Bấm nút 🎨 trên thanh Header để chuyển nhanh theme tức thì, hoặc mở Cài Đặt để chiêm ngưỡng các bảng màu xem trước cực kỳ mượt mà!",
+        icon: "⚡",
+        badge: "Tiện lợi ✨",
         badgeType: "manage"
       }
     ]);
@@ -53,7 +46,16 @@ export class txaversion {
   // Lịch sử các phiên bản
   static get VERSION_HISTORY() {
     return [
-      txaversion.CURRENT_VERSION
+      txaversion.CURRENT_VERSION,
+      new txaversion("1.2.0", 120, "13/10/2026", [
+        {
+          title: "Sân Khấu Phố Xá & Khách Dạo Phố Tấp Nập",
+          desc: "Dòng khách hoạt hình dạo bước trên vỉa hè trước quán, hít hà mùi nước dùng và ngắm nghía tiệm mì!",
+          icon: "🏮",
+          badge: "Bản 1.2.0",
+          badgeType: "hot"
+        }
+      ])
     ];
   }
 
@@ -88,7 +90,7 @@ export class txaversion {
         <div class="version-banner-icon">🏮</div>
         <div class="version-banner-info">
           <div class="version-pill-tag">BẢN NÂNG CẤP MỚI v${current.version}</div>
-          <h3 class="version-heading">Đại Tiệc Mì Cay & Quán Ăn Tấp Nập</h3>
+          <h3 class="version-heading">Đại Tiệc Đa Sắc Theme & txacoachmark</h3>
           <span class="version-date">📅 Phát hành: ${current.releaseDate} · Bản chính thức</span>
         </div>
       </div>

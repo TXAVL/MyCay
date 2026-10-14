@@ -19,6 +19,15 @@
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="styles/main.css" />
+
+  <script>
+    // Áp dụng theme lưu trước để chống giật giao diện (Anti-FOUC)
+    try {
+      const savedTheme = localStorage.getItem('mycay_theme') || 'cozy';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      if (document.body) document.body.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+  </script>
 </head>
 <body>
 
@@ -88,9 +97,17 @@
         <div class="header-col-right">
           <div class="header-stars-row" id="display-stars">★★★★☆</div>
           <div class="header-reviews-sub" id="display-reviews-count">0 đánh giá</div>
-          <button id="btn-open-settings" class="btn-settings-gear" title="Cài đặt game">
-            ⚙️
-          </button>
+          <div class="header-actions-row">
+            <button id="btn-quick-theme" class="btn-header-action" title="Đổi giao diện nhanh (5 Theme Anime)">
+              <span id="header-theme-icon">🏮</span>
+            </button>
+            <button id="btn-trigger-coachmark" class="btn-header-action" title="Xem hướng dẫn tiệm mì Mèo Mochi">
+              🧭
+            </button>
+            <button id="btn-open-settings" class="btn-settings-gear" title="Cài đặt game">
+              ⚙️
+            </button>
+          </div>
         </div>
       </header>
 
@@ -921,6 +938,20 @@
           <div class="setting-control">
             <input type="checkbox" id="setting-particles-toggle" checked />
           </div>
+        </div>
+
+        <!-- Giao diện & Theme Anime Đa Sắc -->
+        <div class="settings-section-title">
+          <span>🎨 Giao Diện Tiệm Mì (5 Bảng Màu)</span>
+        </div>
+        <div id="settings-theme-container"></div>
+
+        <!-- Xem lại hướng dẫn Spotlight Mochi -->
+        <div class="setting-row">
+          <label><span>🧭</span> Hướng dẫn tân thủ:</label>
+          <button id="btn-replay-coachmark" class="btn-secondary-link">
+            Xem Lại Hướng Dẫn
+          </button>
         </div>
 
         <!-- Đổi tên quán -->
