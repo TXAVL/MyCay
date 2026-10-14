@@ -740,7 +740,7 @@ export class SpicyNoodleGame {
   brewSupplies() {
     this.state.hasBrewedToday = true;
     const stoveLv = this.state.upgrades.stoveSpeed || 1;
-    const bonusStock = stoveLv * 4;
+    const bonusStock = 2 + (stoveLv - 1);
 
     if (this.state.noodles.my_bo) {
       this.state.noodles.my_bo.stock += bonusStock;
@@ -1005,17 +1005,18 @@ export class SpicyNoodleGame {
     if (!listEl) return;
 
     const upgradesConfig = [
-      { key: "tableCount", name: "Thêm Bàn Ghế Gỗ Sồi", desc: "Tăng số lượng bàn đón khách cùng lúc", baseCost: 150, max: 6, icon: "🪑" },
-      { key: "stoveSpeed", name: "Bếp Niêu Đất Cao Cấp", desc: "Tăng tốc độ ninh mỳ và nấu song song", baseCost: 200, max: 4, icon: "🔥" },
-      { key: "chiliSecret", name: "Sốt Ớt Hiểm Bí Truyền", desc: "Gia vị cay nồng độc quyền tăng 15% giá bán", baseCost: 250, max: 3, icon: "🌶️" },
-      { key: "acCooling", name: "Điều Hòa Daikin Mát Rượi", desc: "Giải nhiệt ăn cay, tăng 30% kiên nhẫn của khách", baseCost: 180, max: 3, icon: "❄️" },
-      { key: "decorScore", name: "Đèn Lồng Đỏ Tokyo - Seoul", desc: "Tăng danh tiếng và kéo khách nườm nượp", baseCost: 220, max: 4, icon: "🏮" }
+      { key: "tableCount", name: "Thêm Bàn Ghế Gỗ Sồi", desc: "Tăng số lượng bàn đón khách cùng lúc", baseCost: 280, max: 6, icon: "🪑", minDay: 1 },
+      { key: "stoveSpeed", name: "Bếp Niêu Đất Cao Cấp", desc: "Tăng tốc độ ninh mỳ và nấu song song", baseCost: 350, max: 4, icon: "🔥", minDay: 2 },
+      { key: "chiliSecret", name: "Sốt Ớt Hiểm Bí Truyền", desc: "Gia vị cay nồng độc quyền tăng 15% giá bán", baseCost: 420, max: 3, icon: "🌶️", minDay: 2 },
+      { key: "acCooling", name: "Điều Hòa Daikin Mát Rượi", desc: "Giải nhiệt ăn cay, tăng 30% kiên nhẫn của khách", baseCost: 320, max: 3, icon: "❄️", minDay: 2 },
+      { key: "decorScore", name: "Đèn Lồng Đỏ Tokyo - Seoul", desc: "Tăng danh tiếng và kéo khách nườm nượp", baseCost: 380, max: 4, icon: "🏮", minDay: 3 }
     ];
 
     listEl.innerHTML = upgradesConfig.map(up => {
       const currentLv = this.state.upgrades[up.key] || 1;
       const isMax = currentLv >= up.max;
-      const cost = Math.round(up.baseCost * Math.pow(1.5, currentLv - 1));
+      const cost = Math.round(up.baseCost * Math.pow(1.6, currentLv - 1));
+      const isDayUnlocked = this.state.day >= up.minDay;
 
       return `
         <div class="upgrade-card">
@@ -1024,19 +1025,24 @@ export class SpicyNoodleGame {
             <span class="upgrade-card-desc">${up.desc}</span>
           </div>
           <div>
-            ${isMax ? `<span style="font-weight: 800; color: #258A6D;">Tối đa</span>` : `
-              <button class="btn-menu-action btn-buy-lock" onclick="window.game.buyUpgrade('${up.key}', ${cost})">
+            ${isMax ? `<span style="font-weight: 800; color: #258A6D;">Tối đa</span>` : (
+              !isDayUnlocked ? `<span class="staff-lock-badge">🔒 Ngày ${up.minDay}</span>` : `
+              <button class="btn-menu-action btn-buy-lock" onclick="window.game.buyUpgrade('${up.key}', ${cost}, ${up.minDay})">
                 <span class="btn-price-top">${cost}k</span>
                 <span class="btn-action-sub">Nâng Cấp</span>
               </button>
-            `}
+            `)}
           </div>
         </div>
       `;
     }).join("");
   }
 
-  buyUpgrade(key, cost) {
+  buyUpgrade(key, cost, minDay = 1) {
+    if (this.state.day < minDay) {
+      GameUIModal.showToast(`Trang bị này mở khóa từ Ngày ${minDay}!`, "warning", "📅");
+      return;
+    }
     if (this.state.money < cost) {
       GameUIModal.showToast(`Cần ${cost}k để nâng cấp!`, "warning", "🪙");
       return;
@@ -1070,15 +1076,16 @@ export class SpicyNoodleGame {
     if (!listEl) return;
 
     const staffConfig = [
-      { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Tự động chào đón khách & tăng 25% tiền tip", cost: 180, icon: "🐱" },
-      { key: "kenji", name: "Gấu Kenji (Đầu bếp ninh mì)", desc: "Tự động nấu niêu đất khi khách gọi món", cost: 250, icon: "🐼" },
-      { key: "usagi", name: "Thỏ Usagi (Bưng bê niêu đất)", desc: "Tự động bưng mì nóng hổi ra bàn cho khách", cost: 220, icon: "🐰" },
-      { key: "shiba", name: "Cún Shiba (Tạp vụ dọn bàn)", desc: "Tự động lau dọn bàn sạch bóng tức thì", cost: 200, icon: "🐶" },
-      { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và phát phiếu giảm giá", cost: 280, icon: "🦊" }
+      { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Tự động chào đón khách & tăng 25% tiền tip", cost: 350, minDay: 2, icon: "🐱" },
+      { key: "usagi", name: "Thỏ Usagi (Bưng bê niêu đất)", desc: "Tự động bưng mì nóng hổi ra bàn cho khách", cost: 480, minDay: 2, icon: "🐰" },
+      { key: "shiba", name: "Cún Shiba (Tạp vụ dọn bàn)", desc: "Tự động lau dọn bàn sạch bóng & nhặt tiền tip", cost: 520, minDay: 3, icon: "🐶" },
+      { key: "kenji", name: "Gấu Kenji (Đầu bếp ninh mì)", desc: "Tự động nấu niêu đất khi khách gọi món", cost: 680, minDay: 4, icon: "🐼" },
+      { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và phát phiếu giảm giá", cost: 750, minDay: 5, icon: "🦊" }
     ];
 
     listEl.innerHTML = staffConfig.map(st => {
       const isHired = !!this.state.staff[st.key];
+      const isDayUnlocked = this.state.day >= st.minDay;
 
       return `
         <div class="staff-card">
@@ -1087,19 +1094,24 @@ export class SpicyNoodleGame {
             <span class="staff-card-desc">${st.desc}</span>
           </div>
           <div>
-            ${isHired ? `<span style="font-weight: 800; color: #258A6D;">Đang làm việc</span>` : `
-              <button class="btn-menu-action btn-buy-lock" onclick="window.game.hireStaff('${st.key}', ${st.cost})">
+            ${isHired ? `<span style="font-weight: 800; color: #258A6D;">Đang làm việc</span>` : (
+              !isDayUnlocked ? `<span class="staff-lock-badge">🔒 Ngày ${st.minDay}</span>` : `
+              <button class="btn-menu-action btn-buy-lock" onclick="window.game.hireStaff('${st.key}', ${st.cost}, ${st.minDay})">
                 <span class="btn-price-top">${st.cost}k</span>
                 <span class="btn-action-sub">Thuê</span>
               </button>
-            `}
+            `)}
           </div>
         </div>
       `;
     }).join("");
   }
 
-  hireStaff(key, cost) {
+  hireStaff(key, cost, minDay = 1) {
+    if (this.state.day < minDay) {
+      GameUIModal.showToast(`Nhân viên này chỉ nhận hợp đồng từ Ngày ${minDay}!`, "warning", "📅");
+      return;
+    }
     if (this.state.money < cost) {
       GameUIModal.showToast(`Cần ${cost}k để ký hợp đồng nhân viên!`, "warning", "🪙");
       return;
@@ -1496,38 +1508,38 @@ export class SpicyNoodleGame {
     const staff = this.state.staff;
     const workers = [
       {
-        name: this.state.ownerName || "Bếp Trưởng Mèo",
-        role: "🧑‍🍳 Bếp chính (Đang đứng quầy)",
+        name: this.state.ownerName || "Bếp Trưởng",
+        role: "Bếp chính",
         avatar: this.state.ownerAvatar || "assets/cust_cat.png",
         active: true
       },
       {
-        name: "Mèo Mochi",
-        role: "🐱 Tiếp tân (+25% tip)",
+        name: "Mochi",
+        role: "Tiếp tân (+25%)",
         avatar: "assets/staff_mochi.png",
         active: !!staff.mochi
       },
       {
-        name: "Gấu Kenji",
-        role: "🐼 Tự nấu niêu đất",
+        name: "Kenji",
+        role: "Tự nấu mì",
         avatar: "assets/staff_kenji.png",
         active: !!staff.kenji
       },
       {
-        name: "Thỏ Usagi",
-        role: "🐰 Tự bưng mì ra bàn",
+        name: "Usagi",
+        role: "Tự bưng bê",
         avatar: "assets/staff_usagi.png",
         active: !!staff.usagi
       },
       {
-        name: "Cún Shiba",
-        role: "🐶 Tạp vụ (nhặt tip)",
+        name: "Shiba",
+        role: "Tạp vụ dọn",
         avatar: "assets/staff_shiba.png",
         active: !!staff.shiba
       },
       {
-        name: "Cáo Shiro",
-        role: "🦊 Tự giao Shipper",
+        name: "Shiro",
+        role: "Thu ngân",
         avatar: "assets/cust_fox.png",
         active: !!staff.shiro
       }
@@ -1545,7 +1557,7 @@ export class SpicyNoodleGame {
 
     if (activeWorkers.length <= 1) {
       staffBar.innerHTML += `
-        <div class="kitchen-worker-pill" style="opacity: 0.75; font-size: 11px; cursor: pointer;" onclick="window.game.switchTab('tab-staff');">
+        <div class="kitchen-worker-pill" style="opacity: 0.8; font-size: 11px; cursor: pointer; flex-basis: 100%; white-space: normal;" onclick="window.game.switchTab('tab-staff');">
           <span>💡 Vào Tab "Nhân viên" thuê Gấu Kenji & Thỏ Usagi để tự động nấu và bưng mỳ!</span>
         </div>
       `;
@@ -1854,25 +1866,36 @@ export class SpicyNoodleGame {
     // 0. Render các món mẫu 1-chạm
     this.renderQuickPresets();
 
-    // 1. Size Niêu
+    // 1. Size Niêu (Sync cả 2 vị trí: Tab Cay và Tab Chọn Mì)
     const btnM = document.getElementById("btn-size-m");
     const btnL = document.getElementById("btn-size-l");
-    if (btnM && btnL) {
-      btnM.classList.toggle("active", this.currentPot.size === "M");
-      btnL.classList.toggle("active", this.currentPot.size === "L");
-      btnM.onclick = () => this.selectPotSize("M");
-      btnL.onclick = () => this.selectPotSize("L");
-    }
+    const btnMInline = document.getElementById("btn-size-m-inline");
+    const btnLInline = document.getElementById("btn-size-l-inline");
 
-    // 2. Cấp Độ Cay 0 - 7
+    [btnM, btnMInline].forEach(b => {
+      if (b) {
+        b.classList.toggle("active", this.currentPot.size === "M");
+        b.onclick = () => this.selectPotSize("M");
+      }
+    });
+    [btnL, btnLInline].forEach(b => {
+      if (b) {
+        b.classList.toggle("active", this.currentPot.size === "L");
+        b.onclick = () => this.selectPotSize("L");
+      }
+    });
+
+    // 2. Cấp Độ Cay 0 - 7 (Hiển thị ngay trong tab Chọn Mì và tab Cay & Size)
     const spicyWrap = document.getElementById("spicy-levels-options");
-    if (spicyWrap) {
-      spicyWrap.innerHTML = [0, 1, 2, 3, 4, 5, 6, 7].map(lvl => `
-        <button class="btn-spicy-level level-${lvl} ${this.currentPot.spicyLevel === lvl ? 'active' : ''}" onclick="window.game.selectSpicyLevel(${lvl})">
-          ${lvl}
-        </button>
-      `).join("");
-    }
+    const spicyWrapInline = document.getElementById("spicy-levels-options-inline");
+    const spicyButtonsHtml = [0, 1, 2, 3, 4, 5, 6, 7].map(lvl => `
+      <button class="btn-spicy-level level-${lvl} ${this.currentPot.spicyLevel === lvl ? 'active' : ''}" onclick="window.game.selectSpicyLevel(${lvl})" title="Cấp độ cay ${lvl}">
+        ${lvl}
+      </button>
+    `).join("");
+
+    if (spicyWrap) spicyWrap.innerHTML = spicyButtonsHtml;
+    if (spicyWrapInline) spicyWrapInline.innerHTML = spicyButtonsHtml;
 
     // 3. Mì cay (có badge số lượng tồn kho tròn nổi trên đầu chuẩn ảnh)
     const noodleWrap = document.getElementById("cooking-noodles-grid");
@@ -2681,7 +2704,8 @@ export class SpicyNoodleGame {
 
       // Nâng cấp Điều Hòa Daikin (acCooling): Không khí mát lành giảm độ bức bối giúp khách kiên nhẫn hơn
       const acLv = this.state.upgrades.acCooling || 1;
-      const patienceLoss = Math.max(0.4, 1.05 - (acLv - 1) * 0.15); // Nhịp độ thư thả giúp khách kiên nhẫn hơn, người chơi có thời gian nấu mì!
+      const dayRush = Math.min(0.35, (this.state.day - 1) * 0.05); // Các ngày sau khách đông và sốt ruột hơn một chút
+      const patienceLoss = Math.max(0.6, 1.1 + dayRush - (acLv - 1) * 0.15);
 
       // Giảm độ kiên nhẫn của khách ở các slot (Điều hòa Daikin & Tác động giá bán)
       this.orderSlots.forEach((slot, idx) => {
@@ -3064,6 +3088,13 @@ export class SpicyNoodleGame {
     if (prepView) prepView.style.display = "block";
     if (openView) openView.style.display = "none";
 
+    // Chi phí mặt bằng & điện nước vận hành (từ Ngày 2 trở đi để game có độ thử thách thực tế)
+    const rentCost = this.state.day === 1 ? 0 : Math.min(120, 25 + (this.state.day - 1) * 15);
+    this.state.todayRentCost = rentCost;
+    if (rentCost > 0) {
+      this.state.money = Math.max(0, this.state.money - rentCost);
+    }
+
     this.showDaySummaryModal();
     this.state.day += 1;
     this.saveGame();
@@ -3075,6 +3106,9 @@ export class SpicyNoodleGame {
     const titleEl = document.getElementById("day-summary-title");
     const bodyEl = document.getElementById("day-summary-body");
 
+    const rentCost = this.state.todayRentCost || 0;
+    const netProfit = this.state.todayEarnings - rentCost;
+
     if (titleEl) titleEl.textContent = `🎉 Kết Quả Ngày ${this.state.day}`;
     if (bodyEl) {
       bodyEl.innerHTML = `
@@ -3084,17 +3118,28 @@ export class SpicyNoodleGame {
             <span>${this.state.todayBowlsSold} tô 🍜</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-weight: 700;">
-            <span>Tiền bán mỳ:</span>
+            <span>Doanh thu bán mỳ:</span>
             <span style="color: var(--accent-money);">+${txaformat.formatVND(this.state.todayEarnings - this.state.todayTips)}</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-weight: 700;">
             <span>Tiền tip của khách:</span>
             <span style="color: var(--accent-berry);">+${txaformat.formatVND(this.state.todayTips)} 💖</span>
           </div>
+          ${rentCost > 0 ? `
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #E74C3C;">
+              <span>Chi phí điện nước & mặt bằng:</span>
+              <span>-${txaformat.formatVND(rentCost)} ⚡</span>
+            </div>
+          ` : `
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #27AE60; font-weight: 700;">
+              <span>Hỗ trợ ngày khai trương:</span>
+              <span>Miễn phí mặt bằng ✨</span>
+            </div>
+          `}
           <hr style="border: none; border-top: 1px solid var(--border-subtle);" />
           <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 800;">
-            <span>Tổng lợi nhuận ngày:</span>
-            <span style="color: #258A6D;">+${txaformat.formatVND(this.state.todayEarnings)} 🪙</span>
+            <span>Lợi nhuận ròng ngày:</span>
+            <span style="color: ${netProfit >= 0 ? '#258A6D' : '#E74C3C'};">${netProfit >= 0 ? '+' : ''}${txaformat.formatVND(netProfit)} 🪙</span>
           </div>
         </div>
       `;

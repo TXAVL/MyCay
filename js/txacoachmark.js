@@ -3,9 +3,9 @@
 // Hệ thống hướng dẫn người mới chơi phong cách Anime Cozy
 // Tự động spotlight làm nổi bật từng vị trí quan trọng của tiệm mì:
 // 1. Tên tiệm & Vốn khởi nghiệp
-// 2. Nồi ninh nước dùng xương 7 cấp độ
-// 3. Bảng đen Menu & Món đặc biệt Hot Combo
-// 4. 8 Tab quản lý tiệm mì & kho hàng
+// 2. Bảng đen Menu & Món đặc biệt Hot Combo
+// 3. 8 Tab quản lý tiệm mì & kho hàng
+// 4. Nồi ninh nước dùng xương 7 cấp độ
 // 5. Nút mở cửa đón khách tấp nập
 // ==========================================================
 
@@ -21,6 +21,7 @@ export class txacoachmark {
 
     this.currentStep = 0;
     this.isActive = false;
+    this.rafId = null;
 
     // DOM references
     this.overlayEl = null;
@@ -33,7 +34,7 @@ export class txacoachmark {
   }
 
   /**
-   * Danh sách các bước hướng dẫn chuẩn của Tiệm Mỳ Cay
+   * Danh sách các bước hướng dẫn chuẩn của Tiệm Mỳ Cay theo thứ tự từ trên xuống dưới
    */
   static get DEFAULT_STEPS() {
     return [
@@ -45,13 +46,6 @@ export class txacoachmark {
         placement: "bottom"
       },
       {
-        target: "#btn-brew-supplies",
-        title: "🍲 Ninh Nước Dùng Xương Hầm",
-        desc: "Mỗi sáng mở quán, việc đầu tiên là nhấn nút này để ninh một nồi nước dùng 7 cấp độ thơm lừng và nhận mì sợi tươi ngon!",
-        mascotQuote: "Nước hầm xương 12 tiếng cùng thảo mộc bí truyền, khách ăn là mê tít! ✨",
-        placement: "bottom"
-      },
-      {
         target: "#chalkboard-banner",
         title: "📋 Menu Hôm Nay & Hot Combo",
         desc: "Bảng phấn hiển thị thực đơn mì cay và topping nhúng niêu đất. Phục vụ đúng 'Món đặc biệt hôm nay' sẽ nhận thêm 20% tiền tip từ khách!",
@@ -59,14 +53,21 @@ export class txacoachmark {
         placement: "bottom"
       },
       {
-        target: ".nav-grid-container",
+        target: ".game-nav-grid",
         title: "🏪 8 Khu Vực Quản Lý & Kho Hàng",
         desc: "Bấm vào các tab để mua nguyên liệu dự trữ, mở rộng bàn ghế gỗ, nâng cấp bếp niêu đất, và thuê nhân viên Mèo Mochi, Thỏ Usagi bưng bê phụ quán!",
         mascotQuote: "Thuê bé Mochi đón khách sẽ giúp tăng tới 25% tiền tip mỗi tô mì luôn đấy! 🐱",
         placement: "top"
       },
       {
-        target: "#btn-quick-open-day, #btn-primary-action",
+        target: "#btn-brew-supplies",
+        title: "🍲 Ninh Nước Dùng Xương Hầm",
+        desc: "Mỗi sáng mở quán, việc đầu tiên là nhấn nút này để ninh một nồi nước dùng 7 cấp độ thơm lừng và chuẩn bị sẵn mì sợi tươi ngon!",
+        mascotQuote: "Nước hầm xương 12 tiếng cùng thảo mộc bí truyền, khách ăn là mê tít! ✨",
+        placement: "top"
+      },
+      {
+        target: "#btn-quick-open-day",
         title: "✨ Mở Cửa Phục Vụ Thực Khách!",
         desc: "Khi đã có đủ nước dùng và chuẩn bị chu đáo, nhấn 'Mở Cửa Bán Hàng' để đón những vị thực khách đầu tiên vào ăn mì xì xèo nhé!",
         mascotQuote: "Chúc Bếp Trưởng buôn may bán đắt, khách vào nườm nượp thả tim 5 sao nha! 🎉🍜",
@@ -154,21 +155,23 @@ export class txacoachmark {
     const isLast = index === this.steps.length - 1;
 
     // Đảm bảo ở chế độ Chuẩn bị và mở đúng tab Kho nếu target là nút kho/mở cửa
-    if (window.game && (step.target.includes("btn-brew") || step.target.includes("quick-open"))) {
-      if (window.game.switchTab) window.game.switchTab("kho");
+    if (window.game) {
+      if (step.target.includes("btn-brew") || step.target.includes("quick-open")) {
+        if (window.game.switchTab) window.game.switchTab("tab-kho");
+      }
     }
 
     let targetEl = document.querySelector(step.target);
 
-    // Nếu target không tồn tại (ví dụ đang ở view khác), chuyển về prep view
-    if (!targetEl && window.game) {
-      if (window.game.switchTab) window.game.switchTab("kho");
+    // Nếu target không tồn tại, mở lại tab Kho
+    if (!targetEl && window.game && window.game.switchTab) {
+      window.game.switchTab("tab-kho");
       targetEl = document.querySelector(step.target);
     }
 
-    // Cuộn nhẹ nhàng đến phần tử nếu cần
+    // Cuộn tức thì đến phần tử để lấy tọa độ chuẩn xác tuyệt đối
     if (targetEl) {
-      targetEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+      targetEl.scrollIntoView({ behavior: "auto", block: "center", inline: "nearest" });
     }
 
     // Render HTML nội dung thẻ Mascot Coachmark
@@ -208,10 +211,14 @@ export class txacoachmark {
       </div>
     `;
 
-    // Cập nhật vị trí spotlight và card
-    setTimeout(() => {
+    // Cập nhật vị trí spotlight và card ngay lập tức & kiểm tra lại sau 1 tick
+    requestAnimationFrame(() => {
       this.updatePosition(targetEl, step.placement);
-    }, 60);
+      setTimeout(() => {
+        const recheckTarget = document.querySelector(step.target);
+        this.updatePosition(recheckTarget, step.placement);
+      }, 50);
+    });
 
     // Gắn sự kiện cho các nút trong card
     const btnNext = document.getElementById("btn-txa-coach-next");
@@ -245,7 +252,7 @@ export class txacoachmark {
   }
 
   /**
-   * Định vị spotlight bao quanh target và thẻ hướng dẫn
+   * Định vị spotlight bao quanh target và thẻ hướng dẫn chính xác
    */
   updatePosition(targetEl, preferredPlacement = "bottom") {
     if (!this.overlayEl || !this.spotlightEl || !this.cardEl) return;
@@ -259,9 +266,17 @@ export class txacoachmark {
       return;
     }
 
-    this.spotlightEl.style.display = "block";
     const rect = targetEl.getBoundingClientRect();
-    const pad = 6;
+    if (rect.width === 0 || rect.height === 0) {
+      this.spotlightEl.style.display = "none";
+      this.cardEl.style.top = "50%";
+      this.cardEl.style.left = "50%";
+      this.cardEl.style.transform = "translate(-50%, -50%)";
+      return;
+    }
+
+    this.spotlightEl.style.display = "block";
+    const pad = 8;
 
     // Vị trí và kích thước của spotlight
     const spotTop = Math.max(0, rect.top - pad);
@@ -276,26 +291,27 @@ export class txacoachmark {
 
     // Tính toán vị trí card sao cho không tràn màn hình
     const cardRect = this.cardEl.getBoundingClientRect();
+    const cardWidth = cardRect.width || 360;
+    const cardHeight = cardRect.height || 220;
     const viewWidth = window.innerWidth;
     const viewHeight = window.innerHeight;
 
-    let cardLeft = rect.left + rect.width / 2 - cardRect.width / 2;
+    let cardLeft = rect.left + rect.width / 2 - cardWidth / 2;
     // Giữ lề hai bên ít nhất 16px
-    cardLeft = Math.max(16, Math.min(cardLeft, viewWidth - cardRect.width - 16));
+    cardLeft = Math.max(16, Math.min(cardLeft, viewWidth - cardWidth - 16));
 
     let cardTop;
     const spaceBelow = viewHeight - (spotTop + spotHeight);
     const spaceAbove = spotTop;
 
-    if (preferredPlacement === "top" && spaceAbove > cardRect.height + 20) {
-      cardTop = spotTop - cardRect.height - 14;
-    } else if (spaceBelow > cardRect.height + 20) {
-      cardTop = spotTop + spotHeight + 14;
-    } else if (spaceAbove > cardRect.height + 20) {
-      cardTop = spotTop - cardRect.height - 14;
+    if (preferredPlacement === "top" && spaceAbove > cardHeight + 20) {
+      cardTop = spotTop - cardHeight - 16;
+    } else if (spaceBelow > cardHeight + 20) {
+      cardTop = spotTop + spotHeight + 16;
+    } else if (spaceAbove > cardHeight + 20) {
+      cardTop = spotTop - cardHeight - 16;
     } else {
-      // Nếu cả hai đều hẹp, căn giữa màn hình
-      cardTop = Math.max(16, (viewHeight - cardRect.height) / 2);
+      cardTop = Math.max(16, (viewHeight - cardHeight) / 2);
     }
 
     this.cardEl.style.top = `${cardTop}px`;
@@ -349,12 +365,22 @@ export class txacoachmark {
   bindEvents() {
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("resize", this.handleResize);
-    window.addEventListener("scroll", this.handleResize, true);
+
+    const scrollBody = document.getElementById("game-scroll-body");
+    if (scrollBody) {
+      scrollBody.addEventListener("scroll", this.handleResize, { passive: true });
+    }
+    window.addEventListener("scroll", this.handleResize, { passive: true, capture: true });
   }
 
   unbindEvents() {
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("resize", this.handleResize);
+
+    const scrollBody = document.getElementById("game-scroll-body");
+    if (scrollBody) {
+      scrollBody.removeEventListener("scroll", this.handleResize);
+    }
     window.removeEventListener("scroll", this.handleResize, true);
   }
 
@@ -371,10 +397,13 @@ export class txacoachmark {
 
   handleResize() {
     if (!this.isActive) return;
-    const step = this.steps[this.currentStep];
-    if (step) {
-      const targetEl = document.querySelector(step.target);
-      this.updatePosition(targetEl, step.placement);
-    }
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.rafId = requestAnimationFrame(() => {
+      const step = this.steps[this.currentStep];
+      if (step) {
+        const targetEl = document.querySelector(step.target);
+        this.updatePosition(targetEl, step.placement);
+      }
+    });
   }
 }

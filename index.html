@@ -643,8 +643,24 @@
                     </div>
                   </div>
 
-                  <!-- Pane 2: Chọn Mì -->
+                  <!-- Pane 2: Chọn Mì & Chọn Ngay Độ Cay -->
                   <div class="dock-pane" id="pane-dock-noodle" style="display: none;">
+                    <!-- Thanh Chọn Cấp Độ Cay & Size Ngay Trong Khung Chọn Mì -->
+                    <div class="noodle-dock-spicy-bar">
+                      <div class="dock-spicy-size-row inline-noodle-spicy">
+                        <div class="spicy-row-size-block">
+                          <span class="spicy-block-label">Size:</span>
+                          <button class="btn-step-pill active" id="btn-size-m-inline" data-size="M" onclick="window.game.selectPotSize('M')">Niêu M</button>
+                          <button class="btn-step-pill" id="btn-size-l-inline" data-size="L" onclick="window.game.selectPotSize('L')">Niêu L +7k</button>
+                        </div>
+                        <div class="spicy-row-levels-block">
+                          <span class="spicy-block-label">🌶️ Cấp Cay (0 - 7):</span>
+                          <div class="step-options-row spicy-levels-row" id="spicy-levels-options-inline">
+                            <!-- Render các nút cấp cay 0 đến 7 ngay tại đây -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="step-ingredients-grid" id="cooking-noodles-grid">
                       <!-- Render các món mì kèm badge số lượng tồn kho -->
                     </div>
@@ -970,6 +986,14 @@
           </button>
         </div>
 
+        <!-- Mã QR Chơi Game Cùng Bạn Bè -->
+        <div class="setting-row">
+          <label><span>📱</span> Chia sẻ bạn bè:</label>
+          <button id="btn-open-qr-modal" class="btn-secondary-link" style="color: var(--accent-berry); font-weight: 800;">
+            Mã QR Chơi Cùng Bạn Bè
+          </button>
+        </div>
+
         <!-- Chơi lại từ đầu -->
         <div class="setting-row" style="border-bottom: none; margin-top: 10px;">
           <label><span>⚠️</span> Dữ liệu trò chơi:</label>
@@ -977,6 +1001,47 @@
             Xóa Dữ Liệu & Chơi Lại
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       12.1 MODAL MÃ QR CHƠI GAME VỚI BẠN BÈ (TXAQR)
+       ========================================================== -->
+  <div id="modal-qr-share" class="modal-overlay" style="display: none;">
+    <div class="modal-dialog" style="max-width: 420px; text-align: center;">
+      <div class="modal-header">
+        <h3>📱 Rủ Bạn Bè Chơi Tiệm Mỳ Cay</h3>
+        <button id="btn-close-qr-modal" class="btn-modal-close">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 14px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+        <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.45;">
+          Quét mã QR bằng Camera điện thoại hoặc Zalo để cùng mở quán mì và tranh tài Bếp Trưởng 7 cấp độ nhé! 🍜✨
+        </p>
+
+        <!-- Khung Canvas Mã QR với Logo ở giữa -->
+        <div class="qr-code-frame">
+          <canvas id="qr-code-canvas" width="300" height="300"></canvas>
+        </div>
+
+        <!-- Thanh URL & Nút Sao Chép -->
+        <div class="qr-url-box">
+          <input type="text" id="qr-share-url-input" readonly value="" />
+          <button id="btn-copy-qr-url" class="btn-copy-link" title="Sao chép liên kết">
+            📋 Sao chép
+          </button>
+        </div>
+
+        <!-- Cụm Nút Hành Động: Tải Xuống -->
+        <div class="qr-actions-row">
+          <button id="btn-download-qr" class="btn-primary-action-lg">
+            📥 Tải Mã QR Về Máy
+          </button>
+        </div>
+
+        <!-- Thông Báo Rõ Ràng Trạng Thái Tải -->
+        <div id="qr-download-status" class="qr-status-feedback"></div>
       </div>
     </div>
   </div>

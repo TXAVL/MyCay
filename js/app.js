@@ -8,6 +8,7 @@ import { NameValidator } from "./filter.js";
 import { SpicyNoodleGame } from "./game.js";
 import { txatheme } from "./txatheme.js";
 import { txacoachmark } from "./txacoachmark.js";
+import { txaqr } from "./txaqr.js";
 import { GameUIModal } from "./modal.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -376,6 +377,80 @@ document.addEventListener("DOMContentLoaded", () => {
       if (box) box.style.display = "none";
       const glowBtn = document.querySelector(".btn-stepper.highlight-glow");
       if (glowBtn) glowBtn.classList.remove("highlight-glow");
+    });
+  }
+
+  // 6. Modal Mã QR Chơi Cùng Bạn Bè (txaqr)
+  const modalQrShare = document.getElementById("modal-qr-share");
+  const btnOpenQrModal = document.getElementById("btn-open-qr-modal");
+  const btnCloseQrModal = document.getElementById("btn-close-qr-modal");
+  const qrCanvas = document.getElementById("qr-code-canvas");
+  const qrUrlInput = document.getElementById("qr-share-url-input");
+  const btnCopyQrUrl = document.getElementById("btn-copy-qr-url");
+  const btnDownloadQr = document.getElementById("btn-download-qr");
+  const qrDownloadStatus = document.getElementById("qr-download-status");
+
+  function openQrModal() {
+    if (!modalQrShare || !qrCanvas) return;
+    if (settingsModal) settingsModal.style.display = "none";
+    modalQrShare.style.display = "flex";
+    if (game.sound) game.sound.playReviewChime();
+
+    const shareUrl = window.location.origin + window.location.pathname;
+    if (qrUrlInput) qrUrlInput.value = shareUrl;
+    if (qrDownloadStatus) {
+      qrDownloadStatus.textContent = "";
+      qrDownloadStatus.className = "qr-status-feedback";
+    }
+
+    // Render mã QR độc lập với logo ở giữa
+    txaqr.renderToCanvas(qrCanvas, shareUrl, "assets/logo.png");
+  }
+
+  if (btnOpenQrModal) {
+    btnOpenQrModal.addEventListener("click", openQrModal);
+  }
+
+  if (btnCloseQrModal) {
+    btnCloseQrModal.addEventListener("click", () => {
+      modalQrShare.style.display = "none";
+      if (game.sound) game.sound.playButtonClick();
+    });
+  }
+
+  if (modalQrShare) {
+    modalQrShare.addEventListener("click", (e) => {
+      if (e.target === modalQrShare) {
+        modalQrShare.style.display = "none";
+      }
+    });
+  }
+
+  if (btnCopyQrUrl) {
+    btnCopyQrUrl.addEventListener("click", async () => {
+      const shareUrl = qrUrlInput ? qrUrlInput.value : window.location.href;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        GameUIModal.showToast("Đã sao chép link game vào bộ nhớ tạm!", "success", "📋");
+      } catch (err) {
+        if (qrUrlInput) {
+          qrUrlInput.select();
+          document.execCommand("copy");
+          GameUIModal.showToast("Đã sao chép link game!", "success", "📋");
+        }
+      }
+    });
+  }
+
+  if (btnDownloadQr) {
+    btnDownloadQr.addEventListener("click", () => {
+      if (game.sound) game.sound.playButtonClick();
+      const res = txaqr.downloadQR(qrCanvas, "tiem-my-cay-qr.png");
+      if (qrDownloadStatus) {
+        qrDownloadStatus.textContent = res.message;
+        qrDownloadStatus.className = res.success ? "qr-status-feedback success" : "qr-status-feedback error";
+      }
+      GameUIModal.showToast(res.message, res.success ? "success" : "warning", res.success ? "📥" : "⚠️");
     });
   }
 

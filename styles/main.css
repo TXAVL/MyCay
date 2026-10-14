@@ -2169,27 +2169,26 @@ html, body {
 /* 0. Dải Bếp & Nhân Viên Làm Việc Thực Tế */
 .active-staff-kitchen-bar {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 4px 2px 10px;
-  scrollbar-width: none;
-}
-
-.active-staff-kitchen-bar::-webkit-scrollbar {
-  display: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0 8px;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .kitchen-worker-pill {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: #FFFFFF;
+  gap: 5px;
+  background: var(--bg-card, #FFFFFF);
   border: 1.5px solid var(--border-card);
   border-radius: var(--radius-pill);
-  padding: 4px 10px 4px 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  padding: 3px 8px 3px 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   white-space: nowrap;
   animation: workerBounce 2.5s infinite alternate ease-in-out;
+  flex-shrink: 0;
 }
 
 @keyframes workerBounce {
@@ -2198,27 +2197,30 @@ html, body {
 }
 
 .worker-avatar {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   object-fit: cover;
   background: var(--bg-tray);
   border: 1px solid var(--border-btn);
+  flex-shrink: 0;
 }
 
 .worker-name {
   font-size: 11px;
   font-weight: 800;
   color: var(--text-title);
+  line-height: 1;
 }
 
 .worker-role {
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
   background: #EAF5EE;
   color: #227554;
   padding: 1px 5px;
-  border-radius: 6px;
+  border-radius: 5px;
+  line-height: 1.2;
 }
 
 /* Đơn Hàng Shipper Trực Tiếp Trong Ca Bán */
@@ -5617,9 +5619,7 @@ html, body {
   position: fixed;
   inset: 0;
   z-index: 99998;
-  background: rgba(12, 10, 9, 0.72);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  background: transparent;
   pointer-events: auto;
   transition: opacity 0.3s ease;
 }
@@ -5627,11 +5627,11 @@ html, body {
 .txa-coachmark-spotlight {
   position: fixed;
   z-index: 99999;
-  border-radius: 16px;
-  box-shadow: 0 0 0 9999px rgba(12, 10, 9, 0.72), 0 0 24px rgba(255, 193, 7, 0.85);
+  border-radius: 14px;
+  box-shadow: 0 0 0 9999px rgba(12, 10, 9, 0.76), 0 0 24px rgba(255, 193, 7, 0.85);
   border: 3px solid #FFC107;
   pointer-events: none;
-  transition: all 0.38s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: top 0.22s ease-out, left 0.22s ease-out, width 0.22s ease-out, height 0.22s ease-out;
   animation: txaSpotlightPulse 2s infinite ease-in-out;
 }
 
@@ -5863,6 +5863,170 @@ html, body {
   from { opacity: 0; transform: scale(0.92); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* ==========================================================
+   18. THANH CHỌN ĐỘ CAY TRỰC TIẾP TRONG TAB CHỌN MÌ
+   ========================================================== */
+.noodle-dock-spicy-bar {
+  background: var(--bg-tray, #F9F2E7);
+  border: 1.5px solid var(--border-card, #E2CEB9);
+  border-radius: 14px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.inline-noodle-spicy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 480px) {
+  .inline-noodle-spicy {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.inline-noodle-spicy .spicy-row-size-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-noodle-spicy .spicy-row-levels-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================
+   19. MODAL MÃ QR CHƠI GAME VỚI BẠN BÈ (TXAQR)
+   ========================================================== */
+.qr-code-frame {
+  background: #FFFFFF;
+  padding: 14px;
+  border-radius: 18px;
+  border: 2px solid var(--border-card, #E2CEB9);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+}
+
+#qr-code-canvas {
+  width: 220px;
+  height: 220px;
+  max-width: 100%;
+  display: block;
+  border-radius: 8px;
+}
+
+.qr-url-box {
+  display: flex;
+  width: 100%;
+  max-width: 320px;
+  gap: 6px;
+  background: var(--bg-tray, #F9F2E7);
+  border: 1px solid var(--border-subtle, #E8DCCB);
+  border-radius: var(--radius-pill, 999px);
+  padding: 4px 6px;
+}
+
+#qr-share-url-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: inherit;
+  padding-left: 8px;
+  text-overflow: ellipsis;
+}
+
+.btn-copy-link {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-btn, #D4C3AF);
+  color: var(--text-title);
+  border-radius: var(--radius-pill, 999px);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-copy-link:hover {
+  background: var(--accent-berry);
+  color: #FFFFFF;
+  border-color: var(--accent-berry);
+}
+
+.qr-actions-row {
+  width: 100%;
+  max-width: 320px;
+}
+
+.btn-primary-action-lg {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent-berry, #C44569) 0%, #E84118 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-pill, 999px);
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(196, 69, 105, 0.4);
+  transition: transform 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary-action-lg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(196, 69, 105, 0.5);
+}
+
+.btn-primary-action-lg:active {
+  transform: translateY(0);
+}
+
+.qr-status-feedback {
+  font-size: 12.5px;
+  font-weight: 700;
+  min-height: 20px;
+  transition: all 0.25s;
+}
+
+.qr-status-feedback.success {
+  color: #27AE60;
+}
+
+.qr-status-feedback.error {
+  color: #E74C3C;
+}
+
+.staff-lock-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #8C7B75;
+  background: #EFEBE9;
+  border: 1px solid #D7CCC8;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill, 999px);
+  white-space: nowrap;
+}
+
 
 
 

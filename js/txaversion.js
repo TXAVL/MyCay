@@ -3,42 +3,49 @@
 
 export class txaversion {
   constructor(version, versionCode, releaseDate, features = []) {
-    this.version = version; // Ví dụ: "1.3.0"
-    this.versionCode = versionCode; // Ví dụ: 130
+    this.version = version; // Ví dụ: "1.4.0"
+    this.versionCode = versionCode; // Ví dụ: 140
     this.releaseDate = releaseDate;
     this.features = features; // Danh sách { title, desc, icon, badge }
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.3.0 - Đại Tiệc Đa Sắc Theme & Hướng Dẫn txacoachmark)
+  // Khai báo phiên bản hiện tại của game (Bản 1.4.0 - Mã QR Chơi Cùng Bạn Bè & Cân Bằng Độ Khó)
   static get CURRENT_VERSION() {
-    return new txaversion("1.3.0", 130, "14/10/2026", [
+    return new txaversion("1.4.0", 140, "14/10/2026", [
       {
-        title: "Bộ Sưu Tập 5 Giao Diện Theme Tuyệt Sắc",
-        desc: "Thỏa sức biến hóa tiệm mì với 5 phong cách: Ấm Áp Cozy truyền thống, Phố Đêm Tokyo (Dark Mode huyền ảo), Hoa Anh Đào Pastel ngọt ngào, Lửa Cay Habanero rực cháy và Trà Xanh Matcha thanh tịnh!",
-        icon: "🎨",
-        badge: "Đại Tiệc Mới 🔥",
+        title: "Mã QR Rủ Bạn Bè & Tải Ảnh Sắc Nét",
+        desc: "Mở Cài Đặt để lấy mã QR kèm Logo Tiệm Mỳ Cay ở chính giữa! Bạn bè có thể dùng Camera hoặc Zalo quét mã để chơi ngay. Có sẵn nút tải ảnh PNG sắc nét và báo rõ trạng thái tải!",
+        icon: "📱",
+        badge: "Tính năng mới 🔥",
         badgeType: "hot"
       },
       {
-        title: "Hệ Thống Hướng Dẫn Spotlight txacoachmark",
-        desc: "Bé Mèo Mochi trực tiếp dắt tay Bếp Trưởng qua từng góc quán: cách ninh nước dùng 7 cấp, xem menu bảng đen, quản lý 8 khu vực và bấm mở cửa đón khách!",
-        icon: "🧭",
-        badge: "Độc quyền 🌟",
-        badgeType: "visual"
+        title: "Chọn Cấp Độ Cay & Size Ngay Trong Khung Chọn Mì",
+        desc: "Không cần phải chuyển tab hay cuộn xuống cuối! Giờ đây khi bấm vào Mì, thanh chọn Độ Cay (0 - 7) và Size Niêu (M / L) xuất hiện ngay phía trên để bạn thao tác thần tốc!",
+        icon: "🌶️",
+        badge: "Tiện lợi ⚡",
+        badgeType: "manage"
       },
       {
-        title: "Nghi Thức Khai Trương & Đặt Tên Quán",
-        desc: "Quy trình khai trương chuẩn chỉ! Ngay sau khi đọc tin mới, Bếp Trưởng sẽ được mời đặt tên tiệm mỳ để khắc lên biển hiệu gỗ trước khi chính thức vào bếp!",
-        icon: "🏮",
-        badge: "Khai trương 🎉",
+        title: "Cân Bằng Kinh Doanh & Thử Thách Mới",
+        desc: "Nâng cấp và thuê nhân viên giờ đây cần tích lũy vốn và mở khóa theo từng Ngày kinh doanh! Từ Ngày 2, quán bắt đầu tính chi phí mặt bằng & điện nước vận hành thực tế!",
+        icon: "📈",
+        badge: "Thử thách 🪙",
         badgeType: "star"
       },
       {
-        title: "Nút Đổi Theme Nhanh & Bảng Màu Trực Quan",
-        desc: "Bấm nút 🎨 trên thanh Header để chuyển nhanh theme tức thì, hoặc mở Cài Đặt để chiêm ngưỡng các bảng màu xem trước cực kỳ mượt mà!",
-        icon: "⚡",
-        badge: "Tiện lợi ✨",
-        badgeType: "manage"
+        title: "Gọn Gàng Quầy Bếp & Nhân Viên",
+        desc: "Khắc phục triệt để lỗi tràn ngang khi thuê nhiều nhân viên! Các thẻ nhân viên Mèo Mochi, Gấu Kenji, Thỏ Usagi tự động co giãn và xuống dòng thẩm mỹ 100% không còn ô cuộn ngang thừa!",
+        icon: "🐾",
+        badge: "Gọn gàng ✨",
+        badgeType: "visual"
+      },
+      {
+        title: "Căn Chuẩn Spotlight Tân Thủ txacoachmark",
+        desc: "Sửa hoàn toàn lỗi spotlight hướng dẫn trôi nổi giữa không trung! Khung viền vàng nổi bật giờ đây bám sát chuẩn xác từng nút chức năng và quầy quản lý của quán!",
+        icon: "🧭",
+        badge: "Tối ưu 🌟",
+        badgeType: "visual"
       }
     ]);
   }
@@ -47,6 +54,15 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion("1.3.0", 130, "14/10/2026", [
+        {
+          title: "Bộ Sưu Tập 5 Giao Diện Theme Tuyệt Sắc",
+          desc: "Thỏa sức biến hóa tiệm mì với 5 phong cách: Ấm Áp Cozy truyền thống, Phố Đêm Tokyo, Hoa Anh Đào Pastel, Lửa Cay và Trà Xanh Matcha!",
+          icon: "🎨",
+          badge: "Bản 1.3.0",
+          badgeType: "hot"
+        }
+      ]),
       new txaversion("1.2.0", 120, "13/10/2026", [
         {
           title: "Sân Khấu Phố Xá & Khách Dạo Phố Tấp Nập",
@@ -87,10 +103,10 @@ export class txaversion {
     const current = txaversion.CURRENT_VERSION;
     return `
       <div class="version-banner">
-        <div class="version-banner-icon">🏮</div>
+        <div class="version-banner-icon">🍜</div>
         <div class="version-banner-info">
           <div class="version-pill-tag">BẢN NÂNG CẤP MỚI v${current.version}</div>
-          <h3 class="version-heading">Đại Tiệc Đa Sắc Theme & txacoachmark</h3>
+          <h3 class="version-heading">Mã QR Bạn Bè & Cân Bằng Kinh Doanh</h3>
           <span class="version-date">📅 Phát hành: ${current.releaseDate} · Bản chính thức</span>
         </div>
       </div>
