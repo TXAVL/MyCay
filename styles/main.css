@@ -2017,55 +2017,7 @@ html, body {
   cursor: pointer;
 }
 
-/* ==========================================================
-   15. TOAST & FLOATING FX
-   ========================================================== */
-.game-toast-container {
-  position: fixed;
-  top: 75px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999999;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
-  max-width: 400px;
-  width: 90%;
-}
 
-.game-toast {
-  pointer-events: auto;
-  background: var(--bg-card);
-  border: 1.5px solid var(--border-card);
-  border-radius: 14px;
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  font-weight: 800;
-  font-size: 13px;
-  color: var(--text-title);
-}
-
-.anime-toast-slide-in {
-  animation: slideDownToast 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.anime-toast-slide-out {
-  animation: fadeOutToast 0.3s forwards;
-}
-
-@keyframes slideDownToast {
-  0% { opacity: 0; transform: translateY(-16px) scale(0.95); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes fadeOutToast {
-  0% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.95); }
-}
 
 /* Hiệu ứng cánh hoa anh đào */
 #sakura-particles {
@@ -3057,18 +3009,19 @@ html, body {
 }
 
 .custom-dialog-box {
-  background: #FFFDF9;
+  background: var(--bg-card);
   border: 2px solid var(--border-card);
   border-radius: 24px;
   padding: 26px 22px 22px;
   width: 100%;
   max-width: 380px;
-  box-shadow: 0 16px 40px rgba(50, 30, 15, 0.25), 0 2px 6px rgba(50, 30, 15, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   position: relative;
+  color: var(--text-title);
 }
 
 .anime-bounce-in {
@@ -3192,55 +3145,89 @@ html, body {
   z-index: 9999999;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   pointer-events: none;
-  max-width: 90%;
-  width: 380px;
+  max-width: 92%;
+  width: 400px;
 }
 
 .game-toast {
   pointer-events: auto;
-  background: rgba(255, 253, 249, 0.96);
+  background: var(--bg-card);
   border: 1.5px solid var(--border-card);
-  border-radius: 18px;
-  padding: 10px 16px;
+  border-radius: 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 8px 24px rgba(60, 35, 15, 0.18);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-title);
+  min-height: 52px;
 }
 
 .toast-icon-wrap {
   font-size: 22px;
   line-height: 1;
   flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
 }
 
 .toast-msg-text {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 13.5px;
+  font-weight: 800;
   color: var(--text-title);
-  line-height: 1.35;
+  line-height: 1.4;
   flex: 1;
+  word-break: break-word;
 }
 
 .toast-success {
-  border-left: 5px solid #258A6D;
+  border-left: 5px solid #10B981;
+}
+.toast-success .toast-icon-wrap {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.35);
 }
 
 .toast-warning {
-  border-left: 5px solid #E5A83B;
+  border-left: 5px solid #F59E0B;
+}
+.toast-warning .toast-icon-wrap {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.35);
 }
 
 .toast-error {
-  border-left: 5px solid #B8384E;
+  border-left: 5px solid #EF4444;
+}
+.toast-error .toast-icon-wrap {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.toast-info {
+  border-left: 5px solid #0EA5E9;
+}
+.toast-info .toast-icon-wrap {
+  background: rgba(14, 165, 233, 0.18);
+  border-color: rgba(14, 165, 233, 0.35);
 }
 
 .toast-coin {
-  border-left: 5px solid #E5A83B;
-  background: rgba(255, 251, 240, 0.98);
+  border-left: 5px solid #F59E0B;
+}
+.toast-coin .toast-icon-wrap {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
 }
 
 .anime-toast-slide-in {
@@ -3797,23 +3784,23 @@ html, body {
 }
 
 .reply-chip {
-  background: #FFFDF9;
-  border: 1px solid #E5C3A6;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-pill);
-  padding: 4px 10px;
+  padding: 5px 12px;
   font-size: 11px;
   font-weight: 700;
-  color: #5A2A18;
+  color: var(--text-title);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 1px 3px rgba(90, 42, 24, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   user-select: none;
 }
 
 .reply-chip:hover {
-  background: #FFF8E7;
+  background: var(--bg-card);
   border-color: #E67E22;
-  color: #D35400;
+  color: #E67E22;
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(230, 126, 34, 0.25);
 }
@@ -4400,7 +4387,7 @@ html, body {
 
 /* Phòng ăn gỗ sồi thu nhỏ trong Prep Mode - Tối ưu không gian & Bố cục gọn gàng */
 .prep-dining-preview-strip {
-  background: #FFFDF9;
+  background: var(--bg-card);
   border-top: 1.5px solid var(--border-card);
   padding: 8px 12px;
 }
@@ -4978,18 +4965,18 @@ html, body {
    ========================================================== */
 #modal-version-update .modal-dialog {
   max-width: 520px;
-  background: #FFFDF9;
-  border: 2px solid #EAD8C7;
+  background: var(--bg-card);
+  border: 2px solid var(--border-card);
   border-radius: 20px;
   padding: 0;
   overflow: hidden;
-  box-shadow: 0 16px 40px rgba(59, 24, 14, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 }
 
 #modal-version-update .modal-header {
   padding: 14px 18px;
-  background: #FAF2E8;
-  border-bottom: 1.5px solid #EAD8C7;
+  background: var(--bg-card-subtle);
+  border-bottom: 1.5px solid var(--border-card);
   display: flex;
   justify-content: space-between;
   align-items: center;
