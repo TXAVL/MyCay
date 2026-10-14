@@ -1,0 +1,16 @@
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: microphone=(), camera=()
+
+/*.js
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Content-Type: application/javascript; charset=utf-8
+
+/*.css
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Content-Type: text/css; charset=utf-8
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Tiệm Mỳ Cay - Quán Mỳ Cay 7 Cấp Độ & Quầy Trà Giải Cay</title>
+  <meta name="description" content="Trò chơi mô phỏng quản lý Tiệm Mỳ Cay 7 cấp độ phong cách Cozy Anime. Nấu niêu đất nóng hổi, phục vụ khách thú cưng dễ thương, mở rộng quán và quầy nước giải cay!" />
+  <meta name="theme-color" content="#F6F0E6" />
+
+  <!-- Google Fonts: Quicksand & Nunito chuẩn phong cách Cozy Anime -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Favicon & PWA Icons -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+  <!-- Hiệu ứng cánh hoa anh đào lơ lửng -->
+  <div id="sakura-particles"></div>
+
+  <!-- ==========================================================
+       1. MÀN HÌNH LOADING COZY
+       ========================================================== -->
+  <div id="loading-screen">
+    <div class="loading-container">
+      <div class="loading-anime-pot">
+        <span class="loading-teapot-emoji">🍜</span>
+      </div>
+      <h2 class="loading-title">Tiệm Mỳ Cay</h2>
+      <p class="loading-subtitle">Hương vị cay nồng ấm bụng sưởi ấm những ngày mưa 🌧️✨</p>
+
+      <div class="loading-progress-track">
+        <div id="loading-progress-fill" class="loading-progress-fill"></div>
+      </div>
+
+      <div class="loading-status-row">
+        <span>Đang ninh nước dùng & chuẩn bị niêu đất...</span>
+        <span id="loading-percent">0%</span>
+      </div>
+
+      <div class="loading-tip-box">
+        💡 <span id="loading-tip-text">Đang ninh nước dùng xương hầm cùng thảo mộc thơm lừng...</span>
+      </div>
+
+      <button id="btn-start-play" class="btn-start-play">
+        🍜 VÀO TIỆM MỲ NGAY!
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       2. KHUNG ỨNG DỤNG CHÍNH (MOBILE VIEWPORT FRAME)
+       ========================================================== -->
+  <div class="game-viewport-wrapper">
+    <div class="game-phone-frame">
+
+      <!-- HEADER TOP (3 CỘT CHUẨN ẢNH THỰC TẾ) -->
+      <header class="game-top-header">
+        <div class="header-col-left">
+          <div class="header-left-wrap">
+            <button class="header-pause-btn" id="btn-header-pause" style="display: none;" title="Tạm dừng ca bán">⏸️</button>
+            <div class="shop-owner-avatar-box" id="btn-owner-profile" title="Hồ sơ chủ quán mì">
+              <img src="assets/cust_cat.png" alt="Chủ tiệm" class="owner-avatar-img" id="header-owner-avatar" onerror="this.src='assets/cust_cat.png'" />
+              <span class="owner-crown-badge">🧑‍🍳</span>
+            </div>
+            <div class="shop-name-block">
+              <div class="shop-name-row" id="btn-trigger-rename" title="Bấm để đổi tên tiệm">
+                <h1 id="display-shop-name">Tiệm Mỳ Cay</h1>
+                <span class="shop-pencil-icon">✏️</span>
+              </div>
+              <div class="shop-day-sub" id="display-day-status">Ngày 1 · Chuẩn bị</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-col-center">
+          <div class="header-time-title" id="display-day-timer">4 phút</div>
+          <div class="header-money-val" id="display-money">400.000đ</div>
+        </div>
+
+        <div class="header-col-right">
+          <div class="header-stars-row" id="display-stars">★★★★☆</div>
+          <div class="header-reviews-sub" id="display-reviews-count">0 đánh giá</div>
+          <button id="btn-open-settings" class="btn-settings-gear" title="Cài đặt game">
+            ⚙️
+          </button>
+        </div>
+      </header>
+
+      <!-- SCROLLABLE CONTENT BODY -->
+      <div class="game-scroll-body" id="game-scroll-body">
+
+        <!-- ==========================================================
+             VIEW 1: CHẾ ĐỘ CHUẨN BỊ (PREP MODE - 8 TAB QUẢN LÝ TIỆM)
+             ========================================================== -->
+        <div id="view-prep-mode">
+
+          <!-- 3. BẢNG ĐEN MENU HÔM NAY (CHALKBOARD GREEN BANNER) -->
+          <section class="chalkboard-card" id="chalkboard-banner">
+            <div class="chalkboard-pill-badge" id="btn-chalkboard-rename" title="Bấm để đổi tên tiệm">
+              <span id="badge-chalk-name">✏️ Đổi Tên Tiệm</span>
+            </div>
+
+            <h2 class="chalkboard-title">📋 Menu hôm nay</h2>
+
+            <!-- Danh sách món mì cay đang bán hôm nay (Mì cay bò Mỹ 40k, Mì cay hải sản 45k...) -->
+            <div class="chalkboard-menu-list" id="chalkboard-menu-list">
+              <!-- Render động bằng JS -->
+            </div>
+
+            <!-- Dòng Topping -->
+            <div class="chalkboard-topping-row">
+              <span class="chalkboard-topping-label">Topping</span>
+              <div class="chalkboard-pills-wrap" id="chalkboard-toppings-wrap">
+                <!-- Render động: Bò mềm +15k, Tôm sú +25k, Phô mai +20k... -->
+              </div>
+            </div>
+
+            <!-- Dòng ghi chú chân bảng -->
+            <div class="chalkboard-footer-note" id="chalkboard-footer-note">
+              Cấp độ 0 - 7 · 4 phút một ngày
+            </div>
+          </section>
+
+          <!-- 4. THẺ MÓN ĐẶC BIỆT HÔM NAY (HOT SPECIAL DISH COMBO) -->
+          <section class="special-dish-card" id="special-dish-banner">
+            <div class="special-dish-header">
+              <div class="special-dish-tag">
+                <span class="star-icon">★</span>
+                <span class="special-dish-label">Món đặc biệt hôm nay</span>
+              </div>
+              <span class="special-dish-hot-badge">✨ HOT COMBO</span>
+            </div>
+            <div class="special-dish-content" id="display-special-combo">
+              Mì cay hải sản · Cấp 3 · Thêm Phô mai kéo sợi
+            </div>
+            <div class="special-dish-footer">
+              <span class="special-dish-streak" id="display-special-streak">Điểm danh 0 ngày</span>
+              <span class="special-dish-buff">🔥 +20% Tip & Khách Ưu Tiên</span>
+            </div>
+          </section>
+
+          <!-- 4.1 SÂN KHẤU MẶT TIỀN & KHÔNG KHÍ QUÁN MÌ CAY SỐNG ĐỘNG (LIVING RESTAURANT STREET) -->
+          <section class="bustling-prep-stage" id="prep-restaurant-stage">
+            <div class="prep-stage-roof">
+              <div class="roof-lantern-wrap">
+                <span class="animated-lantern swing-left">🏮</span>
+                <span class="roof-shop-badge" id="prep-roof-shop-badge">🏮 Tiệm Mỳ Cay 7 Cấp Độ 🏮</span>
+                <span class="animated-lantern swing-right">🏮</span>
+              </div>
+              <div class="prep-crowd-meter" id="prep-crowd-meter">
+                <span class="crowd-fire-dot">🔥</span>
+                <span id="prep-crowd-status-text" class="crowd-status-label">Độ nổi tiếng: 5.0 ⭐ · Khách trên phố đang ngóng chờ mở quán!</span>
+              </div>
+            </div>
+
+            <!-- Vỉa hè trước quán & Dòng khách vãng lai đi lại (Pedestrian Stream) -->
+            <div class="prep-street-sidewalk">
+              <div class="street-environment-bg">
+                <div class="street-lantern-post">🏮</div>
+                <div class="shop-sliding-door closed">
+                  <div class="door-sign" id="door-sign-status">🚪 Đang chuẩn bị</div>
+                </div>
+                <div class="street-lantern-post">🏮</div>
+              </div>
+              <div class="pedestrians-walking-track" id="pedestrians-walking-track">
+                <!-- Render động khách hoạt hình dạo phố và bong bóng thoại -->
+              </div>
+            </div>
+
+            <!-- Bàn ăn phòng trong & Nhân viên chuẩn bị -->
+            <div class="prep-dining-preview-strip">
+              <div class="strip-header">
+                <span class="strip-title">🪑 Phòng Ăn Gỗ Sồi:</span>
+                <span id="prep-dining-status-text" class="strip-status">3 bàn sạch bóng chờ đón thực khách</span>
+              </div>
+              <div class="mini-dining-tables-row" id="prep-mini-tables">
+                <!-- Render 3 bàn ăn chuẩn bị -->
+              </div>
+            </div>
+          </section>
+
+        <!-- 5. THANH 8 TAB ĐIỀU HƯỚNG CHÍNH (2 HÀNG x 4 CỘT) -->
+        <nav class="game-nav-grid">
+          <button class="nav-grid-btn active" data-tab="tab-kho">
+            <span class="tab-btn-icon">📦</span>
+            <span class="tab-btn-label">Kho</span>
+          </button>
+          <button class="nav-grid-btn" data-tab="tab-menu">
+            <span class="tab-btn-icon">🍜</span>
+            <span class="tab-btn-label">Menu</span>
+          </button>
+          <button class="nav-grid-btn" data-tab="tab-price">
+            <span class="tab-btn-icon">🏷️</span>
+            <span class="tab-btn-label">Giá bán</span>
+          </button>
+          <button class="nav-grid-btn" data-tab="tab-upgrades">
+            <span class="tab-btn-icon">🛠️</span>
+            <span class="tab-btn-label">Nâng cấp</span>
+          </button>
+
+          <button class="nav-grid-btn" data-tab="tab-staff">
+            <span class="tab-btn-icon">😄</span>
+            <span class="tab-btn-label">Nhân viên</span>
+          </button>
+          <button class="nav-grid-btn" data-tab="tab-online">
+            <span class="tab-btn-icon">🚚</span>
+            <span class="tab-btn-label">Online</span>
+          </button>
+          <button class="nav-grid-btn" data-tab="tab-collection">
+            <span class="tab-btn-icon">⭐</span>
+            <span class="tab-btn-label">Bộ sưu tập</span>
+          </button>
+          <button class="nav-grid-btn" data-tab="tab-summary">
+            <span class="tab-btn-icon">📈</span>
+            <span class="tab-btn-label">Tổng kết</span>
+          </button>
+        </nav>
+
+        <!-- 6. NỘI DUNG CHI TIẾT TỪNG TAB -->
+        <div class="tab-content-area">
+
+          <!-- ================= TAB 1: KHO (NGUYÊN LIỆU & NẤU NHẬN) ================= -->
+          <section id="tab-kho" class="tab-pane active">
+            <!-- CỤM NÚT HÀNH ĐỘNG CHÍNH (PREP CTA DECK) & TẠM TÍNH THANH TOÁN -->
+            <div class="kho-cta-action-deck" id="kho-cta-action-deck">
+              <div class="kho-cta-buttons-row">
+                <button id="btn-brew-supplies" class="btn-brew-action" title="Ninh nước dùng xương và chuẩn bị mì sợi miễn phí cho ngày mới">
+                  <span class="btn-cta-icon">🔥</span>
+                  <span class="btn-cta-text" id="btn-brew-text">Ninh Nước Dùng & Nấu Mì Sẵn Sàng</span>
+                </button>
+                <button id="btn-quick-open-day" class="btn-open-day-prominent" onclick="window.game.startOpenDay()" title="Mở cửa đón khách ngay!">
+                  <span class="btn-cta-icon">🚪</span>
+                  <span class="btn-cta-text" id="btn-quick-open-text">Mở Cửa Ngày 1</span>
+                </button>
+              </div>
+
+              <!-- Thanh Hiển Thị Tạm Tính Chi Phí Dự Kiến & Ngân Sách -->
+              <div class="kho-subtotal-bar" id="kho-subtotal-bar">
+                <div class="subtotal-item subtotal-spent">
+                  <span class="subtotal-icon">🧾</span>
+                  <span class="subtotal-label">Tổng tiền nhập hàng:</span>
+                  <strong class="subtotal-amount" id="kho-subtotal-spent">0đ</strong>
+                </div>
+                <div class="subtotal-item subtotal-wallet">
+                  <span class="subtotal-icon">🪙</span>
+                  <span class="subtotal-label">Số dư ví:</span>
+                  <strong class="subtotal-amount" id="kho-subtotal-wallet">400.000đ</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hướng dẫn Tutorial Tooltip (chuẩn screenshot 1) -->
+            <div id="tutorial-tooltip-kho" class="tutorial-popover-box">
+              <span class="tooltip-text">Bấm <strong>+</strong> để mua Mì sợi Hàn Quốc</span>
+              <button id="btn-dismiss-tutorial" class="tooltip-dismiss-btn">Bỏ qua</button>
+            </div>
+
+            <!-- Danh mục Mì & Nước Dùng Dạng Thẻ Bài Grid -->
+            <div class="category-block">
+              <div class="category-header-wrap">
+                <h3 class="category-heading">🍜 Mì & Nước Dùng Hầm</h3>
+                <span class="category-count-hint">Nguyên liệu cơ bản</span>
+              </div>
+              <div id="kho-noodle-list" class="kho-cards-grid">
+                <!-- Render động các loại mì dạng thẻ bài Card Grid -->
+              </div>
+            </div>
+
+            <!-- Danh mục Topping & Niêu Đất Dạng Thẻ Bài Grid -->
+            <div class="category-block" style="margin-top: 18px;">
+              <div class="category-header-wrap">
+                <h3 class="category-heading">🥩 Topping & Niêu Đất Nung</h3>
+                <span class="category-count-hint">Thức ăn kèm nóng hổi</span>
+              </div>
+              <div id="kho-topping-list" class="kho-cards-grid">
+                <!-- Render động topping dạng thẻ bài Card Grid -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= TAB 2: MENU (THỰC ĐƠN MÓN MỲ CAY & NƯỚC GIẢI CAY) ================= -->
+          <section id="tab-menu" class="tab-pane">
+            <p class="tab-description-hint">
+              Mở khoá món mỳ cay, topping và quầy nước giải cay mới. Bỏ món khỏi menu thì khách không gọi nữa, thêm lại lúc nào cũng miễn phí.
+            </p>
+
+            <div class="category-block">
+              <h3 class="category-heading">🍜 Mì Cay Các Loại</h3>
+              <div id="menu-noodle-list" class="item-rows-list">
+                <!-- Render động: Mì cay bò Mỹ (Đang bán), Mì cay hải sản (Đang bán), Mì cay thập cẩm (150k Mua)... -->
+              </div>
+            </div>
+
+            <div class="category-block" style="margin-top: 18px;">
+              <h3 class="category-heading">🥩 Topping Nhúng Niêu Đất</h3>
+              <div id="menu-topping-list" class="item-rows-list">
+                <!-- Render động topping: Bò mềm, Tôm sú, Xúc xích, Phô mai... -->
+              </div>
+            </div>
+
+            <div class="category-block" style="margin-top: 18px;">
+              <h3 class="category-heading">🧋 Quầy Nước Giải Cay (Boba & Tea)</h3>
+              <div id="menu-drink-list" class="item-rows-list">
+                <!-- Render động trà sữa, trà đào, sữa tươi... -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= TAB 3: GIÁ BÁN ================= -->
+          <section id="tab-price" class="tab-pane">
+            <p class="tab-description-hint">
+              Điều chỉnh giá bán từng món. Đặt giá rẻ khách sẽ đông và khen ngợi, đặt giá quá cao khách có thể chê đắt và bỏ về.
+            </p>
+            <div id="price-settings-list" class="price-items-list">
+              <!-- Render động bằng JS -->
+            </div>
+          </section>
+
+          <!-- ================= TAB 4: NÂNG CẤP ================= -->
+          <section id="tab-upgrades" class="tab-pane">
+            <p class="tab-description-hint">
+              Đầu tư nâng cấp bếp niêu đất, bàn ghế gỗ sồi, điều hòa nhiệt độ và sốt ớt bí truyền tăng giá bán.
+            </p>
+            <div id="upgrades-list" class="upgrades-items-list">
+              <!-- Render động -->
+            </div>
+          </section>
+
+          <!-- ================= TAB 5: NHÂN VIÊN ================= -->
+          <section id="tab-staff" class="tab-pane">
+            <p class="tab-description-hint">
+              Các trợ thủ anime đắc lực giúp bạn chào đón khách, nấu mì nhanh thoăn thoắt, bưng bê và dọn dẹp sạch bóng!
+            </p>
+            <div id="staff-list" class="staff-items-list">
+              <!-- Render động: Mèo Mochi, Gấu Kenji, Thỏ Usagi, Cún Shiba, Cáo Shiro -->
+            </div>
+          </section>
+
+          <!-- ================= TAB 6: ONLINE (SHIPPER GIAO MỲ CAY) ================= -->
+          <section id="tab-online" class="tab-pane">
+            <p class="tab-description-hint">
+              Mở bán mỳ cay & trà giải cay giao tận nhà qua ứng dụng GrabFood & ShopeeFood để nổ đơn liên tục!
+            </p>
+            <div class="online-orders-container">
+              <div class="online-status-bar">
+                <span class="online-indicator">🟢 Đang nhận đơn tự động</span>
+                <span id="online-total-delivered" class="online-stat-pill">Đã giao: 0 đơn</span>
+              </div>
+              <div id="online-orders-list" class="online-orders-list">
+                <!-- Render động các đơn hàng ship mỳ cay -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= TAB 7: BỘ SƯU TẬP ================= -->
+          <section id="tab-collection" class="tab-pane">
+            <p class="tab-description-hint">
+              Hồ sơ các vị khách quen VIP ghé tiệm cùng huy hiệu vinh danh người làm chủ tiệm xuất sắc!
+            </p>
+            <div class="collection-section">
+              <h3 class="category-heading">🐾 Khách Quen Ghé Tiệm Mì</h3>
+              <div id="collection-customers-grid" class="customers-collection-grid">
+                <!-- Render ảnh chân dung khách, số lần ghé, sở thích ăn cay -->
+              </div>
+            </div>
+            <div class="collection-section" style="margin-top: 20px;">
+              <h3 class="category-heading">🏆 Huy Hiệu Quán Mì Cay</h3>
+              <div id="collection-badges-grid" class="badges-collection-grid">
+                <!-- Render huy hiệu -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= TAB 8: TỔNG KẾT & ĐÁNH GIÁ THỰC TẾ ================= -->
+          <section id="tab-summary" class="tab-pane">
+            <p class="tab-description-hint">
+              Báo cáo chi tiết hoạt động kinh doanh, số tô mì đã bán, tiền tip và sổ tay đánh giá chân thực từ khách hàng.
+            </p>
+            <div class="summary-stats-cards">
+              <div class="stat-card">
+                <span class="stat-label">Tổng Doanh Thu (Lũy kế)</span>
+                <span id="sum-total-money" class="stat-num" style="color: #258A6D;">400.000đ</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Số Dư Tiền Mặt Ví</span>
+                <span id="sum-wallet-money" class="stat-num" style="color: var(--accent-money);">400.000đ</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Số Tô Mì Đã Bán</span>
+                <span id="sum-bowls-sold" class="stat-num">0 tô 🍜</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Tiền Khách Tip</span>
+                <span id="sum-tips-earned" class="stat-num">0đ 💖</span>
+              </div>
+            </div>
+
+            <!-- Thống kê mở rộng chi tiết -->
+            <div class="summary-stats-cards" style="margin-top: -6px;">
+              <div class="stat-card">
+                <span class="stat-label">Điểm Uy Tín</span>
+                <span id="sum-reputation" class="stat-num">30 ⭐</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Nước Giải Cay Đã Bán</span>
+                <span id="sum-drinks-sold" class="stat-num">0 ly 🧋</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Mì Cấp 7 Bốc Hỏa</span>
+                <span id="sum-spicy7-sold" class="stat-num">0 tô 🔥</span>
+              </div>
+            </div>
+
+            <div class="reviews-section-block">
+              <h3 class="category-heading">⭐ Sổ Tay Đánh Giá Của Khách Ăn Mì</h3>
+              <div id="reviews-list" class="reviews-list">
+                <!-- Render các đánh giá và phản hồi nhận tip -->
+              </div>
+            </div>
+          </section>
+
+        </div>
+        </div> <!-- /view-prep-mode -->
+
+        <!-- ==========================================================
+             VIEW 2: CHẾ ĐỘ MỞ CỬA BÁN MÌ CAY (OPEN COOKING MODE)
+             CHUẨN 100% THEO ẢNH SCREENSHOT THỰC TẾ CỦA BẠN!
+             ========================================================== -->
+        <div id="view-open-mode" style="display: none;">
+
+          <!-- THANH CHUYỂN ĐỔI CHẾ ĐỘ DÀNH RIÊNG CHO MOBILE: BẾP NẤU 0-CUỘN HOẶC SẢNH BÀN ĂN -->
+          <div class="mobile-open-view-tabs" id="mobile-open-view-tabs">
+            <button class="btn-open-view-tab active" id="btn-tab-cockpit" onclick="window.game.switchMobileOpenTab('cockpit')">
+              🍳 Bếp Nấu Siêu Tốc (0-Cuộn)
+            </button>
+            <button class="btn-open-view-tab" id="btn-tab-dining" onclick="window.game.switchMobileOpenTab('dining')">
+              🪑 Sảnh Bàn Ăn <span class="tab-dining-badge" id="open-dining-count" style="font-size: 11px; font-weight: 700; color: #8C431A; margin-left: 2px;"></span> <span class="tab-badge-dirty" id="tab-badge-dirty" style="display:none;">🧹</span>
+            </button>
+          </div>
+
+          <!-- BỐ CỤC ĐÁP ỨNG: DESKTOP 2 CỘT RỘNG RÃI / MOBILE TẬP TRUNG KHÔNG CUỘN -->
+          <div class="open-mode-responsive-layout" id="open-mode-responsive-layout" data-mobile-tab="cockpit">
+            
+            <!-- CỘT TRÁI (LEFT): Sảnh Phòng Ăn Sống Động, Đội Ngũ Nhân Viên & Đơn Shipper -->
+            <div class="open-col-left" id="open-col-dining-side">
+              <!-- QUẦY BẾP & ĐỘI NGŨ NHÂN VIÊN ĐANG LÀM VIỆC THỰC TẾ -->
+              <div class="active-staff-kitchen-bar" id="active-staff-kitchen-bar">
+                <!-- Render Chủ tiệm và các nhân viên đã thuê -->
+              </div>
+
+              <!-- SÂN KHẤU PHÒNG ĂN TRỰC TIẾP & THƯỚC ĐO TẤP NẬP (LIVE DINING HALL STAGE) -->
+              <section class="open-live-dining-stage" id="open-live-dining-stage">
+                <div class="open-stage-header">
+                  <div class="stage-crowd-headline">
+                    <span class="lantern-live">🏮</span>
+                    <span id="open-crowd-headline-text" class="crowd-headline-text">🔥 QUÁN ĐANG ĐÔNG NGHẸT KHÁCH! (Độ nổi tiếng: 5.0 ⭐)</span>
+                    <span class="lantern-live">🏮</span>
+                  </div>
+                  <div class="active-buffs-indicator" id="active-buffs-indicator">
+                    <!-- Render tự động các buff nâng cấp đang kích hoạt: 🏮 Decor · ❄️ Daikin · 🌶️ Sốt bí truyền -->
+                  </div>
+                </div>
+
+                <!-- 3 BÀN ĂN GỖ SỒI THỰC KHÁCH ĐANG ĂN MÌ CAY (LIVE DINING TABLES) -->
+                <div class="open-dining-tables-grid" id="open-dining-tables-grid">
+                  <!-- Render 3 bàn ăn trực tiếp với thực khách ngồi ăn, niêu đất xì xèo, bong bóng cảm nghĩ, nút dọn bàn -->
+                </div>
+
+                <!-- Nút nhảy nhanh về bếp khi trên mobile -->
+                <div class="mobile-dining-back-bar">
+                  <button class="btn-jump-to-kitchen" onclick="window.game.switchMobileOpenTab('cockpit')">
+                    🍳 Quay lại Bếp Nấu Siêu Tốc
+                  </button>
+                </div>
+              </section>
+            </div>
+
+            <!-- CỘT PHẢI (RIGHT): KHÔNG GIAN BẾP NẤU SIÊU TỐC - ĐƠN HÀNG, NIÊU ĐẤT & DOCK NGUYÊN LIỆU (ZERO-SCROLL) -->
+            <div class="open-col-right" id="open-col-kitchen-side">
+
+              <!-- ĐƠN HÀNG ONLINE SHIPPER TRỰC TIẾP TRONG CA BÁN (CÓ HẸN GIỜ ĐỢI) -->
+              <div class="open-mode-shipper-card" id="open-mode-shipper-card" style="display: none;">
+                <div class="shipper-header">
+                  <span class="shipper-tag">🛵 Shipper Chờ Lấy Mì</span>
+                  <span class="shipper-timer-badge" id="open-shipper-timer">⏱️ 20s</span>
+                  <span class="shipper-price" id="open-shipper-price">+65k</span>
+                </div>
+                <div class="shipper-timer-track">
+                  <div class="shipper-timer-fill" id="open-shipper-timer-fill" style="width: 100%;"></div>
+                </div>
+                <div class="shipper-desc" id="open-shipper-desc">1 Mì cay bò Mỹ (Cấp 2)</div>
+                <button class="btn-shipper-handover" id="btn-open-handover">📦 Giao Niêu Mì Cho Shipper (Phím Space)</button>
+              </div>
+
+              <!-- 1. HÀNG 3 KHAY ĐƠN HÀNG CỦA THỰC KHÁCH (ORDER QUEUE SLOTS) -->
+              <div class="order-queue-grid" id="order-queue-grid">
+                <!-- Slot 1 -->
+                <div class="order-slot-card" id="order-slot-1">
+                  <!-- Render động bằng JS -->
+                </div>
+                <!-- Slot 2 -->
+                <div class="order-slot-card slot-empty" id="order-slot-2">
+                  <span class="empty-slot-text">Trống</span>
+                </div>
+                <!-- Slot 3 -->
+                <div class="order-slot-card slot-empty" id="order-slot-3">
+                  <span class="empty-slot-text">Trống</span>
+                </div>
+              </div>
+
+              <!-- 2. KHU VỰC NIÊU ĐẤT NẤU MÌ (WORKSTATION TRUNG TÂM NẰM NGAY DƯỚI ĐƠN HÀNG) -->
+              <div class="pot-workstation-card">
+                <div class="pot-visual-wrap">
+                  <!-- Hơi nước bốc lên xì xèo -->
+                  <div class="pot-steam-particles" id="pot-steam-particles">
+                    <span class="steam-wisp steam-1">♨️</span>
+                    <span class="steam-wisp steam-2">♨️</span>
+                  </div>
+
+                  <!-- Niêu Đất Nung Thần Kì (Authentic Clay Pot Cauldron) -->
+                  <div class="korean-clay-pot size-m" id="korean-clay-pot">
+                    <!-- Quai niêu bên trái -->
+                    <div class="pot-handle handle-left"></div>
+
+                    <!-- Miệng và lòng niêu đất -->
+                    <div class="pot-rim"></div>
+                    <div class="pot-cauldron">
+                      <!-- Nước súp dùng sôi sùng sục theo cấp độ cay -->
+                      <div class="pot-soup-lake" id="pot-soup-lake">
+                        <div class="soup-bubbles-layer">
+                          <span class="bubble b1"></span>
+                          <span class="bubble b2"></span>
+                          <span class="bubble b3"></span>
+                        </div>
+                        <!-- Lớp mì sợi Hàn Quốc -->
+                        <div class="pot-noodles-layer" id="pot-noodles-layer"></div>
+                        <!-- Lớp Topping thả vào niêu -->
+                        <div class="pot-toppings-layer" id="pot-toppings-layer"></div>
+                      </div>
+                      <!-- Vạch hướng dẫn định mức -->
+                      <div class="pot-guide-level-line">
+                        <span class="level-label">mức đầy</span>
+                      </div>
+                    </div>
+
+                    <!-- Quai niêu bên phải -->
+                    <div class="pot-handle handle-right"></div>
+
+                    <!-- Khay gỗ sồi lót đáy niêu chống nóng -->
+                    <div class="pot-wooden-trivet"></div>
+                  </div>
+
+                  <!-- Ngọn lửa bếp gas đun xì xèo -->
+                  <div class="pot-gas-burner active" id="pot-gas-burner">
+                    <span class="burner-flame flame-1">🔥</span>
+                    <span class="burner-flame flame-2">🔥</span>
+                    <span class="burner-flame flame-3">🔥</span>
+                  </div>
+                </div>
+
+                <!-- Bảng thông tin trạng thái niêu đất & Điều khiển nhanh -->
+                <div class="pot-status-info">
+                  <div class="pot-badge-row">
+                    <span class="pot-cooking-badge" id="pot-cooking-badge">🥣 Chờ Chọn Món</span>
+                    <span class="pot-spicy-indicator" id="pot-spicy-indicator">Cấp 0</span>
+                    <div class="pot-quick-size-toggle">
+                      <button class="btn-mini-size active" id="mini-size-m" onclick="window.game.selectPotSize('M')">M</button>
+                      <button class="btn-mini-size" id="mini-size-l" onclick="window.game.selectPotSize('L')">L</button>
+                    </div>
+                  </div>
+                  <h3 class="pot-title-status" id="pot-title-status">Chưa chọn niêu</h3>
+                  <p class="pot-sub-status" id="pot-sub-status">chưa có mì & nước dùng</p>
+
+                  <div class="pot-summary-pills" id="pot-summary-pills"></div>
+
+                  <div class="pot-actions-row">
+                    <button class="btn-clear-pot" id="btn-clear-pot">🗑️ Làm lại (C)</button>
+                    <button class="btn-direct-serve" id="btn-direct-serve" onclick="window.game.serveToMatchingSlot()">
+                      ✨ Bưng Khớp Đơn
+                    </button>
+                    <div class="pot-drink-preview" id="pot-drink-preview"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. THANH DOCK CHỌN CÔNG THỨC & NGUYÊN LIỆU THEO TAB (ZERO-SCROLL DOCK) -->
+              <div class="cooking-steps-container">
+                <!-- Thanh hướng dẫn bước linh hoạt -->
+                <div class="step-guide-pill" id="step-guide-pill">
+                  ⓘ Chạm vào đơn khách để nấu 1 chạm, hoặc bấm công thức bên dưới!
+                </div>
+
+                <!-- Tabs danh mục nguyên liệu -->
+                <div class="cooking-dock-tabs" id="cooking-dock-tabs">
+                  <button class="btn-dock-tab active" id="dock-tab-quick" onclick="window.game.switchCookingDockTab('quick')">
+                    ⚡ Món Mẫu
+                  </button>
+                  <button class="btn-dock-tab" id="dock-tab-noodle" onclick="window.game.switchCookingDockTab('noodle')">
+                    🍜 Chọn Mì
+                  </button>
+                  <button class="btn-dock-tab" id="dock-tab-topping" onclick="window.game.switchCookingDockTab('topping')">
+                    🥩 Topping
+                  </button>
+                  <button class="btn-dock-tab" id="dock-tab-spicy" onclick="window.game.switchCookingDockTab('spicy')">
+                    🌶️ Cay & Size
+                  </button>
+                  <button class="btn-dock-tab" id="dock-tab-drink" onclick="window.game.switchCookingDockTab('drink')">
+                    🧋 Nước
+                  </button>
+                </div>
+
+                <!-- Khung nội dung hiển thị của Tab được chọn -->
+                <div class="cooking-dock-content">
+                  <!-- Pane 1: Món mẫu 1-chạm (Presets) -->
+                  <div class="dock-pane active" id="pane-dock-quick">
+                    <div class="quick-presets-grid" id="quick-presets-grid">
+                      <!-- Render động danh sách công thức mẫu phổ biến -->
+                    </div>
+                  </div>
+
+                  <!-- Pane 2: Chọn Mì -->
+                  <div class="dock-pane" id="pane-dock-noodle" style="display: none;">
+                    <div class="step-ingredients-grid" id="cooking-noodles-grid">
+                      <!-- Render các món mì kèm badge số lượng tồn kho -->
+                    </div>
+                  </div>
+
+                  <!-- Pane 3: Topping -->
+                  <div class="dock-pane" id="pane-dock-topping" style="display: none;">
+                    <div class="step-ingredients-grid" id="cooking-toppings-grid">
+                      <!-- Render các topping kèm badge số lượng -->
+                    </div>
+                  </div>
+
+                  <!-- Pane 4: Cấp cay & Size -->
+                  <div class="dock-pane" id="pane-dock-spicy" style="display: none;">
+                    <div class="dock-spicy-size-row">
+                      <div class="spicy-row-size-block">
+                        <span class="spicy-block-label">Size:</span>
+                        <button class="btn-step-pill active" id="btn-size-m" data-size="M">Niêu M</button>
+                        <button class="btn-step-pill" id="btn-size-l" data-size="L">Niêu L +7k</button>
+                      </div>
+                      <div class="spicy-row-levels-block">
+                        <span class="spicy-block-label">Cấp Cay:</span>
+                        <div class="step-options-row spicy-levels-row" id="spicy-levels-options">
+                          <!-- Render các nút cấp cay 0 đến 7 -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Pane 5: Nước uống -->
+                  <div class="dock-pane" id="pane-dock-drink" style="display: none;">
+                    <div class="step-ingredients-grid" id="cooking-drinks-grid">
+                      <!-- Render trà sữa, trà đào... -->
+                    </div>
+                  </div>
+                </div>
+
+              </div> <!-- /cooking-steps-container -->
+
+            </div> <!-- /open-col-right -->
+
+          </div> <!-- /open-mode-responsive-layout -->
+
+          <!-- THANH TRẠNG THÁI NỒI NIÊU NỔI DÀNH RIÊNG CHO MOBILE (STICKY MOBILE POT BAR) -->
+          <div class="mobile-sticky-pot-bar" id="mobile-sticky-pot-bar">
+            <div class="sticky-pot-info">
+              <span class="sticky-pot-icon">🍲</span>
+              <span id="sticky-pot-label" class="sticky-pot-text">Niêu M · Cấp 0 · Chưa chọn mì</span>
+            </div>
+            <div class="sticky-pot-actions">
+              <button class="btn-sticky-serve" id="btn-sticky-serve-any" onclick="window.game.serveToMatchingSlot()">
+                ✨ Bưng khớp đơn
+              </button>
+              <button class="btn-sticky-clear" onclick="window.game.clearCurrentPot()">🗑️</button>
+            </div>
+          </div>
+
+        </div> <!-- /view-open-mode -->
+
+        <!-- KHOẢNG ĐỆM CHÂN TRANG ĐỂ TRÁNH BỊ CHE BỞI NÚT DƯỚI CÙNG -->
+        <div class="bottom-action-spacer"></div>
+
+      </div>
+
+      <!-- 7. THANH NÚT HÀNH ĐỘNG CỐ ĐỊNH CHÂN MÀN HÌNH (CHỈ HIỆN KHI ĐANG MỞ BÁN ĐỂ TẠM DỪNG) -->
+      <footer class="game-bottom-action-bar" style="display: none;">
+        <!-- Nút khi ở chế độ chuẩn bị: Ẩn để tránh trùng 2 nút Mở cửa ngày X -->
+        <button id="btn-primary-action" class="btn-primary-action btn-open-day" style="display: none;">
+          Mở cửa ngày 1
+        </button>
+
+        <!-- Nút khi đang mở cửa bán mỳ: Tạm dừng -->
+        <button id="btn-pause-open" class="btn-primary-action btn-pause-day" style="display: none;">
+          ⏸️ Tạm dừng
+        </button>
+      </footer>
+
+    </div>
+
+    <!-- 8. FOOTER DESKTOP HIỂN THỊ DƯỚI ĐÁY TRÌNH DUYỆT (CHUẨN SCREENSHOT 2) -->
+    <div class="desktop-app-footer">
+      <div class="desktop-footer-left">
+        <span>MIỄN PHÍ</span>
+        <span class="dot">·</span>
+        <span>KHÔNG CẦN TẢI</span>
+        <span class="dot">·</span>
+        <span>HTML5</span>
+        <span class="dot">·</span>
+        <span>TRÌNH DUYỆT</span>
+        <span class="dot">·</span>
+        <span>CHƠI TRÊN ĐIỆN THOẠI & MÁY TÍNH</span>
+      </div>
+      <button id="btn-footer-changelog" class="btn-footer-changelog">
+        💡 CÓ GÌ MỚI
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       8.5 MODAL HỒ SƠ CHỦ TIỆM MỲ CAY (OWNER PROFILE)
+       ========================================================== -->
+  <div id="modal-owner-profile" class="modal-overlay" style="display: none;">
+    <div class="modal-dialog modal-owner-dialog">
+      <div class="modal-header">
+        <div class="stage-modal-title">
+          <span class="stage-ico">👑</span>
+          <span>Hồ Sơ Chủ Tiệm Mì Cay</span>
+        </div>
+        <button id="btn-close-owner" class="btn-modal-close" type="button">✕</button>
+      </div>
+
+      <div class="owner-profile-body">
+        <div class="owner-current-badge-card">
+          <div class="owner-current-avatar-wrap">
+            <img src="assets/cust_cat.png" alt="Chủ tiệm" id="owner-dialog-avatar" class="owner-dialog-img" onerror="this.src='assets/cust_cat.png'" />
+            <span class="owner-crown-float">👑</span>
+          </div>
+          <div class="owner-dialog-meta">
+            <h3 id="owner-dialog-name">Bếp Trưởng Mèo</h3>
+            <span class="owner-rank-tag" id="owner-dialog-rank">⭐⭐ Bếp Trưởng Triển Vọng</span>
+            <p class="owner-dialog-sub">Phụ trách nồi nước dùng thảo mộc & các niêu đất mỳ cay 7 cấp độ!</p>
+          </div>
+        </div>
+
+        <div class="owner-avatar-selector-block">
+          <label class="owner-label">Chọn hình tượng đại diện của bạn:</label>
+          <div class="owner-avatar-options-grid" id="owner-avatar-options-grid">
+            <div class="owner-avatar-opt active" data-avatar="assets/cust_cat.png" data-name="Bếp Trưởng Mèo Linh">
+              <img src="assets/cust_cat.png" alt="Mèo Linh" />
+              <span>Mèo Linh</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/cust_bear.png" data-name="Gấu Master Chef Lửa">
+              <img src="assets/cust_bear.png" alt="Gấu Nâu" />
+              <span>Gấu Lửa</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/cust_bunny.png" data-name="Thỏ Chiaki Trưởng Tiệm">
+              <img src="assets/cust_bunny.png" alt="Thỏ Chiaki" />
+              <span>Thỏ Chiaki</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/cust_shiba.png" data-name="Shiba Bếp Phó Cay">
+              <img src="assets/cust_shiba.png" alt="Cún Shiba" />
+              <span>Shiba Phó</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="owner-stats-grid">
+          <div class="owner-stat-box">
+            <span class="stat-number" id="owner-stat-bowls">0</span>
+            <span class="stat-label">Tô Mì Đã Nấu 🍜</span>
+          </div>
+          <div class="owner-stat-box">
+            <span class="stat-number" id="owner-stat-spicy7">0</span>
+            <span class="stat-label">Mì Cấp 7 Bốc Hỏa 🔥</span>
+          </div>
+          <div class="owner-stat-box">
+            <span class="stat-number" id="owner-stat-shippers">0</span>
+            <span class="stat-label">Đơn Giao Shipper 🛵</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-modal-footer">
+        <button class="btn-primary-action" id="btn-save-owner-profile" type="button" style="margin: 0; width: 100%;">Lưu Hình Tượng Chủ Tiệm ✨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       9. MODAL SÂN KHẤU TIỆM MỲ SỐNG ĐỘNG (LIVING DINING ROOM)
+       ========================================================== -->
+  <div id="modal-dining-stage" class="modal-overlay">
+    <div class="modal-dialog modal-stage-dialog">
+      <div class="modal-header">
+        <div class="stage-modal-title">
+          <span class="stage-ico">🏮</span>
+          <span id="stage-shop-title">Tiệm Mỳ Cay Tokyo - Seoul Ấm Cúng</span>
+        </div>
+        <button id="btn-close-dining" class="btn-modal-close">✕</button>
+      </div>
+
+      <div class="living-stage-wrapper">
+        <div class="stage-ambient-lights">🏮 🏮 🏮</div>
+        <div id="living-restaurant-scene" class="dining-tables-floor">
+          <!-- Render các bàn ăn, niêu đất xì xèo, khách thú cưng đang ăn mì cay, nhân viên phục vụ -->
+        </div>
+      </div>
+
+      <div class="stage-modal-footer">
+        <div id="stage-quick-tip">💡 Gấu Kenji đang ninh niêu đất, Mèo Mochi và Thỏ Usagi bưng mì cay ra bàn!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       10. MODAL NHẬP / ĐỔI TÊN QUÁN
+       ========================================================== -->
+  <div id="modal-name-prompt" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="name-prompt-body">
+        <span class="name-prompt-icon">🍜</span>
+        <h3 id="name-modal-title">Đặt Tên Tiệm Mỳ Cay</h3>
+        <p class="name-prompt-sub">
+          Hãy đặt cho tiệm mỳ một cái tên thật ấm cúng và dễ thương để treo lên bảng hiệu gỗ nhé:
+        </p>
+        
+        <div class="name-input-wrapper">
+          <input 
+            type="text" 
+            id="input-shop-name" 
+            class="shop-name-input" 
+            placeholder="Ví dụ: Tiệm Mỳ Cay Seoul, Tiệm Mỳ Cay Mochi..." 
+            maxlength="25" 
+            autocomplete="off"
+            value="Tiệm Mỳ Cay"
+          />
+          <div id="name-warning-msg" class="name-warning-box"></div>
+        </div>
+
+        <div class="modal-actions-row">
+          <button id="btn-confirm-name" class="btn-modal-primary">
+            🎉 Treo Biển Khai Trương!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       11. MODAL BẢN CẬP NHẬT MỚI (TXAVERSION CARDS)
+       ========================================================== -->
+  <div id="modal-version-update" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>✨ Bản Cập Nhật Tiệm Mỳ Cay</h3>
+        <button id="btn-close-version-icon" class="btn-modal-close">✕</button>
+      </div>
+      
+      <div id="version-modal-content"></div>
+
+      <button id="btn-close-version" class="btn-modal-primary" style="margin-top: 14px;">
+        🍜 Tuyệt Vời, Vào Quán Thôi!
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       12. MODAL CÀI ĐẶT GAME
+       ========================================================== -->
+  <div id="modal-settings" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3>⚙️ Cài Đặt Tiệm Mì Cay</h3>
+        <button id="btn-close-settings" class="btn-modal-close">✕</button>
+      </div>
+
+      <div class="settings-group">
+        <!-- Nhạc nền Lo-Fi BGM -->
+        <div class="setting-row">
+          <label><span>🎵</span> Nhạc nền Lo-Fi ấm áp:</label>
+          <div class="setting-control">
+            <input type="checkbox" id="setting-bgm-toggle" checked />
+            <input type="range" id="setting-bgm-vol" min="0" max="100" value="35" title="Âm lượng nhạc nền" />
+          </div>
+        </div>
+
+        <!-- Âm thanh hiệu ứng SFX -->
+        <div class="setting-row">
+          <label><span>🔔</span> Tiếng xì xèo & Chuông leng keng:</label>
+          <div class="setting-control">
+            <input type="checkbox" id="setting-sfx-toggle" checked />
+            <input type="range" id="setting-sfx-vol" min="0" max="100" value="50" title="Âm lượng hiệu ứng" />
+          </div>
+        </div>
+
+        <!-- Tốc độ game -->
+        <div class="setting-row">
+          <label><span>⚡</span> Tốc độ trò chơi:</label>
+          <div class="setting-control">
+            <select id="setting-game-speed">
+              <option value="1">1x (Thong thả cozy)</option>
+              <option value="1.5">1.5x (Nhanh vừa)</option>
+              <option value="2">2x (Siêu tốc)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cánh hoa anh đào -->
+        <div class="setting-row">
+          <label><span>🌸</span> Hiệu ứng hoa anh đào:</label>
+          <div class="setting-control">
+            <input type="checkbox" id="setting-particles-toggle" checked />
+          </div>
+        </div>
+
+        <!-- Đổi tên quán -->
+        <div class="setting-row">
+          <label><span>✏️</span> Tên tiệm mì:</label>
+          <button id="btn-rename-from-settings" class="btn-secondary-link">
+            Đổi Tên Tiệm
+          </button>
+        </div>
+
+        <!-- Xem lại phiên bản mới -->
+        <div class="setting-row">
+          <label><span>📜</span> Thông tin cập nhật:</label>
+          <button id="btn-show-version-settings" class="btn-secondary-link">
+            Xem Có Gì Mới
+          </button>
+        </div>
+
+        <!-- Chơi lại từ đầu -->
+        <div class="setting-row" style="border-bottom: none; margin-top: 10px;">
+          <label><span>⚠️</span> Dữ liệu trò chơi:</label>
+          <button id="btn-reset-game-data" class="btn-danger-link">
+            Xóa Dữ Liệu & Chơi Lại
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       13. MODAL TỔNG KẾT KẾT THÚC NGÀY (DAY REPORT)
+       ========================================================== -->
+  <div id="modal-day-summary" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header" style="justify-content: center; text-align: center;">
+        <h3 id="day-summary-title">🎉 Tổng Kết Ngày 1</h3>
+      </div>
+      <div class="day-summary-report-body" id="day-summary-body">
+        <!-- Render động kết quả kinh doanh ngày -->
+      </div>
+      <button id="btn-next-day" class="btn-modal-primary" style="margin-top: 16px;">
+        🌅 Chuẩn Bị Cho Ngày Mới!
+      </button>
+    </div>
+  </div>
+
+  <!-- File Module Chính -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

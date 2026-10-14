@@ -1,0 +1,12 @@
+name = "tmc"
+compatibility_date = "2024-09-23"
+main = "worker.js"
+
+# Cho phép chạy trực tiếp trên tên miền *.workers.dev miễn phí của Cloudflare
+workers_dev = true
+
+# Cấu hình Static Assets của Cloudflare Workers
+[assets]
+directory = "."
+binding = "ASSETS"
+not_found_handling = "single-page-application"
