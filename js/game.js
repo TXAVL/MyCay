@@ -30,6 +30,8 @@ export class SpicyNoodleGame {
       todayDrinksSold: 0,
       todaySpicy7Sold: 0,
       todayTips: 0,
+      todaySpecialBonus: 0,
+      todaySpecialBowlsSold: 0,
       hasBrewedToday: false, // Đã ninh nước dùng & chuẩn bị mỳ chưa
       tutorialDismissed: false,
 
@@ -115,6 +117,8 @@ export class SpicyNoodleGame {
         drinksServed: 0,
         spicyMasterServed: 0, // Cấp 6-7 bốc hỏa
         tipsEarned: 0,
+        specialBowlsServed: 0,
+        specialBonusEarned: 0,
         totalRevenue: 400
       }
     };
@@ -504,6 +508,7 @@ export class SpicyNoodleGame {
 
     this.renderBottomActionBar();
     this.renderDiningStage();
+    this.renderDaikinAC();
   }
 
   // 1. Header Top (Thống kê chính xác chuẩn ảnh)
@@ -599,19 +604,70 @@ export class SpicyNoodleGame {
     }
   }
 
-  // 3. Thẻ món đặc biệt hôm nay
+  // Đổi mới hoặc làm mới Món Đặc Biệt Hôm Nay theo các nguyên liệu đã mở khóa
+  rollDailySpecialCombo(keepStreak = true) {
+    const unlockedNoodles = Object.values(this.state.noodles).filter(n => n.unlocked);
+    const chosenNoodle = unlockedNoodles.length > 0
+      ? unlockedNoodles[Math.floor(Math.random() * unlockedNoodles.length)]
+      : (this.state.noodles.my_bo || { id: "my_bo", name: "Mì cay Bò Mỹ" });
+
+    const unlockedTops = Object.values(this.state.toppings).filter(t => t.unlocked);
+    const chosenTop = unlockedTops.length > 0
+      ? unlockedTops[Math.floor(Math.random() * unlockedTops.length)]
+      : (this.state.toppings.bo || { id: "bo", name: "Bò Mềm" });
+
+    // Cấp độ cay ngẫu nhiên từ 1 đến 5 (hợp khẩu vị đa số thực khách)
+    const spicyLevel = Math.floor(Math.random() * 5) + 1;
+    const currentStreak = keepStreak && this.state.specialCombo ? (this.state.specialCombo.streak || 0) : 0;
+
+    this.state.specialCombo = {
+      noodleId: chosenNoodle.id,
+      spicyLevel: spicyLevel,
+      toppingId: chosenTop.id,
+      streak: currentStreak
+    };
+  }
+
+  // Kiểm tra đơn của khách có trùng với Món Đặc Biệt Hôm Nay ở bảng chuẩn bị
+  isSpecialComboOrder(order) {
+    if (!order || !this.state.specialCombo) return false;
+    const spec = this.state.specialCombo;
+    const isNoodleMatch = order.noodleId === spec.noodleId;
+    const isSpicyMatch = Number(order.spicyLevel) === Number(spec.spicyLevel);
+    const isToppingMatch = spec.toppingId ? (order.toppingId === spec.toppingId) : true;
+    return Boolean(isNoodleMatch && isSpicyMatch && isToppingMatch);
+  }
+
+  // Kiểm tra niêu đất đang nấu có khớp với Món Đặc Biệt Hôm Nay
+  isSpecialComboPot(pot) {
+    if (!pot || !this.state.specialCombo || !pot.noodleId) return false;
+    const spec = this.state.specialCombo;
+    const isNoodleMatch = pot.noodleId === spec.noodleId;
+    const isSpicyMatch = Number(pot.spicyLevel) === Number(spec.spicyLevel);
+    const isToppingMatch = spec.toppingId ? (Array.isArray(pot.toppings) && pot.toppings.includes(spec.toppingId)) : true;
+    return Boolean(isNoodleMatch && isSpicyMatch && isToppingMatch);
+  }
+
+  // 3. Thẻ món đặc biệt hôm nay (ở Bảng Chuẩn Bị Ngày)
   renderSpecialCard() {
     const comboEl = document.getElementById("display-special-combo");
     const streakEl = document.getElementById("display-special-streak");
 
+    // Nếu món trong combo hiện tại chưa được mở khóa, tự động làm mới sang món hợp lệ
+    const currentNoodle = this.state.noodles[this.state.specialCombo?.noodleId];
+    const currentTop = this.state.toppings[this.state.specialCombo?.toppingId];
+    if (!currentNoodle || !currentNoodle.unlocked || !currentTop || !currentTop.unlocked) {
+      this.rollDailySpecialCombo(true);
+    }
+
     if (comboEl) {
-      const noodle = this.state.noodles[this.state.specialCombo.noodleId] || this.state.noodles.my_haisan;
-      const top = this.state.toppings[this.state.specialCombo.toppingId] || this.state.toppings.phomai;
+      const noodle = this.state.noodles[this.state.specialCombo.noodleId] || this.state.noodles.my_bo || { name: "Mì cay Bò Mỹ" };
+      const top = this.state.toppings[this.state.specialCombo.toppingId] || this.state.toppings.bo || { name: "Bò Mềm" };
       comboEl.textContent = `${noodle.name} · Cấp ${this.state.specialCombo.spicyLevel} · Thêm ${top.name}`;
     }
 
     if (streakEl) {
-      streakEl.textContent = `Điểm danh ${this.state.specialCombo.streak} ngày`;
+      streakEl.textContent = `Điểm danh ${this.state.specialCombo.streak || 0} ngày`;
     }
   }
 
@@ -1063,8 +1119,17 @@ export class SpicyNoodleGame {
       });
     }
 
-    this.sound.playCoinChime();
-    GameUIModal.showToast("Nâng cấp thành công cơ ngơi tiệm mì!", "success", "🛠️");
+    if (key === "acCooling") {
+      const newLv = this.state.upgrades.acCooling;
+      const tempText = newLv >= 3 ? "16°C Turbo Max" : "20°C Inverter";
+      GameUIModal.showToast(`❄️ Đã nâng cấp Điều Hòa Daikin lên Cấp ${newLv} (${tempText})! Cả tiệm mát lạnh sâu, khách kiên nhẫn hơn +${newLv * 25}%!`, "success", "❄️");
+      this.renderDaikinAC();
+      this.renderDiningStage();
+    } else {
+      this.sound.playCoinChime();
+      GameUIModal.showToast("Nâng cấp thành công cơ ngơi tiệm mì!", "success", "🛠️");
+    }
+
     this.saveGame();
     this.renderHeader();
     this.renderUpgradesTab();
@@ -1325,13 +1390,14 @@ export class SpicyNoodleGame {
                     <button class="btn-send-reply" onclick="window.game.submitCustomReply(${idx})">Gửi 💌</button>
                   </div>
                   <div class="reply-quick-chips">
-                    ${starCount <= 2 ? `
-                      <span class="reply-chip" onclick="window.game.fillQuickReply(${idx}, 'Dạ tiệm xin lỗi bạn nhiều nha, lần sau ghé tiệm sẽ bù cho bạn 1 phần trà sữa ạ! 🧋')">🧋 Xin lỗi & Tặng trà sữa</span>
-                      <span class="reply-chip" onclick="window.game.fillQuickReply(${idx}, 'Tiệm chân thành ghi nhận và đã chấn chỉnh ngay tốc độ nấu mì ạ! ⚡')">⚡ Hứa cải thiện tốc độ</span>
-                    ` : `
-                      <span class="reply-chip" onclick="window.game.fillQuickReply(${idx}, 'Cảm ơn bạn yêu nhiều nha, chúc bạn luôn vui vẻ và ngon miệng! 💖')">💖 Cảm ơn nồng nhiệt</span>
-                      <span class="reply-chip" onclick="window.game.fillQuickReply(${idx}, 'Cảm ơn bạn đã ủng hộ tiệm, hẹn gặp lại bạn trong ca bán tới nhé! 🍜')">🍜 Hẹn gặp lại bạn</span>
-                    `}
+                    <div style="font-size: 10px; font-weight: 800; color: #7F8C8D; width: 100%; margin-bottom: 3px;">
+                      💡 Chọn mục phản hồi (Bấm vào nút để tự động random câu ngẫu nhiên 🎲):
+                    </div>
+                    ${this.getReviewReplyCategories(starCount, r.customerName).map(tpl => `
+                      <span class="reply-chip" onclick="window.game.fillQuickReplyCategory(${idx}, '${tpl.key}')" title="Bấm để random câu ngẫu nhiên thuộc mục: ${tpl.label}">
+                        ${tpl.label} 🎲
+                      </span>
+                    `).join("")}
                   </div>
                 </div>
               `}
@@ -1342,6 +1408,164 @@ export class SpicyNoodleGame {
         reviewsList.innerHTML = headerHtml + listHtml;
       }
     }
+  }
+
+  // Danh mục phân loại các nút gợi ý phản hồi
+  getReviewReplyCategories(stars, custName = "bạn") {
+    const pool = this.getReviewReplyPool(stars, custName);
+    return Object.keys(pool).map(key => ({
+      key: key,
+      label: pool[key].label
+    }));
+  }
+
+  // Kho dữ liệu các câu trả lời phong phú theo từng mục để random ngẫu nhiên khi bấm
+  getReviewReplyPool(stars, custName = "bạn") {
+    if (stars <= 3) {
+      return {
+        apology_tea: {
+          label: "🧋 Xin lỗi & Tặng trà sữa",
+          texts: [
+            `Dạ tiệm xin lỗi ${custName} nhiều nha! Lần sau ghé tiệm sẽ bù tặng bạn 1 phần trà sữa trân châu mát lạnh ạ! 🧋`,
+            `Chân thành xin lỗi ${custName} vì trải nghiệm chưa trọn vẹn! Tiệm xin gửi tặng bạn 1 ly trà sữa siêu to khổng lồ vào lần tới nhé! 🧋💖`,
+            `Dạ tiệm áy náy quá ạ! ${custName} đừng buồn tiệm nha, lần sau ghé quán đãi bạn trà sữa miễn phí liền ạ! 🧋✨`,
+            `Tiệm xin lỗi ${custName} thật nhiều! Cho tiệm cơ hội chuộc lỗi bằng một ly trà sữa ngọt lịm mát lạnh vào lần sau nha! 🧋🥰`
+          ]
+        },
+        speed: {
+          label: "⚡ Hứa cải thiện tốc độ",
+          texts: [
+            `Tiệm chân thành ghi nhận góp ý và đã chấn chỉnh ngay tốc độ nấu mì của bếp để phục vụ ${custName} nhanh hơn ạ! ⚡`,
+            `Dạ tiệm đã nâng cấp thêm bếp nấu và nhắc nhở nhân viên ra món cấp tốc để ${custName} không phải đợi lâu nữa ạ! 🍲⚡`,
+            `Cảm ơn ${custName} đã kiên nhẫn góp ý! Bếp trưởng cam kết lần tới bạn ghé mì sẽ lên bàn nóng hổi chỉ trong tích tắc! ⏱️✨`,
+            `Tiệm đang tối ưu lại toàn bộ quy trình bếp nấu, lần sau ${custName} ghé chắc chắn sẽ được phục vụ nhanh như chớp nha! ⚡💨`
+          ]
+        },
+        funny: {
+          label: "😆 Rep hài hước lầy lội",
+          texts: [
+            `Dạ bếp trưởng mải mê canh niêu đất sôi xì xèo nên lỡ chậm tí xíu, mong ${custName} đáng yêu bỏ qua cho tiệm nha haha! 😆💖`,
+            `Ahihi ${custName} ơi đừng giận mà tội nghiệp tiệm! Giận mau già đó nha, lần tới ghé tiệm biểu diễn múa mì đền bù nè! 🍜😆`,
+            `Oan cho tiệm quá ${custName} ơi, tại niêu mì thơm quá làm đầu bếp đứng ngửi mê mẩn á! Lần sau tiệm xin chừa ạ haha! 🤣🍲`,
+            `Dạ em xin quỳ gối tạ lỗi với đại nhân ${custName}! Xin đại nhân bớt giận, lần tới ghé em xin hầu hạ chu đáo tận bàn ạ! 🙇‍♂️😆`
+          ]
+        },
+        overload: {
+          label: "🍲 Giờ cao điểm thông cảm",
+          texts: [
+            `Dạ hôm nay vào giờ cao điểm quán bị quá tải đơn nên để ${custName} phải chờ, tiệm vô cùng áy náy và mong bạn thông cảm ạ! 🍲🙏`,
+            `Lúc ${custName} ghé quán đông nghẹt kín bàn nên phục vụ chưa được chu đáo, mong bạn lượng thứ cho tiệm nha! 🙏✨`,
+            `Giờ cao điểm khách dồn dập làm bếp hơi lúng túng, tiệm thành thật xin lỗi ${custName} vì sự bất tiện này ạ! 🍲🍂`,
+            `Dạ đơn đặt dồn dập khiến tiệm trở tay không kịp, cảm ơn ${custName} đã kiên nhẫn và rất mong bạn thông cảm giúp tiệm ạ! 💖🙏`
+          ]
+        },
+        topping: {
+          label: "🥩 Đền bù Topping Bò Mỹ",
+          texts: [
+            `Dạ sơ suất của tiệm làm ${custName} phiền lòng! Lần tới ghé bảo chủ quán bù tặng ngay 1 đĩa Bò Mỹ tươi ngon nha! 🥩✨`,
+            `Để bù đắp cho ${custName}, lần tới ghé tiệm xin phép tặng thêm bạn gấp đôi topping thịt bò ăn cho đã miệng ạ! 🥩🍲`,
+            `Tiệm gửi tặng ${custName} một phần topping phô mai / bò mềm vào lần sau để làm hòa nha, bạn đừng giận tiệm nữa nhé! 🧀🥩`,
+            `Lần tới ghé nhớ ới chủ quán để nhận ngay đĩa topping đặc biệt đền bù cho ${custName} nhé, mãi yêu bạn! 🥩💖`
+          ]
+        },
+        spicy_adjust: {
+          label: "🌶️ Điều chỉnh độ cay chuẩn gu",
+          texts: [
+            `Dạ nếu cấp độ cay này hơi gắt, lần tới ${custName} ghé tiệm sẽ nấu riêng một niêu đậm đà vừa vặn chuẩn gu bạn luôn ạ! 🌶️🍲`,
+            `Tiệm có đủ cấp từ 0 đến 7 nè, lần tới ${custName} nhớ dặn bếp hạ bớt ớt hiểm xuống để ăn ngon miệng nhất nha! 🌶️✨`,
+            `Dạ lần tới ghé tiệm sẽ nêm nếm nước dùng ngọt thanh dịu nhẹ hơn đúng theo ý ${custName} luôn ạ! 🍲💖`,
+            `Ớt hiểm hôm nay cay nồng quá làm ${custName} vất vả rồi! Lần sau tiệm sẽ điều chỉnh độ cay êm ái hơn nha! 🌶️😋`
+          ]
+        }
+      };
+    } else {
+      return {
+        thanks: {
+          label: "💖 Cảm ơn nồng nhiệt",
+          texts: [
+            `Cảm ơn ${custName} yêu quý nhiều nha! Chúc bạn luôn vui vẻ, tràn đầy năng lượng và ngon miệng mỗi ngày! 💖✨`,
+            `Đọc review của ${custName} mà cả tiệm vui cả ngày luôn á! Cảm ơn bạn đã yêu thích hương vị mì cay của quán nha! 💖🍲`,
+            `Cảm ơn ${custName} triệu tim! Sự ủng hộ nhiệt tình của bạn là niềm hạnh phúc lớn nhất của tiệm mì nè! 💖🎉`,
+            `Tiệm cảm ơn ${custName} nhiều lắm! Chúc bạn luôn có những bữa ăn xì xèo ấm áp và ngon miệng nha! 💖🥰`
+          ]
+        },
+        see_you: {
+          label: "🍜 Hẹn gặp lại cùng hội bạn",
+          texts: [
+            `Cảm ơn ${custName} đã ủng hộ tiệm! Hẹn sớm gặp lại bạn và hội bạn thân ghé xì xèo mì cay trong ca bán tới nhé! 🍜🎉`,
+            `Cuối tuần rủ ngay cạ cứng qua tiệm làm nồi lẩu mì cay nóng hổi tiếp nha ${custName} ơi! Hẹn gặp lại bạn nè! 🍜✨`,
+            `Tiệm luôn sẵn sàng niêu đất nóng hổi chờ đón ${custName} ghé lại bất cứ lúc nào nha! 🍜💖`,
+            `Hẹn gặp lại ${custName} vào một ngày gần nhất nha, quán sẽ chuẩn bị chỗ ngồi view đẹp nhất cho bạn nè! 🪑🍜`
+          ]
+        },
+        spicy_challenge: {
+          label: "🔥 Rủ thử cấp cay 6-7",
+          texts: [
+            `Nghe ${custName} khen ngon mà tiệm ấm lòng ghê! Lần tới ghé thử thách niêu mì cấp 6-7 bốc khói xem sao nha! 🔥🌶️`,
+            `Ẩn số cấp 7 đang chờ cao thủ như ${custName} tới chinh phục đó! Lần sau ghé làm một niêu bốc lửa xem sao nhé! 🔥👑`,
+            `Ăn cay đỉnh thế này lần sau ghé phải nâng cấp độ lên thôi ${custName} ơi, tiệm đợi bạn phá kỷ lục nè! 🔥🍲`,
+            `Khách ăn cay cừ khôi quá chừng! Lần tới nhớ thử cấp độ bốc hỏa của quán xem có làm khó được ${custName} không nha! 🌶️🔥`
+          ]
+        },
+        vip: {
+          label: "👑 Tri ân Khách VIP ruột",
+          texts: [
+            `Những lời khen của ${custName} là động lực to lớn nhất của quán! Tiệm xin phép ghi nhận bạn là Khách VIP ruột của tiệm ạ! 👑🌟`,
+            `Vinh danh ${custName} - vị khách quý 10 điểm không có nhưng của tiệm mì cay! Cảm ơn bạn rất nhiều! 👑✨`,
+            `Khách ruột VIP có khác, đánh giá có tâm xỉu luôn! Tiệm trân trọng và biết ơn ${custName} nhiều lắm ạ! 👑💖`,
+            `Chủ quán đã lưu tên ${custName} vào danh sách Thượng khách VIP rồi nhé, ghé ăn là luôn được ưu tiên nha! 👑🎉`
+          ]
+        },
+        drink: {
+          label: "🍑 Mời thêm Trà Đào Cam Sả",
+          texts: [
+            `Khách dễ thương quá chừng luôn á! Lần tới ghé nhớ gọi thêm ly Trà đào cam sả thanh mát uống giải nhiệt cùng mì cay nha! 🍑🧋`,
+            `Ăn mì cay đậm đà mà làm thêm ngụm Trà sữa trân châu hoặc Trà đào là combo chuẩn bài luôn đó ${custName} ơi! 🧋✨`,
+            `Lần tới ghé tiệm nhớ thử món Sữa tươi lắc phô mai mát lạnh uống kèm mì cay nha ${custName}, ngon mê ly luôn á! 🥛🧀`,
+            `Menu nước giải cay của tiệm đang có nhiều món mới thơm ngon lắm, lần sau ${custName} ghé thử nha! 🍑🥤`
+          ]
+        },
+        sweet: {
+          label: "🥰 Thả tim siêu ngọt ngào",
+          texts: [
+            `Yêu thương ${custName} nhiều nhiều! Tiệm sẽ luôn giữ vững hương vị ngọt xương đậm đà này để đón bạn ghé ăn hoài hoài nhé! 🥰🍲`,
+            `U là trời chủ quán đọc xong muốn tan chảy con tim luôn á! Cảm ơn ${custName} dễ thương ngập tràn nha! 🥰💖`,
+            `Bếp trưởng gửi ngàn nụ hôn và lời cảm ơn chân thành nhất đến ${custName} nè, yêu bạn nhiều lắm! 🥰✨`,
+            `Khách gì mà vừa xinh lại vừa đáng yêu thế này! Cảm ơn ${custName} đã gửi tặng tiệm những lời ấm áp nha! 🥰🍲`
+          ]
+        }
+      };
+    }
+  }
+
+  // Tự động chọn ngẫu nhiên một câu văn khác biệt thuộc danh mục khi người chơi bấm nút
+  fillQuickReplyCategory(idx, categoryKey) {
+    const rev = this.state.reviews[idx];
+    if (!rev) return;
+
+    const input = document.getElementById(`reply-input-${idx}`);
+    if (!input) return;
+
+    const custName = rev.customerName || "bạn";
+    const stars = rev.stars || 5;
+    const pool = this.getReviewReplyPool(stars, custName);
+    const categoryData = pool[categoryKey];
+
+    if (!categoryData || !categoryData.texts || categoryData.texts.length === 0) return;
+
+    const currentVal = input.value.trim();
+    // Lọc các câu khác câu đang hiển thị để mỗi lần bấm luôn ra một câu ngẫu nhiên mới
+    let candidates = categoryData.texts.filter(t => t !== currentVal);
+    if (candidates.length === 0) candidates = categoryData.texts;
+
+    const randomText = candidates[Math.floor(Math.random() * candidates.length)];
+    input.value = randomText;
+    input.focus();
+
+    // Hiệu ứng nháy sáng nhẹ để người chơi nhận biết câu mới vừa được random điền vào
+    input.classList.remove("reply-input-pulse");
+    void input.offsetWidth; // Trigger reflow
+    input.classList.add("reply-input-pulse");
   }
 
   fillQuickReply(idx, text) {
@@ -1471,6 +1695,7 @@ export class SpicyNoodleGame {
     this.renderPotWorkstation();
     this.renderCookingSteps();
     this.renderDiningStage();
+    this.renderDaikinAC();
   }
 
   // Render các buff nâng cấp đang kích hoạt trong ca bán
@@ -1591,22 +1816,28 @@ export class SpicyNoodleGame {
         (pot.spicyLevel === order.spicyLevel) &&
         (!order.toppingId || pot.toppings.includes(order.toppingId));
 
+      const isSpecialCombo = Boolean(slot.isSpecialCombo || this.isSpecialComboOrder(order));
+      const noodleItem = this.state.noodles[order.noodleId];
+      const isNoodleOutOfStock = !noodleItem || (noodleItem.stock <= 0);
+
       return `
-        <div class="order-slot-card ${isMatch ? 'is-matching-dish' : ''}">
+        <div class="order-slot-card ${isSpecialCombo ? 'is-special-combo-slot' : ''} ${isMatch ? 'is-matching-dish' : ''}">
           <div class="order-customer-head">
             <div class="order-cust-avatar-wrap">
               <img src="${cust.avatar}" alt="${cust.name}" class="order-cust-avatar" onerror="this.src='assets/cust_cat.png'" />
             </div>
             <div class="order-cust-info">
-              <span class="order-cust-title">${slot.isSpecial ? '⭐ ' : ''}${cust.name}</span>
+              <span class="order-cust-title">${isSpecialCombo ? '🌟 ' : (slot.isSpecial ? '⭐ ' : '')}${cust.name}</span>
               <span class="order-cust-mood ${patienceClass}">
                 ${patiencePct > 55 ? '😊 Đang đợi món' : (patiencePct > 25 ? '🤤 Sốt ruột' : '💦 Sắp về')}
               </span>
             </div>
           </div>
           <div class="order-speech-bubble" onclick="window.game.quickCookForSlot(${idx})" style="cursor: pointer;" title="Chạm để nạp nhanh công thức này vào niêu đất!">
-            ${slot.isSpecial ? '<div style="font-size:9.5px; color:#C44569; font-weight:800; margin-bottom:1px;">Món tâm đắc:</div>' : ''}
+            ${isSpecialCombo ? '<div class="special-combo-order-badge">✨ ĐƠN ĐẶC BIỆT (+BONUS) ✨</div>' : (slot.isSpecial ? '<div style="font-size:9.5px; color:#C44569; font-weight:800; margin-bottom:1px;">Món tâm đắc:</div>' : '')}
+            ${isSpecialCombo ? '<div style="font-size:9px; color:#D35400; font-weight:800; margin-bottom:2px;">🔥 Món đặc biệt: Tip x2 + Siêu Bonus!</div>' : ''}
             <span class="dish-highlight-badge">${order.noodleName}</span>
+            ${isNoodleOutOfStock ? '<div style="font-size:8.5px; color:#E74C3C; font-weight:800; margin-top:2px; background:rgba(231,76,60,0.12); padding:1px 5px; border-radius:4px; border:1px solid rgba(231,76,60,0.3);">⚠️ Hết mì trong kho (Đơn cuối trên khay)</div>' : ''}
             <div style="margin-top: 2px; font-size: 10.5px;">
               Size <strong>${order.size}</strong> · Cấp <strong>${order.spicyLevel} 🌶️</strong>
               ${order.toppingName ? `<br/>+ thêm <strong>${order.toppingName}</strong>` : ''}
@@ -1619,8 +1850,8 @@ export class SpicyNoodleGame {
             <button class="btn-quick-cook" onclick="window.game.quickCookForSlot(${idx})" title="Tự động chuẩn bị niêu đất đúng đơn khách này">
               ⚡ Nấu
             </button>
-            <button class="btn-serve-slot ${isMatch ? 'is-matching' : ''}" onclick="window.game.serveToSlot(${idx})">
-              ${isMatch ? '✨ Bưng' : 'Bưng 🍜'}
+            <button class="btn-serve-slot ${isMatch ? 'is-matching' : ''} ${isSpecialCombo ? 'is-special-combo-btn' : ''}" onclick="window.game.serveToSlot(${idx})">
+              ${isMatch ? (isSpecialCombo ? '🌟 Bưng (+Bonus)' : '✨ Bưng') : (isSpecialCombo ? 'Bưng (+Bonus) 🌟' : 'Bưng 🍜')}
             </button>
             <button class="btn-reject-slot" onclick="window.game.rejectSlot(${idx})" title="Từ chối khách">✕</button>
           </div>
@@ -2181,7 +2412,22 @@ export class SpicyNoodleGame {
     let tip = Math.round(bowlPrice * baseTipRate * (slot.customer.tipMultiplier || 1));
     if (this.state.staff.mochi) tip = Math.round(tip * 1.35);
 
-    const totalEarned = bowlPrice + tip;
+    // KIỂM TRA ĐƠN ĐẶC BIỆT (SPECIAL COMBO TRÙNG VỚI BẢNG CHUẨN BỊ NGÀY)
+    const isSpecialCombo = Boolean(slot.isSpecialCombo || this.isSpecialComboOrder(order) || this.isSpecialComboPot(pot));
+    let specialBonus = 0;
+    if (isSpecialCombo) {
+      // Đơn đặc biệt: Khách tip gấp đôi và tặng thêm một khoản BONUS tiền khủng!
+      tip = Math.round(tip * 2.0);
+      specialBonus = Math.round(bowlPrice * 0.85) + 50; // Thưởng thêm nóng cực nhiều tiền
+
+      this.state.specialCombo.streak = (this.state.specialCombo.streak || 0) + 1;
+      this.state.todaySpecialBowlsSold = (this.state.todaySpecialBowlsSold || 0) + 1;
+      this.state.todaySpecialBonus = (this.state.todaySpecialBonus || 0) + specialBonus;
+      this.state.stats.specialBowlsServed = (this.state.stats.specialBowlsServed || 0) + 1;
+      this.state.stats.specialBonusEarned = (this.state.stats.specialBonusEarned || 0) + specialBonus;
+    }
+
+    const totalEarned = bowlPrice + tip + specialBonus;
 
     // Trừ 1 suất nguyên liệu trong kho
     if (noodle.stock > 0) noodle.stock -= 1;
@@ -2191,20 +2437,27 @@ export class SpicyNoodleGame {
       }
     });
 
+    // Nếu mì trong kho vừa hết, tự động kiểm tra và từ chối các đơn sau trên khay để nhường chỗ cho khách khác
+    if (noodle.stock <= 0) {
+      this.checkAndAutoRejectOutOfStockDuplicates();
+    }
+
     this.state.money += totalEarned;
     this.state.todayEarnings += totalEarned;
     this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + totalEarned;
     this.state.todayBowlsSold += 1;
-    this.state.todayTips += tip;
+    this.state.todayTips += (tip + specialBonus);
     this.state.stats.bowlsServed += 1;
-    this.state.stats.tipsEarned += tip;
+    this.state.stats.tipsEarned += (tip + specialBonus);
     if (pot.spicyLevel >= 6) {
       this.state.todaySpicy7Sold += 1;
       this.state.stats.spicyMasterServed += 1;
     }
 
     this.sound.playCoinChime();
-    if (isAutoUsagi) {
+    if (isSpecialCombo) {
+      GameUIModal.showToast(`🌟 KHÁCH MÊ MẨN ĐƠN ĐẶC BIỆT! Nhận +${totalEarned}k (Mì + Tip x2 & 🎁 BONUS COMBO +${specialBonus}k)!`, "success", "🔥");
+    } else if (isAutoUsagi) {
       GameUIModal.showToast(`🐰 Thỏ Usagi nhanh tay bưng mì cho ${slot.customer.name}! +${totalEarned}k (tip +${tip}k)`, "success", "✨");
     } else {
       GameUIModal.showToast(`Bưng mỳ thành công! Khách gửi +${totalEarned}k (tip +${tip}k)!`, "success", "✨");
@@ -2215,7 +2468,15 @@ export class SpicyNoodleGame {
     let stars = 5;
     let comment = "";
 
-    if (patienceRatio >= 0.70) {
+    if (isSpecialCombo) {
+      stars = 5;
+      const specialComments = [
+        `Món đặc biệt hôm nay (${noodle.name} cấp ${pot.spicyLevel} thêm ${order.toppingName || 'topping'}) đỉnh của chóp! Đậm đà khó cưỡng, gửi tặng chủ tiệm thêm tiền thưởng bonus siêu hậu hĩnh! 🌟💖`,
+        `Thấy bảng Món Đặc Biệt ngoài cửa tiệm ghé vào gọi thử, ngon ngoài mong đợi! Sợi mì dai ngon, nước dùng sôi sùng sục, bonus tiền tip khủng cho quán nhé! 🔥🍜✨`,
+        `Đúng là Hot Combo đặc biệt của tiệm mì cay! Ăn một lần là mê say, chấm ngay 5 sao và bonus tiền cực phóng khoáng cho quán! 👑✨`
+      ];
+      comment = specialComments[Math.floor(Math.random() * specialComments.length)];
+    } else if (patienceRatio >= 0.70) {
       stars = 5;
       const comments5 = [
         `Mì ${noodle.name} cấp ${pot.spicyLevel} nước dùng ngọt xương thơm lừng, phục vụ siêu nhanh, ăn xì xèo ngon mê ly! 💖`,
@@ -2368,13 +2629,73 @@ export class SpicyNoodleGame {
     const activeNoodles = Object.values(this.state.noodles).filter(n => n.unlocked && n.inMenu);
     if (activeNoodles.length === 0) return;
 
-    const chosenNoodle = activeNoodles[Math.floor(Math.random() * activeNoodles.length)];
-    const chosenCust = this.customerTemplates[Math.floor(Math.random() * this.customerTemplates.length)];
-    const spicyLevel = chosenCust.preferredSpicy[Math.floor(Math.random() * chosenCust.preferredSpicy.length)];
+    let chosenNoodle;
+    let spicyLevel;
+    let chosenTop;
+    let isSpecialCombo = false;
 
-    const activeTops = Object.values(this.state.toppings).filter(t => t.unlocked && t.inMenu);
-    const chosenTop = activeTops.length > 0 && Math.random() > 0.4 ? activeTops[Math.floor(Math.random() * activeTops.length)] : null;
+    // Khoảng 35% khách hàng bị hấp dẫn bởi Bảng Món Đặc Biệt Hôm Nay ở khu chuẩn bị!
+    if (this.state.specialCombo && Math.random() < 0.35) {
+      const specNoodle = this.state.noodles[this.state.specialCombo.noodleId];
+      const specTop = this.state.toppings[this.state.specialCombo.toppingId];
+      if (specNoodle && specNoodle.unlocked && specNoodle.inMenu) {
+        chosenNoodle = specNoodle;
+        spicyLevel = this.state.specialCombo.spicyLevel;
+        chosenTop = (specTop && specTop.unlocked && specTop.inMenu) ? specTop : null;
+        isSpecialCombo = true;
+      }
+    }
+
+    if (!chosenNoodle) {
+      chosenNoodle = activeNoodles[Math.floor(Math.random() * activeNoodles.length)];
+      const chosenCust = this.customerTemplates[Math.floor(Math.random() * this.customerTemplates.length)];
+      spicyLevel = chosenCust.preferredSpicy[Math.floor(Math.random() * chosenCust.preferredSpicy.length)];
+      const activeTops = Object.values(this.state.toppings).filter(t => t.unlocked && t.inMenu);
+      chosenTop = activeTops.length > 0 && Math.random() > 0.4 ? activeTops[Math.floor(Math.random() * activeTops.length)] : null;
+    }
+
+    const chosenCust = this.customerTemplates[Math.floor(Math.random() * this.customerTemplates.length)];
     const isSpecial = Math.random() > 0.7;
+
+    // ==========================================================
+    // KIỂM TRA MÌ ĐÃ HẾT: CHỈ HIỆN ĐƠN ĐẦU TIÊN LÊN KHAY,
+    // CÁC ĐƠN SAU TỰ AUTO TỪ CHỐI & BÁO LÊN ĐỂ NHƯỜNG CHỖ CHO KHÁCH KHÁC
+    // ==========================================================
+    const isNoodleOutOfStock = (chosenNoodle.stock <= 0);
+    if (isNoodleOutOfStock) {
+      const alreadyHasOrderOnTray = this.orderSlots.some(s => s && s.order && s.order.noodleId === chosenNoodle.id);
+      if (alreadyHasOrderOnTray) {
+        // Đã có 1 đơn của loại mì đã hết này trên khay rồi!
+        // Tự động từ chối khách sau này và hiển thị thông báo
+        GameUIModal.showToast(
+          `📢 Kho đã hết "${chosenNoodle.name}" (đã có 1 đơn chờ)! Tự động từ chối ${chosenCust.name} để nhường chỗ cho khách khác xếp hàng!`,
+          "warning",
+          "⚠️"
+        );
+
+        // Nhường chỗ khay trống cho khách khác vào gọi món còn hàng
+        const inStockNoodles = activeNoodles.filter(n => n.stock > 0);
+        if (inStockNoodles.length > 0) {
+          const nextNoodle = inStockNoodles[Math.floor(Math.random() * inStockNoodles.length)];
+          const nextCust = this.customerTemplates[Math.floor(Math.random() * this.customerTemplates.length)];
+          const nextSpicy = nextCust.preferredSpicy[Math.floor(Math.random() * nextCust.preferredSpicy.length)];
+          const activeTops = Object.values(this.state.toppings).filter(t => t.unlocked && t.inMenu);
+          const nextTop = activeTops.length > 0 && Math.random() > 0.4 ? activeTops[Math.floor(Math.random() * activeTops.length)] : null;
+
+          chosenNoodle = nextNoodle;
+          spicyLevel = nextSpicy;
+          chosenTop = nextTop;
+          isSpecialCombo = this.isSpecialComboOrder({ noodleId: nextNoodle.id, spicyLevel: nextSpicy, toppingId: nextTop ? nextTop.id : null });
+        } else {
+          // Tất cả mì trong kho đều hết hàng, giữ khay trống
+          return;
+        }
+      }
+    }
+
+    if (this.isSpecialComboOrder({ noodleId: chosenNoodle.id, spicyLevel: spicyLevel, toppingId: chosenTop ? chosenTop.id : null })) {
+      isSpecialCombo = true;
+    }
 
     const baseNoodlePrice = chosenNoodle.basePrice || chosenNoodle.price || 40;
     const currentNoodlePrice = chosenNoodle.price || 40;
@@ -2387,6 +2708,7 @@ export class SpicyNoodleGame {
     this.orderSlots[chosenSlotIdx] = {
       customer: chosenCust,
       isSpecial: isSpecial,
+      isSpecialCombo: isSpecialCombo,
       orderPriceRatio: orderPriceRatio,
       order: {
         noodleId: chosenNoodle.id,
@@ -2402,6 +2724,49 @@ export class SpicyNoodleGame {
 
     this.sound.playDoorBell();
     this.renderOrderQueue();
+  }
+
+  // Tự động kiểm tra và từ chối các đơn thứ 2 trở đi của loại mì đã hết hàng trong kho
+  checkAndAutoRejectOutOfStockDuplicates() {
+    const seenOutOfStockNoodles = new Set();
+    let hasRejected = false;
+
+    this.orderSlots.forEach((slot, idx) => {
+      if (!slot || !slot.order) return;
+      const noodleId = slot.order.noodleId;
+      const noodle = this.state.noodles[noodleId];
+      const isOutOfStock = !noodle || (noodle.stock <= 0);
+
+      if (isOutOfStock) {
+        if (seenOutOfStockNoodles.has(noodleId)) {
+          // Đây là đơn sau của loại mì đã hết hàng -> Tự động từ chối!
+          const custName = slot.customer?.name || "Khách hàng";
+          const noodleName = slot.order.noodleName || noodle?.name || "Mì cay";
+          this.orderSlots[idx] = null;
+          hasRejected = true;
+
+          GameUIModal.showToast(
+            `📢 Kho đã hết "${noodleName}" (đã có 1 đơn chờ)! Tự động từ chối đơn của ${custName} để nhường khay cho khách khác!`,
+            "warning",
+            "⚠️"
+          );
+        } else {
+          // Đơn đầu tiên của loại mì đã hết hàng: Giữ lại trên khay
+          seenOutOfStockNoodles.add(noodleId);
+        }
+      }
+    });
+
+    if (hasRejected) {
+      this.sound.playButtonClick();
+      this.renderOrderQueue();
+      // Nhường chỗ cho khách khác vào xếp hàng ngay
+      setTimeout(() => {
+        if (this.state.dayPhase === "open" && !this.isPaused) {
+          this.spawnCustomerToSlot();
+        }
+      }, 350);
+    }
   }
 
   // 12. Thanh nút chân trang & CTA Deck trên đỉnh Kho
@@ -2558,12 +2923,19 @@ export class SpicyNoodleGame {
       const order = table.order || { noodleName: "Mì cay Bò", spicyLevel: 2 };
       const eatPct = Math.round(((table.eatTimer || 1) / 12) * 100);
 
+      const acLv = this.state.upgrades.acCooling || 1;
       let comment = "🍜 Nước dùng ngọt thanh quá!";
-      if (order.spicyLevel >= 6) comment = "🔥 Cay bốc khói mà ngon tê tái!";
-      else if (order.spicyLevel >= 3) comment = "🌶️ Đậm đà thơm lừng đã miệng!";
+      if (order.spicyLevel >= 6) {
+        comment = acLv >= 2 ? "🔥 Cay xè mà Daikin phà mát rượi đã ghê! ❄️" : "🔥 Cay bốc khói mà ngon tê tái!";
+      } else if (order.spicyLevel >= 3) {
+        comment = acLv >= 2 ? "🌶️ Mì ngon đậm đà, phòng mát lạnh cực êm! ❄️" : "🌶️ Đậm đà thơm lừng đã miệng!";
+      } else if (acLv >= 2) {
+        comment = "❄️ Điều hòa Daikin mát rượi, ăn mì ấm lòng!";
+      }
 
       return `
-        <div class="dining-table-box is-eating">
+        <div class="dining-table-box is-eating" style="position: relative;">
+          ${acLv >= 2 ? '<span class="dining-cool-badge" title="Mát rượi nhờ Daikin">❄️ Mát</span>' : ''}
           <img src="${cust.avatar || 'assets/cust_cat.png'}" class="dining-customer-avatar" alt="${cust.name}" onerror="this.src='assets/cust_cat.png'" />
           <span style="font-size: 11px; font-weight: 800; color: #3B180E;">${cust.name}</span>
           <div class="eating-pot-icon">🍲💨</div>
@@ -2578,6 +2950,7 @@ export class SpicyNoodleGame {
     // 3. Render đồng bộ vào tất cả các vị trí hiển thị trên màn hình:
     const openGrid = document.getElementById("open-dining-tables-grid");
     if (openGrid) openGrid.innerHTML = tablesHtml;
+    this.renderDaikinAC();
 
     // Mini-tables gọn gàng tối ưu diện tích cho Phòng Ăn Gỗ Sồi trong Chế độ Chuẩn bị
     const miniTablesHtml = this.state.tables.map(table => {
@@ -2647,6 +3020,142 @@ export class SpicyNoodleGame {
   }
 
   // ==========================================================
+  // 14. HỆ THỐNG ĐIỀU HÒA DAIKIN MÁT RƯỢI (LIVING DAIKIN AC SYSTEM)
+  // ==========================================================
+  renderDaikinAC() {
+    const acLv = this.state.upgrades.acCooling || 1;
+    let temp = "24°C";
+    let modeText = "INVERTER";
+    let speedText = "Êm ái dịu mát";
+    let bonusPct = 25;
+
+    if (acLv === 2) {
+      temp = "20°C";
+      modeText = "LÀM LẠNH SÂU";
+      speedText = "Gió lạnh băng giá";
+      bonusPct = 50;
+    } else if (acLv >= 3) {
+      temp = "16°C";
+      modeText = "TURBO COOL MAX";
+      speedText = "Băng tuyết siêu tốc";
+      bonusPct = 75;
+    }
+
+    // 1. Cục lạnh treo tường Daikin tại Sân Khấu Phòng Ăn (Open Mode)
+    const stageContainer = document.getElementById("daikin-ac-stage-container");
+    if (stageContainer) {
+      stageContainer.innerHTML = `
+        <div class="daikin-wall-unit lv-${acLv}" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin ${modeText} - Chạm để xả gió lạnh Turbo!">
+          <div class="daikin-front-panel">
+            <div class="daikin-brand-badge">
+              <span class="daikin-brand-name">DAIKIN</span>
+              <span class="daikin-brand-tech">${modeText} · CẤP ${acLv}</span>
+            </div>
+            <div class="daikin-center-grille"></div>
+            <div class="daikin-screen-led">
+              <span class="daikin-led-num" id="daikin-led-num">${temp}</span>
+              <span class="daikin-led-snowflake">❄️</span>
+            </div>
+            <div class="daikin-led-pills">
+              <span class="ac-led-dot led-green" title="Nguồn"></span>
+              <span class="ac-led-dot led-blue" title="Cooling"></span>
+            </div>
+          </div>
+          <div class="daikin-louver-flap"></div>
+          <div class="daikin-air-curtain">
+            <div class="air-breeze-stream stream-left"></div>
+            <div class="air-breeze-stream stream-center"></div>
+            <div class="air-breeze-stream stream-right"></div>
+            <div class="air-frost-particles">
+              <span class="frost-snowflake f1">❄️</span>
+              <span class="frost-snowflake f2">💨</span>
+              <span class="frost-snowflake f3">❄️</span>
+              <span class="frost-snowflake f4">✨</span>
+            </div>
+          </div>
+          <div class="daikin-cooling-tip">
+            <span>❄️ Daikin ${temp} · ${speedText} · Giảm sốt ruột cho khách (+${bonusPct}% kiên nhẫn)</span>
+            <span class="btn-tap-turbo-hint">⚡ Chạm để Turbo</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // 2. Thanh điều hòa Daikin ở Bếp Nấu Siêu Tốc
+    const kitchenBar = document.getElementById("kitchen-daikin-bar");
+    if (kitchenBar) {
+      kitchenBar.innerHTML = `
+        <div class="k-daikin-inner lv-${acLv}">
+          <div class="k-daikin-badge">
+            <span class="k-daikin-brand">❄️ DAIKIN</span>
+            <span class="k-daikin-led">${temp}</span>
+          </div>
+          <div class="k-daikin-flow-wrap">
+            <span class="k-daikin-status">Gió lạnh ${modeText}: Làm dịu cơn cay · Khách kiên nhẫn +${bonusPct}%</span>
+          </div>
+          <button class="btn-k-turbo" onclick="event.stopPropagation(); window.game.interactDaikinAC();" title="Bật Turbo Boost ngay!">
+            ⚡ Turbo 16°C
+          </button>
+        </div>
+      `;
+    }
+
+    // 3. Mini Daikin ở Phòng Chuẩn Bị Ngày
+    const prepAc = document.getElementById("daikin-prep-wall-ac");
+    const prepBadge = document.getElementById("prep-daikin-indicator");
+    if (prepBadge) {
+      prepBadge.textContent = `❄️ Daikin ${temp} (${modeText})`;
+    }
+    if (prepAc) {
+      prepAc.innerHTML = `
+        <div class="prep-daikin-mini lv-${acLv}" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin Inverter sẵn sàng làm mát quán!">
+          <div class="prep-daikin-case">
+            <span class="prep-daikin-brand">DAIKIN</span>
+            <span class="prep-daikin-temp">${temp}</span>
+            <span class="ac-led-dot led-green"></span>
+          </div>
+          <div style="font-weight:700; color:#00796B;">Không gian mát lạnh (+${bonusPct}% kiên nhẫn)</div>
+          <div style="font-size:12px;">❄️💨</div>
+        </div>
+      `;
+    }
+  }
+
+  // Tương tác bấm vào Điều hòa Daikin để xả gió Turbo
+  interactDaikinAC() {
+    this.sound.playCoinChime();
+    const acLv = this.state.upgrades.acCooling || 1;
+    let temp = acLv >= 3 ? "16°C" : (acLv === 2 ? "20°C" : "24°C");
+
+    // Hồi phục kiên nhẫn ngay cho tất cả khách đang chờ
+    let boostedCount = 0;
+    this.orderSlots.forEach(slot => {
+      if (slot) {
+        slot.patience = Math.min(slot.maxPatience, slot.patience + 25);
+        boostedCount++;
+      }
+    });
+
+    const wallUnit = document.querySelector(".daikin-wall-unit");
+    if (wallUnit) {
+      wallUnit.classList.add("is-turbo-blasting");
+      setTimeout(() => wallUnit.classList.remove("is-turbo-blasting"), 3000);
+    }
+    const kBar = document.querySelector(".k-daikin-inner");
+    if (kBar) {
+      kBar.classList.add("is-turbo-blasting");
+      setTimeout(() => kBar.classList.remove("is-turbo-blasting"), 3000);
+    }
+
+    this.renderOrderQueue();
+    GameUIModal.showToast(
+      `🧊 BẬT TURBO DAIKIN 16°C! Làn gió băng tuyết phà mát rượi cả quán, ${boostedCount > 0 ? `hạ nhiệt cho ${boostedCount} khách (+25 Kiên nhẫn)!` : "không khí mát lạnh sảng khoái!"}`,
+      "success",
+      "❄️"
+    );
+  }
+
+  // ==========================================================
   // VÒNG ĐỜI NGÀY MỞ CỬA (DAY CYCLE)
   // ==========================================================
   startOpenDay() {
@@ -2663,6 +3172,8 @@ export class SpicyNoodleGame {
     this.state.todayDrinksSold = 0;
     this.state.todaySpicy7Sold = 0;
     this.state.todayTips = 0;
+    this.state.todaySpecialBonus = 0;
+    this.state.todaySpecialBowlsSold = 0;
     this.dayRemaining = this.dayDuration;
     this.orderSlots = [null, null, null];
     this.clearCurrentPot();
@@ -2701,6 +3212,9 @@ export class SpicyNoodleGame {
 
       this.dayRemaining -= 1;
       this.renderHeader();
+
+      // Kiểm tra định kỳ loại mì hết hàng để từ chối các đơn trùng phía sau
+      this.checkAndAutoRejectOutOfStockDuplicates();
 
       // Nâng cấp Điều Hòa Daikin (acCooling): Không khí mát lành giảm độ bức bối giúp khách kiên nhẫn hơn
       const acLv = this.state.upgrades.acCooling || 1;
@@ -3097,6 +3611,7 @@ export class SpicyNoodleGame {
 
     this.showDaySummaryModal();
     this.state.day += 1;
+    this.rollDailySpecialCombo(true); // Chuẩn bị Món Đặc Biệt mới cho ngày tiếp theo ở bảng chuẩn bị
     this.saveGame();
     this.renderAll();
   }
@@ -3123,8 +3638,14 @@ export class SpicyNoodleGame {
           </div>
           <div style="display: flex; justify-content: space-between; font-weight: 700;">
             <span>Tiền tip của khách:</span>
-            <span style="color: var(--accent-berry);">+${txaformat.formatVND(this.state.todayTips)} 💖</span>
+            <span style="color: var(--accent-berry);">+${txaformat.formatVND(this.state.todayTips - (this.state.todaySpecialBonus || 0))} 💖</span>
           </div>
+          ${this.state.todaySpecialBonus > 0 ? `
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #D35400;">
+              <span>🎁 Thưởng Món Đặc Biệt (${this.state.todaySpecialBowlsSold || 0} đơn):</span>
+              <span style="color: #E67E22; font-weight: 800;">+${txaformat.formatVND(this.state.todaySpecialBonus)} 🌟</span>
+            </div>
+          ` : ''}
           ${rentCost > 0 ? `
             <div style="display: flex; justify-content: space-between; font-weight: 700; color: #E74C3C;">
               <span>Chi phí điện nước & mặt bằng:</span>

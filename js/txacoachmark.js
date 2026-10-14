@@ -48,8 +48,8 @@ export class txacoachmark {
       {
         target: "#chalkboard-banner",
         title: "📋 Menu Hôm Nay & Hot Combo",
-        desc: "Bảng phấn hiển thị thực đơn mì cay và topping nhúng niêu đất. Phục vụ đúng 'Món đặc biệt hôm nay' sẽ nhận thêm 20% tiền tip từ khách!",
-        mascotQuote: "Hôm nay combo Mì Hải Sản cấp 3 có thêm phô mai kéo sợi đang cực hot đó nha! 🔥",
+        desc: "Bảng phấn hiển thị thực đơn và Món Đặc Biệt Hôm Nay. Phục vụ đúng đơn này sẽ nhận tiền tip x2 và cộng thêm Siêu Bonus Tiền cực lớn!",
+        mascotQuote: "Phục vụ đúng đơn Món Đặc Biệt sẽ nhận thêm một khoản tiền bonus siêu khủng luôn đó nha! 🌟🔥",
         placement: "bottom"
       },
       {

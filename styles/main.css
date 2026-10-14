@@ -2318,6 +2318,58 @@ html, body {
   transform: translateY(-2px);
 }
 
+/* Đơn Đặc Biệt Trùng Với Bảng Món Đặc Biệt Chuẩn Bị Ngày */
+.order-slot-card.is-special-combo-slot {
+  border: 2px solid #F39C12;
+  background: linear-gradient(180deg, rgba(243, 156, 18, 0.12) 0%, var(--bg-card) 100%);
+  box-shadow: 0 4px 18px rgba(243, 156, 18, 0.35);
+  animation: specialComboCardPulse 2.2s ease-in-out infinite;
+}
+
+.order-slot-card.is-special-combo-slot.is-matching-dish {
+  border: 2.5px solid #E67E22;
+  box-shadow: 0 6px 24px rgba(230, 126, 34, 0.5);
+  transform: translateY(-3px);
+}
+
+@keyframes specialComboCardPulse {
+  0%, 100% {
+    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.3);
+    border-color: #F39C12;
+  }
+  50% {
+    box-shadow: 0 6px 22px rgba(231, 76, 60, 0.45);
+    border-color: #E74C3C;
+  }
+}
+
+.special-combo-order-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  color: #FFF;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(211, 84, 0, 0.35);
+  margin-bottom: 2px;
+}
+
+.btn-serve-slot.is-special-combo-btn {
+  background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%) !important;
+  color: #FFF !important;
+  font-weight: 800 !important;
+  border: 1px solid #D35400 !important;
+  box-shadow: 0 3px 10px rgba(230, 126, 34, 0.45) !important;
+}
+
+.btn-serve-slot.is-special-combo-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
 .order-slot-card.slot-empty {
   border: 1.5px dashed var(--border-card);
   background-color: var(--bg-tray);
@@ -3739,26 +3791,52 @@ html, body {
 
 .reply-quick-chips {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   flex-wrap: wrap;
+  margin-top: 6px;
 }
 
 .reply-chip {
-  background: var(--bg-tray);
-  border: 1px solid var(--border-btn);
+  background: #FFFDF9;
+  border: 1px solid #E5C3A6;
   border-radius: var(--radius-pill);
-  padding: 3px 8px;
-  font-size: 10.5px;
+  padding: 4px 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-main);
+  color: #5A2A18;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 1px 3px rgba(90, 42, 24, 0.06);
+  user-select: none;
 }
 
 .reply-chip:hover {
-  background: var(--bg-card-subtle);
-  border-color: var(--accent-gold);
-  color: var(--accent-gold);
+  background: #FFF8E7;
+  border-color: #E67E22;
+  color: #D35400;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(230, 126, 34, 0.25);
+}
+
+.reply-chip:active {
+  transform: scale(0.96);
+}
+
+.reply-input-pulse {
+  animation: replyInputFlash 0.35s ease-out;
+}
+
+@keyframes replyInputFlash {
+  0% {
+    background-color: #FFF8E7;
+    border-color: #E67E22;
+    box-shadow: 0 0 10px rgba(230, 126, 34, 0.4);
+  }
+  100% {
+    background-color: #FFF;
+    border-color: var(--border-btn);
+    box-shadow: none;
+  }
 }
 
 /* ==========================================================
@@ -4466,6 +4544,433 @@ html, body {
     grid-template-columns: repeat(3, 1fr);
     gap: 6px;
   }
+}
+
+/* ==========================================================
+   HỆ THỐNG ĐIỀU HÒA DAIKIN TREO TƯỜNG (LIVING DAIKIN AC SYSTEM)
+   ========================================================== */
+.daikin-ac-stage-container {
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 5;
+}
+
+.daikin-wall-unit {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 80%, #E4E7EB 100%);
+  border: 1.5px solid #D1D8E0;
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.12), inset 0 1px 0 #FFF;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.daikin-wall-unit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 160, 233, 0.25), inset 0 1px 0 #FFF;
+  border-color: #00A0E9;
+}
+
+.daikin-wall-unit:active {
+  transform: translateY(1px);
+}
+
+.daikin-front-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.daikin-brand-badge {
+  display: flex;
+  flex-direction: column;
+}
+
+.daikin-brand-name {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #0097E6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-shadow: 0 1px 1px rgba(0, 151, 230, 0.2);
+}
+
+.daikin-brand-tech {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #718093;
+  margin-top: -1px;
+}
+
+.daikin-center-grille {
+  flex: 1;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, #E2E8F0, #E2E8F0 4px, transparent 4px, transparent 8px);
+  border-radius: 3px;
+  opacity: 0.7;
+}
+
+.daikin-screen-led {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #1E272E;
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+  border: 1px solid #2F3640;
+}
+
+.daikin-led-num {
+  font-size: 13px;
+  font-weight: 900;
+  font-family: "Courier New", Courier, monospace;
+  color: #00FFCC;
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.7);
+  letter-spacing: 0.5px;
+}
+
+.daikin-led-snowflake {
+  font-size: 11px;
+  animation: daikinSpin 4s linear infinite;
+  display: inline-block;
+}
+
+@keyframes daikinSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.daikin-led-pills {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ac-led-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: block;
+}
+
+.ac-led-dot.led-green {
+  background: #2ECC71;
+  box-shadow: 0 0 6px #2ECC71;
+  animation: ledBlink 1.8s ease-in-out infinite;
+}
+
+.ac-led-dot.led-blue {
+  background: #00A0E9;
+  box-shadow: 0 0 6px #00A0E9;
+}
+
+@keyframes ledBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Cánh louver vẫy gió */
+.daikin-louver-flap {
+  height: 5px;
+  background: linear-gradient(180deg, #BDC3C7 0%, #7F8C8D 100%);
+  border-radius: 3px;
+  margin-top: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transform-origin: top center;
+  animation: daikinSwing 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes daikinSwing {
+  0% {
+    transform: rotateX(0deg) scaleY(1);
+    background: linear-gradient(180deg, #BDC3C7 0%, #7F8C8D 100%);
+  }
+  100% {
+    transform: rotateX(45deg) scaleY(0.7);
+    background: linear-gradient(180deg, #A4B0BE 0%, #576574 100%);
+  }
+}
+
+/* Rèm gió lạnh thổi xuống */
+.daikin-air-curtain {
+  position: relative;
+  height: 28px;
+  overflow: hidden;
+  margin-top: 2px;
+  pointer-events: none;
+}
+
+.air-breeze-stream {
+  position: absolute;
+  top: 0;
+  width: 28%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.35) 0%, rgba(0, 229, 255, 0.08) 70%, transparent 100%);
+  border-radius: 0 0 8px 8px;
+  animation: breezeFlow 1.6s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+.air-breeze-stream.stream-left { left: 10%; animation-delay: 0s; }
+.air-breeze-stream.stream-center { left: 36%; animation-delay: 0.4s; }
+.air-breeze-stream.stream-right { left: 62%; animation-delay: 0.8s; }
+
+@keyframes breezeFlow {
+  0% {
+    opacity: 0.2;
+    transform: scaleY(0.4) translateY(-4px);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scaleY(1) translateY(0);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scaleY(0.6) translateY(3px);
+  }
+}
+
+.air-frost-particles {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 10px;
+}
+
+.frost-snowflake {
+  animation: frostFall 2s ease-in-out infinite;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.6));
+}
+
+.frost-snowflake.f1 { animation-delay: 0s; }
+.frost-snowflake.f2 { animation-delay: 0.5s; font-size: 11px; }
+.frost-snowflake.f3 { animation-delay: 1.1s; }
+.frost-snowflake.f4 { animation-delay: 1.6s; font-size: 9px; }
+
+@keyframes frostFall {
+  0% {
+    transform: translateY(-8px) scale(0.6);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(2px) scale(1);
+  }
+  100% {
+    transform: translateY(14px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.daikin-cooling-tip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #0077B6;
+  background: rgba(0, 180, 216, 0.08);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px dashed rgba(0, 180, 216, 0.3);
+}
+
+.btn-tap-turbo-hint {
+  background: linear-gradient(135deg, #00A0E9 0%, #0077B6 100%);
+  color: #FFF;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 119, 182, 0.35);
+  animation: pulseHint 1.8s ease-in-out infinite;
+}
+
+@keyframes pulseHint {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* Turbo boost animation */
+.daikin-wall-unit.is-turbo-blasting {
+  border-color: #00E5FF !important;
+  box-shadow: 0 0 24px rgba(0, 229, 255, 0.7), inset 0 0 10px rgba(0, 229, 255, 0.3) !important;
+  animation: turboShake 0.4s ease-in-out infinite;
+}
+
+@keyframes turboShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+.daikin-wall-unit.is-turbo-blasting .daikin-air-curtain {
+  height: 42px;
+}
+
+.daikin-wall-unit.is-turbo-blasting .air-breeze-stream {
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.7) 0%, rgba(0, 229, 255, 0.25) 80%, transparent 100%);
+}
+
+/* THANH ĐIỀU HÒA DAIKIN Ở BẾP NẤU SIÊU TỐC */
+.kitchen-daikin-bar {
+  margin-bottom: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.k-daikin-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: linear-gradient(90deg, #E0F7FA 0%, #E8F8F5 100%);
+  border: 1.5px solid #80DEEA;
+  border-radius: 10px;
+  padding: 4px 8px;
+  box-shadow: 0 2px 6px rgba(0, 150, 136, 0.1);
+  transition: all 0.2s ease;
+}
+
+.k-daikin-inner:hover {
+  border-color: #00ACC1;
+  box-shadow: 0 3px 10px rgba(0, 172, 193, 0.25);
+}
+
+.k-daikin-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #1A365D;
+  padding: 2px 6px;
+  border-radius: 6px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.k-daikin-brand {
+  font-size: 10px;
+  font-weight: 800;
+  color: #E2E8F0;
+  letter-spacing: 0.5px;
+}
+
+.k-daikin-led {
+  font-size: 11px;
+  font-weight: 900;
+  font-family: monospace;
+  color: #00E5FF;
+  text-shadow: 0 0 6px #00E5FF;
+}
+
+.k-daikin-flow-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.k-daikin-status {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00796B;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.btn-k-turbo {
+  background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%);
+  color: #FFF;
+  border: none;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 151, 167, 0.35);
+  transition: transform 0.1s ease;
+  white-space: nowrap;
+}
+
+.btn-k-turbo:active {
+  transform: scale(0.95);
+}
+
+/* MINI DAIKIN Ở PHÒNG CHUẨN BỊ */
+.prep-daikin-mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #E8F8F5;
+  border: 1px solid #A2D9CE;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-bottom: 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.prep-daikin-case {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prep-daikin-brand {
+  font-weight: 800;
+  color: #0097E6;
+  font-size: 9.5px;
+  letter-spacing: 0.8px;
+}
+
+.prep-daikin-temp {
+  background: #2C3E50;
+  color: #00FFCC;
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.prep-daikin-indicator {
+  font-size: 10px;
+  font-weight: 700;
+  color: #0097E6;
+  background: #E1F5FE;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #B3E5FC;
+}
+
+/* Huy hiệu mát rượi trên đầu khách ăn ở bàn */
+.dining-cool-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 180, 216, 0.85);
+  color: #FFF;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  animation: coolFloat 2s ease-in-out infinite;
+}
+
+@keyframes coolFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
 /* ==========================================================

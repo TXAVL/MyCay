@@ -160,7 +160,7 @@
             </div>
             <div class="special-dish-footer">
               <span class="special-dish-streak" id="display-special-streak">Điểm danh 0 ngày</span>
-              <span class="special-dish-buff">🔥 +20% Tip & Khách Ưu Tiên</span>
+              <span class="special-dish-buff">🔥 Siêu Thưởng: Tip x2 + Siêu Bonus Tiền!</span>
             </div>
           </section>
 
@@ -197,7 +197,10 @@
               <div class="strip-header">
                 <span class="strip-title">🪑 Phòng Ăn Gỗ Sồi:</span>
                 <span id="prep-dining-status-text" class="strip-status">3 bàn sạch bóng chờ đón thực khách</span>
+                <span class="prep-daikin-indicator" id="prep-daikin-indicator">❄️ Daikin Inverter</span>
               </div>
+              <!-- Cục lạnh Daikin gắn tường thu nhỏ trong Phòng Chuẩn Bị -->
+              <div class="daikin-prep-wall-ac" id="daikin-prep-wall-ac"></div>
               <div class="mini-dining-tables-row" id="prep-mini-tables">
                 <!-- Render 3 bàn ăn chuẩn bị -->
               </div>
@@ -486,6 +489,11 @@
                   </div>
                 </div>
 
+                <!-- CỤC LẠNH ĐIỀU HÒA DAIKIN TREO TƯỜNG (LIVING DAIKIN WALL UNIT) -->
+                <div class="daikin-ac-stage-container" id="daikin-ac-stage-container">
+                  <!-- Render động qua renderDaikinAC() -->
+                </div>
+
                 <!-- 3 BÀN ĂN GỖ SỒI THỰC KHÁCH ĐANG ĂN MÌ CAY (LIVE DINING TABLES) -->
                 <div class="open-dining-tables-grid" id="open-dining-tables-grid">
                   <!-- Render 3 bàn ăn trực tiếp với thực khách ngồi ăn, niêu đất xì xèo, bong bóng cảm nghĩ, nút dọn bàn -->
@@ -515,6 +523,11 @@
                 </div>
                 <div class="shipper-desc" id="open-shipper-desc">1 Mì cay bò Mỹ (Cấp 2)</div>
                 <button class="btn-shipper-handover" id="btn-open-handover">📦 Giao Niêu Mì Cho Shipper (Phím Space)</button>
+              </div>
+
+              <!-- THANH ĐIỀU HÒA DAIKIN BẾP NẤU & KHU VỰC KHÁCH CHỜ -->
+              <div class="kitchen-daikin-bar" id="kitchen-daikin-bar" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin Inverter đang làm mát - Chạm để xả gió lạnh Turbo!">
+                <!-- Render động qua renderDaikinAC() -->
               </div>
 
               <!-- 1. HÀNG 3 KHAY ĐƠN HÀNG CỦA THỰC KHÁCH (ORDER QUEUE SLOTS) -->
