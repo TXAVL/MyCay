@@ -911,95 +911,149 @@
        12. MODAL CÀI ĐẶT GAME
        ========================================================== -->
   <div id="modal-settings" class="modal-overlay">
-    <div class="modal-dialog" style="max-width: 460px;">
-      <div class="modal-header">
-        <h3>⚙️ Cài Đặt Tiệm Mì Cay</h3>
-        <button id="btn-close-settings" class="btn-modal-close">✕</button>
+    <div class="modal-dialog settings-modal-dialog">
+      <div class="modal-header settings-modal-header">
+        <div class="settings-header-title">
+          <span class="settings-header-icon">⚙️</span>
+          <div>
+            <h3>Cài Đặt Tiệm Mì Cay</h3>
+            <p class="settings-header-sub">Tùy chỉnh âm thanh, giao diện & kết nối bạn bè</p>
+          </div>
+        </div>
+        <button id="btn-close-settings" class="btn-modal-close" title="Đóng cài đặt">✕</button>
       </div>
 
-      <div class="settings-group">
-        <!-- Nhạc nền Lo-Fi BGM -->
-        <div class="setting-row">
-          <label><span>🎵</span> Nhạc nền Lo-Fi ấm áp:</label>
-          <div class="setting-control">
-            <input type="checkbox" id="setting-bgm-toggle" checked />
-            <input type="range" id="setting-bgm-vol" min="0" max="100" value="35" title="Âm lượng nhạc nền" />
+      <div class="settings-modal-scrollable">
+        <!-- NHÓM 1: ÂM THANH & HIỆU ỨNG -->
+        <div class="settings-card-section">
+          <div class="settings-section-badge">
+            <span>🎧 Âm Thanh & Nhạc Quán</span>
+          </div>
+
+          <!-- BGM -->
+          <div class="setting-row-modern">
+            <div class="setting-label-block">
+              <span class="setting-icon-pill">🎵</span>
+              <div>
+                <span class="setting-name">Nhạc nền Lo-Fi ấm áp</span>
+                <span class="setting-subdesc">Giai điệu thư giãn quán ăn ấm cúng</span>
+              </div>
+            </div>
+            <div class="setting-control-group">
+              <input type="range" id="setting-bgm-vol" min="0" max="100" value="35" class="custom-slider" title="Âm lượng nhạc nền" />
+              <label class="switch-toggle" title="Bật/Tắt nhạc nền">
+                <input type="checkbox" id="setting-bgm-toggle" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- SFX -->
+          <div class="setting-row-modern">
+            <div class="setting-label-block">
+              <span class="setting-icon-pill">🔔</span>
+              <div>
+                <span class="setting-name">Hiệu ứng nấu nướng (SFX)</span>
+                <span class="setting-subdesc">Tiếng xì xèo, chuông cửa & leng keng</span>
+              </div>
+            </div>
+            <div class="setting-control-group">
+              <input type="range" id="setting-sfx-vol" min="0" max="100" value="50" class="custom-slider" title="Âm lượng hiệu ứng" />
+              <label class="switch-toggle" title="Bật/Tắt hiệu ứng">
+                <input type="checkbox" id="setting-sfx-toggle" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
           </div>
         </div>
 
-        <!-- Âm thanh hiệu ứng SFX -->
-        <div class="setting-row">
-          <label><span>🔔</span> Tiếng xì xèo & Chuông leng keng:</label>
-          <div class="setting-control">
-            <input type="checkbox" id="setting-sfx-toggle" checked />
-            <input type="range" id="setting-sfx-vol" min="0" max="100" value="50" title="Âm lượng hiệu ứng" />
+        <!-- NHÓM 2: TRẢI NGHIỆM TRÒ CHƠI -->
+        <div class="settings-card-section">
+          <div class="settings-section-badge">
+            <span>⚡ Tùy Chỉnh Trải Nghiệm</span>
+          </div>
+
+          <!-- Tốc độ game -->
+          <div class="setting-row-modern">
+            <div class="setting-label-block">
+              <span class="setting-icon-pill">⏱️</span>
+              <div>
+                <span class="setting-name">Tốc độ trò chơi</span>
+                <span class="setting-subdesc">Nhịp độ phục vụ & nấu mì</span>
+              </div>
+            </div>
+            <div class="setting-control-group">
+              <select id="setting-game-speed" class="custom-select-control">
+                <option value="1">1.0x (Cozy thong thả)</option>
+                <option value="1.5">1.5x (Nhanh vừa)</option>
+                <option value="2">2.0x (Siêu tốc)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Hoa anh đào rơi -->
+          <div class="setting-row-modern">
+            <div class="setting-label-block">
+              <span class="setting-icon-pill">🌸</span>
+              <div>
+                <span class="setting-name">Cánh hoa anh đào rơi</span>
+                <span class="setting-subdesc">Hiệu ứng lãng mạn bay nhẹ</span>
+              </div>
+            </div>
+            <div class="setting-control-group">
+              <label class="switch-toggle" title="Bật/Tắt hoa rơi">
+                <input type="checkbox" id="setting-particles-toggle" checked />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
           </div>
         </div>
 
-        <!-- Tốc độ game -->
-        <div class="setting-row">
-          <label><span>⚡</span> Tốc độ trò chơi:</label>
-          <div class="setting-control">
-            <select id="setting-game-speed">
-              <option value="1">1x (Thong thả cozy)</option>
-              <option value="1.5">1.5x (Nhanh vừa)</option>
-              <option value="2">2x (Siêu tốc)</option>
-            </select>
+        <!-- NHÓM 3: 5 GIAO DIỆN THEME ĐA SẮC -->
+        <div class="settings-card-section">
+          <div class="settings-section-badge">
+            <span>🎨 5 Phong Cách Theme Tuyệt Sắc</span>
           </div>
+          <div id="settings-theme-container"></div>
         </div>
 
-        <!-- Cánh hoa anh đào -->
-        <div class="setting-row">
-          <label><span>🌸</span> Hiệu ứng hoa anh đào:</label>
-          <div class="setting-control">
-            <input type="checkbox" id="setting-particles-toggle" checked />
+        <!-- NHÓM 4: TIỆN ÍCH & CHIA SẺ BẠN BÈ -->
+        <div class="settings-card-section">
+          <div class="settings-section-badge">
+            <span>🌟 Tiện Ích & Chia Sẻ</span>
           </div>
-        </div>
 
-        <!-- Giao diện & Theme Anime Đa Sắc -->
-        <div class="settings-section-title">
-          <span>🎨 Giao Diện Tiệm Mì (5 Bảng Màu)</span>
-        </div>
-        <div id="settings-theme-container"></div>
-
-        <!-- Xem lại hướng dẫn Spotlight Mochi -->
-        <div class="setting-row">
-          <label><span>🧭</span> Hướng dẫn tân thủ:</label>
-          <button id="btn-replay-coachmark" class="btn-secondary-link">
-            Xem Lại Hướng Dẫn
+          <!-- Nút Mở QR Code Rủ Bạn Bè Chơi -->
+          <button id="btn-open-qr-modal" class="settings-action-banner" title="Mở mã QR chia sẻ cho bạn bè">
+            <div class="action-banner-left">
+              <span class="action-banner-icon">📱</span>
+              <div class="action-banner-text">
+                <strong class="action-banner-title">Mã QR Chơi Cùng Bạn Bè</strong>
+                <span class="action-banner-desc">Quét mã QR có logo game để rủ bạn cùng nấu mì</span>
+              </div>
+            </div>
+            <span class="action-banner-btn">Mở Mã QR ❯</span>
           </button>
-        </div>
 
-        <!-- Đổi tên quán -->
-        <div class="setting-row">
-          <label><span>✏️</span> Tên tiệm mì:</label>
-          <button id="btn-rename-from-settings" class="btn-secondary-link">
-            Đổi Tên Tiệm
-          </button>
-        </div>
-
-        <!-- Xem lại phiên bản mới -->
-        <div class="setting-row">
-          <label><span>📜</span> Thông tin cập nhật:</label>
-          <button id="btn-show-version-settings" class="btn-secondary-link">
-            Xem Có Gì Mới
-          </button>
-        </div>
-
-        <!-- Mã QR Chơi Game Cùng Bạn Bè -->
-        <div class="setting-row">
-          <label><span>📱</span> Chia sẻ bạn bè:</label>
-          <button id="btn-open-qr-modal" class="btn-secondary-link" style="color: var(--accent-berry); font-weight: 800;">
-            Mã QR Chơi Cùng Bạn Bè
-          </button>
-        </div>
-
-        <!-- Chơi lại từ đầu -->
-        <div class="setting-row" style="border-bottom: none; margin-top: 10px;">
-          <label><span>⚠️</span> Dữ liệu trò chơi:</label>
-          <button id="btn-reset-game-data" class="btn-danger-link">
-            Xóa Dữ Liệu & Chơi Lại
-          </button>
+          <!-- Các nút thao tác dạng lưới gọn gàng -->
+          <div class="settings-quick-actions-grid">
+            <button id="btn-rename-from-settings" class="settings-tile-btn">
+              <span class="tile-icon">✏️</span>
+              <span class="tile-text">Đổi Tên Tiệm</span>
+            </button>
+            <button id="btn-show-version-settings" class="settings-tile-btn">
+              <span class="tile-icon">📜</span>
+              <span class="tile-text">Xem Có Gì Mới</span>
+            </button>
+            <button id="btn-replay-coachmark" class="settings-tile-btn">
+              <span class="tile-icon">🧭</span>
+              <span class="tile-text">Xem Hướng Dẫn</span>
+            </button>
+            <button id="btn-reset-game-data" class="settings-tile-btn danger">
+              <span class="tile-icon">⚠️</span>
+              <span class="tile-text">Chơi Lại Từ Đầu</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
