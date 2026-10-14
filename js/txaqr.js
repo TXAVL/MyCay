@@ -1,8 +1,8 @@
 // ==========================================================
-// MÃ QR CHƠI GAME CÙNG BẠN BÈ (TXAQR)
-// Thuật toán QR Code chuẩn ISO/IEC 18004 (Kazuhiko Arase Engine)
-// Hỗ trợ Error Correction Level H (30%) & Vẽ Logo Tiệm Mỳ Cay ở trung tâm
-// Quét được 100% trên Zalo, Camera iPhone & Android
+// Copyright (c) 2026 TXA. All rights reserved.
+// Project: Tiệm Mỳ Cay (https://tmc.txasoftdev.workers.dev/)
+// Author: TXA (txasoftdev)
+// QR Code Generator Engine licensed under MIT License
 // ==========================================================
 
 // Khởi tạo engine QR Code chuẩn quốc tế (Zero external dependency)
