@@ -4,11 +4,11 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js";
-import { txaformat } from "./txaformat.js";
-import { NameValidator } from "./filter.js";
-import { SoundManager } from "./audio.js";
-import { GameUIModal } from "./modal.js";
+import { txaversion } from "./txaversion.js?v=1.4.0";
+import { txaformat } from "./txaformat.js?v=1.4.0";
+import { NameValidator } from "./filter.js?v=1.4.0";
+import { SoundManager } from "./audio.js?v=1.4.0";
+import { GameUIModal } from "./modal.js?v=1.4.0";
 
 export class SpicyNoodleGame {
   constructor() {

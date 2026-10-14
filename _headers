@@ -4,13 +4,17 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: microphone=(), camera=()
 
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=43200
+
 /*.js
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Cache-Control: public, max-age=0, must-revalidate
   Content-Type: application/javascript; charset=utf-8
 
 /*.css
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Cache-Control: public, max-age=0, must-revalidate
   Content-Type: text/css; charset=utf-8
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
+

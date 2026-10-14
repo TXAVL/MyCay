@@ -3,7 +3,20 @@
 
 export default {
   async fetch(request, env) {
-    // Tự động phân phối static assets (index.html, styles, js, manifest...)
-    return await env.ASSETS.fetch(request);
+    const url = new URL(request.url);
+    const response = await env.ASSETS.fetch(request);
+
+    // Đối với html, js, css: luôn yêu cầu trình duyệt kiểm tra phiên bản mới
+    if (url.pathname.endsWith(".html") || url.pathname.endsWith(".js") || url.pathname.endsWith(".css") || url.pathname === "/") {
+      const newHeaders = new Headers(response.headers);
+      newHeaders.set("Cache-Control", "public, max-age=0, must-revalidate");
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders
+      });
+    }
+
+    return response;
   }
 };

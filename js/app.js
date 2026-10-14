@@ -3,13 +3,13 @@
 // Kết nối UI, Sự kiện, Tab Navigation và Logic Game
 // ==========================================================
 
-import { txaversion } from "./txaversion.js";
-import { NameValidator } from "./filter.js";
-import { SpicyNoodleGame } from "./game.js";
-import { txatheme } from "./txatheme.js";
-import { txacoachmark } from "./txacoachmark.js";
-import { txaqr } from "./txaqr.js";
-import { GameUIModal } from "./modal.js";
+import { txaversion } from "./txaversion.js?v=1.4.0";
+import { NameValidator } from "./filter.js?v=1.4.0";
+import { SpicyNoodleGame } from "./game.js?v=1.4.0";
+import { txatheme } from "./txatheme.js?v=1.4.0";
+import { txacoachmark } from "./txacoachmark.js?v=1.4.0";
+import { txaqr } from "./txaqr.js?v=1.4.0";
+import { GameUIModal } from "./modal.js?v=1.4.0";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Khởi tạo Theme giao diện
@@ -396,7 +396,13 @@ document.addEventListener("DOMContentLoaded", () => {
     modalQrShare.style.display = "flex";
     if (game.sound) game.sound.playReviewChime();
 
-    const shareUrl = window.location.origin + window.location.pathname;
+    let shareUrl = window.location.href;
+    if (window.location.protocol === "file:" || !window.location.origin || window.location.origin === "null") {
+      shareUrl = "https://tmc.txasoftdev.workers.dev/";
+    } else {
+      shareUrl = window.location.origin + window.location.pathname;
+    }
+
     if (qrUrlInput) qrUrlInput.value = shareUrl;
     if (qrDownloadStatus) {
       qrDownloadStatus.textContent = "";
