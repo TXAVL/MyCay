@@ -10,10 +10,14 @@ import { txatheme } from "./txatheme.js?v=1.5.5";
 import { txacoachmark } from "./txacoachmark.js?v=1.5.5";
 import { txaqr } from "./txaqr.js?v=1.5.5";
 import { GameUIModal } from "./modal.js?v=1.5.5";
+import { realtimeStats } from "./realtime-stats.js?v=1.5.5";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Khởi tạo Theme giao diện
   txatheme.init();
+
+  // Khởi tạo Thống Kê Realtime Online & Lượt Truy Cập Thực Tế (Chống spam)
+  realtimeStats.init();
 
   // Khởi tạo Game Engine
   const game = new SpicyNoodleGame();
