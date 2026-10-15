@@ -22,25 +22,21 @@
 ### 3. 🍲 Màn Hình Loading Hoạt Họa Mượt Mà
 - Tiến trình tải từ 0% đến 100% hiển thị từng trạng thái sinh động (ninh nước hầm, dọn bàn ghế gỗ sồi, chuẩn bị ớt hiểm, bật điều hòa Daikin và khởi động Giờ Vàng).
 
-### 4. 📦 Class `txaversion` Quản Lý Phiên Bản Độc Quyền
-- Quản lý phiên bản tự động bằng class `txaversion`, lưu trữ lịch sử qua `VERSION_HISTORY`.
-- Tự động phát hiện phiên bản mới và bật cửa sổ thông báo **"Có Gì Mới Trong Bản Cập Nhật"** thiết kế Anime Glassmorphism.
-
-### 5. ⭐ Hệ Thống Đánh Giá & Phản Hồi Thực Khách (Review System 2.0)
+### 4. ⭐ Hệ Thống Đánh Giá & Phản Hồi Thực Khách (Review System 2.0)
 - Khách sau khi dùng bữa sẽ để lại đánh giá (số sao 1-5 ⭐, nhận xét món mì và độ cay).
 - **Chủ quán phản hồi:**
   - Có các nút **Gợi ý trả lời nhanh** siêu ngọt ngào và hiếu khách.
   - Tặng Voucher 20% & đền bù ly trà sữa để hóa giải review 1★ thành 5★ xuất sắc!
 - **Khách hàng feedback lại ngay lập tức**: Khi chủ quán gửi phản hồi, khách sẽ trả lời lại tức thì, tặng thêm tiền Tip 🪙 và tăng điểm Danh tiếng ⭐.
 
-### 6. 🛠️ Nâng Cấp Tiệm, Điều Hòa Daikin & 🐾 Nhân Viên Mới
+### 5. 🛠️ Nâng Cấp Tiệm, Điều Hòa Daikin & 🐾 Nhân Viên Mới
 - **Nâng cấp cửa hàng**:
   - *Hệ Thống Điều Hòa Daikin Inverter*: Xả gió lạnh Turbo hạ sâu nhiệt độ, hồi phục kiên nhẫn cho toàn bộ khách.
   - *Bàn Gỗ Sồi Cozy 3 Trạng Thái*: Tương tác húp mì xì xụp và dọn dẹp nhặt tiền tip.
   - *Sốt Bí Truyền Ớt Hiểm*: Tăng vọt giá bán và tiền thưởng.
 - **Đội ngũ nhân sự toàn năng 5 thành viên**: Mèo Mochi, Gấu Kenji, Thỏ Usagi, Vịt Ducky, Cú Mèo Owl và Nai Fawn.
 
-### 7. ⚙️ Cài Đặt Game Đầy Đủ & Mã QR
+### 6. ⚙️ Cài Đặt Game Đầy Đủ & Mã QR
 - Mã QR kèm logo quán sắc nét để tải ảnh hoặc chia sẻ bạn bè quét chơi ngay.
 - Điều chỉnh âm lượng Lo-Fi ấm áp và SFX sống động.
 - 5 phong cách giao diện Theme Anime tuyệt sắc (Cozy, Phố Đêm Tokyo, Hoa Anh Đào, Lửa Cay, Trà Xanh Matcha, Boba Pastel).
@@ -100,7 +96,7 @@ MyCay/
 └── js/
     ├── app.js          # Khởi động, điều phối loading, popup đặt tên và version
     ├── game.js         # Logic tiệm mì, nấu mì 7 cấp độ, review, nhân viên
-    ├── txaversion.js   # Class txaversion quản lý phiên bản 1.0 và anime cards
+    ├── txaversion.js   # Quản lý phiên bản game và thông báo cập nhật mới
     ├── filter.js       # Bộ lọc kiểm duyệt tên quán, cảnh báo đỏ tự biến mất
     └── audio.js        # Bộ âm thanh Web Audio API Lo-Fi & SFX sống động
 ```
