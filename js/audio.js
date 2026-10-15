@@ -353,4 +353,191 @@ export class SoundManager {
     clickOsc.start(now + 0.15);
     clickOsc.stop(now + 0.24);
   }
+
+  // SFX: Tiếng dọn bàn ăn sạch bong & nhặt tiền tip leng keng
+  playCleaningSound() {
+    if (!this.sfxEnabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+
+    // 1. Tiếng chổi quét bàn "xoẹt xoẹt"
+    try {
+      const bufferSize = this.ctx.sampleRate * 0.15;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.4));
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(1400, now);
+      filter.Q.setValueAtTime(2.5, now);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(this.sfxVolume * 0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      noise.start(now);
+      noise.stop(now + 0.18);
+    } catch (e) {
+      // Fallback nếu không tạo được noise buffer
+    }
+
+    // 2. Tiếng leng keng lấp lánh sạch bóng (Sparkle chime)
+    const sparkles = [1318.51, 1760.00, 2093.00];
+    sparkles.forEach((freq, idx) => {
+      const t = now + 0.08 + idx * 0.06;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(this.sfxVolume * 0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.25);
+    });
+  }
+
+  // SFX: Tiếng bưng niêu đất ra bàn (Tiếng gốm sứ đặt lên khay gỗ sồi "cộc" + ding phục vụ)
+  playServeSound() {
+    if (!this.sfxEnabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+
+    // 1. Tiếng cộc đầm của đế niêu đất chạm mặt bàn gỗ
+    const thudOsc = this.ctx.createOscillator();
+    const thudGain = this.ctx.createGain();
+
+    thudOsc.type = "sine";
+    thudOsc.frequency.setValueAtTime(160, now);
+    thudOsc.frequency.exponentialRampToValueAtTime(50, now + 0.08);
+
+    thudGain.gain.setValueAtTime(this.sfxVolume * 0.45, now);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+    thudOsc.connect(thudGain);
+    thudGain.connect(this.ctx.destination);
+
+    thudOsc.start(now);
+    thudOsc.stop(now + 0.1);
+
+    // 2. Tiếng ding thanh lịch món ăn phục vụ thành công
+    const dingChords = [783.99, 1046.50, 1318.51]; // G5, C6, E6
+    dingChords.forEach((freq, idx) => {
+      const t = now + 0.04 + idx * 0.05;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(this.sfxVolume * 0.28, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.35);
+    });
+  }
+
+  // SFX: Tiếng xì xụp ăn mì & nước dùng nóng hổi thơm phức
+  playSlurpSound() {
+    if (!this.sfxEnabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    for (let i = 0; i < 3; i++) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + i * 0.07;
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(320 + i * 80, t);
+      osc.frequency.exponentialRampToValueAtTime(650 + i * 60, t + 0.06);
+
+      gain.gain.setValueAtTime(this.sfxVolume * 0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.08);
+    }
+  }
+
+  // SFX: Tiếng xả gió lạnh băng tuyết Daikin Turbo
+  playFrostWindSound() {
+    if (!this.sfxEnabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Âm gió băng tuyết ngân vang
+    const iceNotes = [1046.50, 1318.51, 1567.98, 2093.00]; // C6, E6, G6, C7
+    iceNotes.forEach((freq, idx) => {
+      const t = now + idx * 0.06;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(this.sfxVolume * 0.24, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.45);
+    });
+  }
+
+  // SFX: Tiếng nâng cấp bàn ghế gỗ sồi & trang thiết bị tiệm mì
+  playUpgradeSound() {
+    if (!this.sfxEnabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const fanfare = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5, E5, G5, C6, E6
+    fanfare.forEach((freq, idx) => {
+      const t = now + idx * 0.07;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(this.sfxVolume * 0.32, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.35);
+    });
+  }
 }

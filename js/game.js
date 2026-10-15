@@ -1322,7 +1322,11 @@ export class SpicyNoodleGame {
       this.renderDaikinAC();
       this.renderDiningStage();
     } else {
-      this.sound.playCoinChime();
+      if (this.sound && typeof this.sound.playUpgradeSound === "function") {
+        this.sound.playUpgradeSound();
+      } else {
+        this.sound.playCoinChime();
+      }
       GameUIModal.showToast("Nâng cấp thành công cơ ngơi tiệm mì!", "success", "🛠️");
     }
 
@@ -2167,7 +2171,11 @@ export class SpicyNoodleGame {
       if (!slot) {
         return `
           <div class="order-slot-card slot-empty">
-            <span class="empty-slot-text">Trống</span>
+            <div class="empty-slot-coaster">
+              <span class="empty-slot-chair-icon">🪑</span>
+              <span class="empty-slot-label">Slot #${idx + 1} Trống</span>
+              <span class="empty-slot-sub">🍵 Chờ khách ghé...</span>
+            </div>
           </div>
         `;
       }
@@ -2875,7 +2883,11 @@ export class SpicyNoodleGame {
       this.state.stats.spicyMasterServed += 1;
     }
 
-    this.sound.playCoinChime();
+    if (this.sound && typeof this.sound.playServeSound === "function") {
+      this.sound.playServeSound();
+    } else {
+      this.sound.playCoinChime();
+    }
 
     const slotCard = document.getElementById(`order-slot-${slotIdx}`);
     if (slotCard && typeof GameUIModal.spawnFloatingFx === "function") {
@@ -3349,14 +3361,30 @@ export class SpicyNoodleGame {
       }
     }
 
-    // 2. Tạo HTML cho các bàn ăn
+    // 2. Tạo HTML cho các bàn ăn sống động, chân thực, ấm cúng
     const tablesHtml = this.state.tables.map(table => {
       if (table.status === "empty") {
         return `
           <div id="dining-table-${table.id}" class="dining-table-box is-empty">
-            <span style="font-size: 26px;">🪑</span>
-            <span style="font-size: 11px; font-weight: 800; color: #3B180E;">Bàn #${table.id} Trống</span>
-            <span style="font-size: 10px; color: #8C431A; opacity: 0.75;">Sẵn sàng đón khách</span>
+            <div class="dining-table-top-bar">
+              <span class="dining-table-num-badge">Bàn #${table.id}</span>
+              <span class="dining-table-status-pill status-ready">🟢 Sẵn sàng</span>
+            </div>
+            <div class="dining-table-scene">
+              <div class="table-oak-surface">
+                <div class="table-chairs-pair">
+                  <span class="chair-icon chair-left">🪑</span>
+                  <div class="table-mat-center">
+                    <span class="table-cutlery-set" title="Đũa & muỗng">🥢</span>
+                    <span class="table-cup-item" title="Trà thơm">🍵</span>
+                  </div>
+                  <span class="chair-icon chair-right">🪑</span>
+                </div>
+              </div>
+            </div>
+            <div class="dining-table-footer">
+              <span class="table-status-hint">✨ Đang chờ khách ghé</span>
+            </div>
           </div>
         `;
       }
@@ -3364,21 +3392,36 @@ export class SpicyNoodleGame {
       if (table.status === "dirty") {
         return `
           <div id="dining-table-${table.id}" class="dining-table-box is-dirty">
-            <span style="font-size: 22px;">🍲✨</span>
-            <span style="font-size: 11px; font-weight: 800; color: #8C431A;">Bàn #${table.id} đã ăn xong</span>
-            <button class="btn-clean-table" onclick="window.game.cleanTable(${table.id})">🧹 Dọn Bàn (+Tip)</button>
+            <div class="dining-table-top-bar">
+              <span class="dining-table-num-badge">Bàn #${table.id}</span>
+              <span class="dining-table-status-pill status-dirty">🧹 Cần dọn</span>
+            </div>
+            <div class="dining-table-scene">
+              <div class="table-oak-surface dirty-surface">
+                <div class="table-dirty-pot-wrap">
+                  <span class="dirty-empty-pot">🍲</span>
+                  <span class="table-coin-pile anime-coin-float">🪙✨</span>
+                </div>
+              </div>
+            </div>
+            <div class="dining-table-footer">
+              <button class="btn-clean-table pulse-clean" onclick="window.game.cleanTable(${table.id})" title="Dọn bàn và thu tiền tip">
+                🧹 Dọn Bàn (+Tip)
+              </button>
+            </div>
           </div>
         `;
       }
 
       const cust = table.customer || { name: "Thực khách", avatar: "assets/cust_cat.png" };
       const order = table.order || { noodleName: "Mì cay Bò", spicyLevel: 2 };
-      const eatPct = Math.round(((table.eatTimer || 1) / 12) * 100);
+      const eatTimer = table.eatTimer || 12;
+      const eatPct = Math.round((eatTimer / 12) * 100);
 
       const acLv = this.state.upgrades.acCooling || 1;
       let comment = "🍜 Nước dùng ngọt thanh quá!";
       if (order.spicyLevel >= 6) {
-        comment = acLv >= 2 ? "🔥 Cay xè mà Daikin phà mát rượi đã ghê! ❄️" : "🔥 Cay bốc khói mà ngon tê tái!";
+        comment = acLv >= 2 ? "🔥 Cay xè mà Daikin phà mát lạnh đã ghê! ❄️" : "🔥 Cay bốc khói mà ngon tê tái!";
       } else if (order.spicyLevel >= 3) {
         comment = acLv >= 2 ? "🌶️ Mì ngon đậm đà, phòng mát lạnh cực êm! ❄️" : "🌶️ Đậm đà thơm lừng đã miệng!";
       } else if (acLv >= 2) {
@@ -3386,14 +3429,35 @@ export class SpicyNoodleGame {
       }
 
       return `
-        <div id="dining-table-${table.id}" class="dining-table-box is-eating" style="position: relative;">
-          ${acLv >= 2 ? '<span class="dining-cool-badge" title="Mát rượi nhờ Daikin">❄️ Mát</span>' : ''}
-          <img src="${cust.avatar || 'assets/cust_cat.png'}" class="dining-customer-avatar" alt="${cust.name}" onerror="this.src='assets/cust_cat.png'" />
-          <span style="font-size: 11px; font-weight: 800; color: #3B180E;">${cust.name}</span>
-          <div class="eating-pot-icon">🍲💨</div>
-          <div class="customer-thought-bubble">${comment}</div>
-          <div class="table-patience-bar">
-            <div class="table-patience-fill" style="width: ${eatPct}%; background: #258A6D;"></div>
+        <div id="dining-table-${table.id}" class="dining-table-box is-eating" onclick="window.game.interactEatingTable(${table.id})" title="Chạm vào bàn để xem khách thưởng thức!">
+          <div class="dining-table-top-bar">
+            <span class="dining-table-num-badge">Bàn #${table.id}</span>
+            ${acLv >= 2 ? '<span class="dining-cool-badge" title="Mát rượi nhờ Daikin">❄️ Mát</span>' : ''}
+            <span class="dining-table-timer-pill">⏱️ ${eatTimer}s</span>
+          </div>
+
+          <div class="dining-table-scene">
+            <div class="dining-eating-stage">
+              <div class="dining-customer-seat">
+                <img src="${cust.avatar || 'assets/cust_cat.png'}" class="dining-customer-avatar" alt="${cust.name}" onerror="this.src='assets/cust_cat.png'" />
+                <span class="dining-customer-name">${cust.name}</span>
+              </div>
+
+              <div class="dining-pot-bubble-col">
+                <div class="dining-clay-pot-visual">
+                  <span class="pot-steam-icon">♨️</span>
+                  <span class="pot-dish-icon">🍲</span>
+                </div>
+                <div class="customer-thought-bubble">${comment}</div>
+              </div>
+            </div>
+            <div class="dining-dish-title">${order.noodleName} · Cấp ${order.spicyLevel} 🌶️</div>
+          </div>
+
+          <div class="dining-table-footer">
+            <div class="table-patience-bar" title="Tiến độ thưởng thức mì của khách">
+              <div class="table-patience-fill" style="width: ${eatPct}%;"></div>
+            </div>
           </div>
         </div>
       `;
@@ -3468,12 +3532,34 @@ export class SpicyNoodleGame {
       GameUIModal.spawnFloatingFx(tableEl, `+${tipEarned}k 🪙`, true);
     }
 
-    this.sound.playCoinChime();
+    if (this.sound && typeof this.sound.playCleaningSound === "function") {
+      this.sound.playCleaningSound();
+    } else {
+      this.sound.playCoinChime();
+    }
+
     GameUIModal.showToast(`Đã dọn sạch bàn #${tableId}! Nhận thêm +${tipEarned}k tiền tip để lại 🪙`, "success", "🧹");
 
     this.saveGame();
     this.renderHeader();
     this.renderDiningStage();
+  }
+
+  // Tương tác chạm vào bàn đang ăn để nghe tiếng ăn xì xụp và thả cảm xúc
+  interactEatingTable(tableId) {
+    const table = this.state.tables.find(t => t.id === tableId);
+    if (!table || table.status !== "eating") return;
+
+    if (this.sound && typeof this.sound.playSlurpSound === "function") {
+      this.sound.playSlurpSound();
+    }
+
+    const tableEl = document.getElementById(`dining-table-${tableId}`);
+    if (tableEl && typeof GameUIModal.spawnFloatingFx === "function") {
+      const compliments = ["Ngon tuyệt! 💖", "Xì xụp! 🍜", "Đậm đà! 🔥", "Mê ly! ✨", "Nước ngọt lừ! 🍲"];
+      const comp = compliments[Math.floor(Math.random() * compliments.length)];
+      GameUIModal.spawnFloatingFx(tableEl, comp, true);
+    }
   }
 
   // ==========================================================
@@ -3693,7 +3779,11 @@ export class SpicyNoodleGame {
 
   // Tương tác bấm vào Điều hòa Daikin để xả gió Turbo
   interactDaikinAC() {
-    this.sound.playCoinChime();
+    if (this.sound && typeof this.sound.playFrostWindSound === "function") {
+      this.sound.playFrostWindSound();
+    } else {
+      this.sound.playCoinChime();
+    }
     const acLv = (this.state && this.state.upgrades && this.state.upgrades.acCooling) || 1;
     const targetTurboTemp = acLv >= 3 ? 14 : 16;
 
@@ -3932,7 +4022,11 @@ export class SpicyNoodleGame {
               this.state.todayEarnings += autoTip;
               this.state.stats.tipsEarned += autoTip;
               this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + autoTip;
-              this.sound.playCoinChime();
+              if (this.sound && typeof this.sound.playCleaningSound === "function") {
+                this.sound.playCleaningSound();
+              } else {
+                this.sound.playCoinChime();
+              }
               const tableEl = document.getElementById(`dining-table-${table.id}`);
               if (tableEl && typeof GameUIModal.spawnFloatingFx === "function") {
                 GameUIModal.spawnFloatingFx(tableEl, `+${autoTip}k 🐶`, true);
