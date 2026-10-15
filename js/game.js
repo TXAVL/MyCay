@@ -128,11 +128,15 @@ export class SpicyNoodleGame {
       // Đánh giá thực khách
       reviews: [],
 
+      // Khách hàng đã mở khóa trong Bộ sưu tập
+      unlockedCustomers: {},
+
       // Thống kê chính xác toàn diện
       stats: {
         bowlsServed: 0,
         drinksServed: 0,
         spicyMasterServed: 0, // Cấp 6-7 bốc hỏa
+        vipServed: 0,
         tipsEarned: 0,
         specialBowlsServed: 0,
         specialBonusEarned: 0,
@@ -589,8 +593,13 @@ export class SpicyNoodleGame {
         if (parsed.specialCombo) Object.assign(this.state.specialCombo, parsed.specialCombo);
         if (typeof parsed.money === "number") this.state.money = parsed.money;
         if (typeof parsed.reputation === "number") this.state.reputation = parsed.reputation;
-        if (typeof parsed.day === "number") this.state.day = parsed.day;
-        if (Array.isArray(parsed.reviews)) this.state.reviews = parsed.reviews;
+        if (Array.isArray(parsed.reviews)) {
+          // Lọc bỏ các review mẫu seed cũ để đảm bảo quán mới mở chưa có review rác
+          this.state.reviews = parsed.reviews.filter(r => !r.id || !String(r.id).startsWith("seed_"));
+        }
+        if (parsed.unlockedCustomers && typeof parsed.unlockedCustomers === "object") {
+          this.state.unlockedCustomers = parsed.unlockedCustomers;
+        }
         if (parsed.shopName) this.state.shopName = parsed.shopName;
         if (parsed.ownerAvatar) this.state.ownerAvatar = parsed.ownerAvatar;
         if (parsed.ownerName) this.state.ownerName = parsed.ownerName;
@@ -598,57 +607,6 @@ export class SpicyNoodleGame {
       } catch (e) {
         console.error("Lỗi nạp game:", e);
       }
-    }
-
-    // Nếu chưa có đánh giá nào, khởi tạo 3 đánh giá mẫu cực kỳ sống động
-    if (!this.state.reviews || this.state.reviews.length === 0) {
-      this.state.reviews = [
-        {
-          id: "seed_1",
-          customerName: "Bé Mèo Linh",
-          customerAvatar: "assets/cust_cat.png",
-          stars: 5,
-          comment: "Mì cay nước hầm xương đậm đà thơm nức mũi, phô mai kéo sợi siêu béo! Không gian quán decor cưng xỉu, sẽ ghé ủng hộ dài dài! 💖",
-          date: "Hôm nay",
-          foodieBadge: "Foodie Triệu View",
-          foodAttached: "Mì Cay Bò Mỹ (Cấp 2) + Trà Sữa",
-          isOnline: false,
-          replied: false,
-          ownerReply: null,
-          customerFeedback: null
-        },
-        {
-          id: "seed_2",
-          customerName: "Cún Shiba Duy IT",
-          customerAvatar: "assets/cust_shiba.png",
-          stars: 4,
-          comment: "Đang chạy deadline đói bụng gọi mì giao tận nơi. Shipper giao nhanh 15 phút, niêu mì đóng thùng giữ nhiệt còn bốc khói. Điểm trừ xíu là ớt hơi gắt với mình, nhưng mì rất ngon!",
-          date: "Hôm nay",
-          foodieBadge: "Thánh Ăn Đêm",
-          foodAttached: "Mì Cay Hải Sản (Cấp 3)",
-          isOnline: true,
-          app: "GrabFood",
-          shipperName: "Bác Tài Shiba",
-          isPacked: true,
-          replied: false,
-          ownerReply: null,
-          customerFeedback: null
-        },
-        {
-          id: "seed_3",
-          customerName: "Gấu Nâu Đại Gia",
-          customerAvatar: "assets/cust_bear.png",
-          stars: 5,
-          comment: "Tô mì cấp 7 đỉnh chóp! Nước dùng bốc khói nghi ngút cay toát mồ hôi hột, topping bò mỹ ngập ngụa, đúng chuẩn mì cay niêu đất truyền thống! 🔥👑",
-          date: "Hôm nay",
-          foodieBadge: "Vua Ăn Cay Cấp 7",
-          foodAttached: "Mì Cay Cấp 7 Bốc Hỏa",
-          isOnline: false,
-          replied: false,
-          ownerReply: null,
-          customerFeedback: null
-        }
-      ];
     }
 
     // Đảm bảo luôn có basePrice thị trường chuẩn cho toàn bộ món ăn & đồ uống
@@ -784,15 +742,17 @@ export class SpicyNoodleGame {
     }
 
     // Tính điểm đánh giá sao chuẩn xác từ reviews
-    let avgStars = 5;
-    if (this.state.reviews.length > 0) {
+    const hasReviews = this.state.reviews && this.state.reviews.length > 0;
+    if (hasReviews) {
       const totalStars = this.state.reviews.reduce((sum, r) => sum + (r.stars || 5), 0);
-      avgStars = Math.round(totalStars / this.state.reviews.length);
+      const avgStars = Math.round(totalStars / this.state.reviews.length);
+      const starString = "★".repeat(Math.min(5, Math.max(1, avgStars))) + "☆".repeat(Math.max(0, 5 - avgStars));
+      if (starsEl) starsEl.textContent = starString;
+      if (reviewsEl) reviewsEl.textContent = `${this.state.reviews.length} đánh giá`;
+    } else {
+      if (starsEl) starsEl.textContent = "☆☆☆☆☆";
+      if (reviewsEl) reviewsEl.textContent = "Chưa có đánh giá";
     }
-    const starString = "★".repeat(Math.min(5, Math.max(1, avgStars))) + "☆".repeat(Math.max(0, 5 - avgStars));
-
-    if (starsEl) starsEl.textContent = starString;
-    if (reviewsEl) reviewsEl.textContent = `${this.state.reviews.length} đánh giá`;
 
     // Cập nhật số lượng khách đang ngồi ăn trực tiếp tại các bàn
     const eatingCount = (this.state.tables || []).filter(t => t.status === "eating").length;
@@ -1500,39 +1460,246 @@ export class SpicyNoodleGame {
     this.renderOnlineTab();
   }
 
-  // 10. Tab 7: Bộ sưu tập
+  // Helper: Mở khóa khách hàng trong Bộ sưu tập (từ từ khi gặp hoặc khi phục vụ)
+  unlockCustomer(cust, isServed = false) {
+    if (!cust || !cust.id) return;
+    if (!this.state.unlockedCustomers) this.state.unlockedCustomers = {};
+    const cid = cust.id;
+    if (!this.state.unlockedCustomers[cid]) {
+      this.state.unlockedCustomers[cid] = {
+        id: cust.id,
+        name: cust.name,
+        avatar: cust.avatar,
+        isVip: Boolean(cust.isVip),
+        firstMetDay: this.state.day || 1,
+        servedCount: isServed ? 1 : 0,
+        seen: true
+      };
+    } else {
+      if (isServed) {
+        this.state.unlockedCustomers[cid].servedCount = (this.state.unlockedCustomers[cid].servedCount || 0) + 1;
+      }
+    }
+  }
+
+  // 10. Tab 7: Bộ sưu tập (Mở khóa dần Thực khách & Huy hiệu thành tích)
   renderCollectionTab() {
     const custGrid = document.getElementById("collection-customers-grid");
     const badgeGrid = document.getElementById("collection-badges-grid");
 
+    const unlockedMap = this.state.unlockedCustomers || {};
+    const totalCustomers = this.customerTemplates.length;
+    const unlockedCustomerCount = this.customerTemplates.filter(c => unlockedMap[c.id]).length;
+    const customerPct = totalCustomers > 0 ? Math.round((unlockedCustomerCount / totalCustomers) * 100) : 0;
+
     if (custGrid) {
-      custGrid.innerHTML = this.customerTemplates.map(c => `
-        <div class="collection-card">
-          <img src="${c.avatar}" alt="${c.name}" class="collection-avatar" onerror="this.src='assets/cust_cat.png'" />
-          <span class="collection-name">${c.name}</span>
-          <span class="collection-bio">${c.bio}</span>
+      const headerHtml = `
+        <div class="collection-progress-header" style="grid-column: 1 / -1;">
+          <div class="collection-progress-meta">
+            <span>🐾 Hồ Sơ Thực Khách Đã Khám Phá:</span>
+            <span style="color: #F59E0B; font-weight: 800;">${unlockedCustomerCount} / ${totalCustomers} vị khách (${customerPct}%)</span>
+          </div>
+          <div class="collection-progress-bar-track">
+            <div class="collection-progress-bar-fill" style="width: ${customerPct}%;"></div>
+          </div>
         </div>
-      `).join("");
+      `;
+
+      const cardsHtml = this.customerTemplates.map(c => {
+        const custData = unlockedMap[c.id];
+        const isUnlocked = Boolean(custData);
+
+        if (isUnlocked) {
+          const isVip = Boolean(c.isVip);
+          const servedCount = custData.servedCount || 0;
+          return `
+            <div class="collection-card is-unlocked-card ${isVip ? 'is-vip-card' : ''}">
+              <img src="${c.avatar}" alt="${c.name}" class="collection-avatar" onerror="this.src='assets/cust_cat.png'" />
+              <span class="collection-name">${isVip ? '👑 ' : ''}${c.name}</span>
+              <span class="collection-bio">${c.bio}</span>
+              <div class="collection-sub-meta">
+                <span>🐾 Đã phục vụ: <strong>${servedCount} lần</strong></span> · 
+                <span>🌶️ Cấp ${c.preferredSpicy ? c.preferredSpicy.join("-") : "1"}</span>
+              </div>
+              <span class="collection-status-pill ${isVip ? 'pill-vip' : 'pill-met'}">
+                ${isVip ? '👑 Khách VIP Thần Tài' : '✨ Khách Quen Tiệm'}
+              </span>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="collection-card is-locked-card">
+              <div class="collection-avatar is-locked-avatar">❓</div>
+              <span class="collection-name" style="color: var(--text-muted);">??? (Chưa gặp)</span>
+              <span class="collection-bio">Vị khách bí ẩn chưa từng ghé tiệm. Hãy mở cửa đón thêm thực khách để mở khóa hồ sơ nhé!</span>
+              <div class="collection-sub-meta" style="opacity: 0.7;">
+                <span>🔒 Chưa khám phá</span>
+              </div>
+              <span class="collection-status-pill pill-locked">🔒 Chưa Khám Phá</span>
+            </div>
+          `;
+        }
+      }).join("");
+
+      custGrid.innerHTML = headerHtml + cardsHtml;
     }
 
     if (badgeGrid) {
-      badgeGrid.innerHTML = `
-        <div class="collection-card">
-          <span style="font-size: 32px;">🌟</span>
-          <span class="collection-name">Khai Trương Tiệm Mì</span>
-          <span class="collection-bio">Mở tiệm mì cay ngày đầu tiên</span>
-        </div>
-        <div class="collection-card">
-          <span style="font-size: 32px;">🔥</span>
-          <span class="collection-name">Bậc Thầy Cấp 7</span>
-          <span class="collection-bio">Phục vụ thành công 10 tô mì cấp 7 bốc hỏa</span>
-        </div>
-        <div class="collection-card">
-          <span style="font-size: 32px;">🍜</span>
-          <span class="collection-name">Vua Niêu Đất</span>
-          <span class="collection-bio">Bán vượt mốc 50 tô mì cay</span>
+      const stats = this.state.stats || {};
+      const bowlsServed = stats.bowlsServed || 0;
+      const spicyMasterServed = stats.spicyMasterServed || 0;
+      const drinksServed = stats.drinksServed || 0;
+      const tipsEarned = stats.tipsEarned || 0;
+      const vipServed = stats.vipServed || 0;
+      const totalRev = typeof stats.totalRevenue === "number" && stats.totalRevenue > 0
+        ? stats.totalRevenue
+        : (this.state.money || 400);
+      const reputation = this.state.reputation || 0;
+      const day = this.state.day || 1;
+
+      const badges = [
+        {
+          id: "grand_open",
+          icon: "🏮",
+          name: "Khai Trương Tiệm Mì",
+          desc: "Mở cửa đón thực khách ngày đầu tiên",
+          current: (day > 1 || bowlsServed > 0 || this.state.dayPhase === "open") ? 1 : 0,
+          target: 1,
+          unit: "lần",
+          isUnlocked: Boolean(day > 1 || bowlsServed > 0 || this.state.dayPhase === "open")
+        },
+        {
+          id: "first_bowl",
+          icon: "🍜",
+          name: "Bát Mì Đầu Tiên",
+          desc: "Phục vụ thành công 1 tô mì cay nóng hổi",
+          current: Math.min(1, bowlsServed),
+          target: 1,
+          unit: "tô",
+          isUnlocked: bowlsServed >= 1
+        },
+        {
+          id: "spicy_level_7",
+          icon: "🔥",
+          name: "Bậc Thầy Cấp 7",
+          desc: "Phục vụ 5 tô mì cấp 6-7 bốc hỏa cho thực khách can đảm",
+          current: Math.min(5, spicyMasterServed),
+          target: 5,
+          unit: "tô",
+          isUnlocked: spicyMasterServed >= 5
+        },
+        {
+          id: "noodle_king",
+          icon: "🍲",
+          name: "Vua Niêu Đất",
+          desc: "Bán tích lũy vượt mốc 25 tô mì cay",
+          current: Math.min(25, bowlsServed),
+          target: 25,
+          unit: "tô",
+          isUnlocked: bowlsServed >= 25
+        },
+        {
+          id: "boba_master",
+          icon: "🧋",
+          name: "Tiệm Trà Sữa Boba",
+          desc: "Pha chế và phục vụ 10 ly trà sữa / nước giải cay",
+          current: Math.min(10, drinksServed),
+          target: 10,
+          unit: "ly",
+          isUnlocked: drinksServed >= 10
+        },
+        {
+          id: "tip_collector",
+          icon: "💖",
+          name: "Được Lòng Thực Khách",
+          desc: "Tích lũy 50.000đ tiền tip từ thực khách hài lòng",
+          current: Math.min(50, Math.floor(tipsEarned)),
+          target: 50,
+          unit: "k",
+          isUnlocked: tipsEarned >= 50
+        },
+        {
+          id: "vip_guest",
+          icon: "👑",
+          name: "Khách VIP Thần Tài",
+          desc: "Đón tiếp thành công ít nhất 1 vị khách VIP Thần Tài",
+          current: Math.min(1, vipServed),
+          target: 1,
+          unit: "khách",
+          isUnlocked: vipServed >= 1
+        },
+        {
+          id: "reputation_star",
+          icon: "⭐",
+          name: "Thương Hiệu Nổi Tiếng",
+          desc: "Đạt từ 50 điểm Danh tiếng uy tín trở lên",
+          current: Math.min(50, reputation),
+          target: 50,
+          unit: "sao",
+          isUnlocked: reputation >= 50
+        },
+        {
+          id: "social_star",
+          icon: "🐾",
+          name: "Bạn Của Muôn Loài",
+          desc: "Gặp gỡ và mở khóa ít nhất 5 thực khách trong Bộ sưu tập",
+          current: Math.min(5, unlockedCustomerCount),
+          target: 5,
+          unit: "vị khách",
+          isUnlocked: unlockedCustomerCount >= 5
+        },
+        {
+          id: "millionaire",
+          icon: "💰",
+          name: "Chủ Tiệm Triệu Phú",
+          desc: "Tích lũy tổng doanh thu đạt 1.000.000đ",
+          current: Math.min(1000, Math.round(totalRev)),
+          target: 1000,
+          unit: "k",
+          isUnlocked: totalRev >= 1000
+        }
+      ];
+
+      const unlockedBadgesCount = badges.filter(b => b.isUnlocked).length;
+      const badgePct = Math.round((unlockedBadgesCount / badges.length) * 100);
+
+      const headerHtml = `
+        <div class="collection-progress-header" style="grid-column: 1 / -1;">
+          <div class="collection-progress-meta">
+            <span>🏆 Huy Hiệu Đã Đạt:</span>
+            <span style="color: #F59E0B; font-weight: 800;">${unlockedBadgesCount} / ${badges.length} (${badgePct}%)</span>
+          </div>
+          <div class="collection-progress-bar-track">
+            <div class="collection-progress-bar-fill" style="width: ${badgePct}%;"></div>
+          </div>
         </div>
       `;
+
+      const cardsHtml = badges.map(b => {
+        const pct = Math.min(100, Math.round((b.current / b.target) * 100));
+        return `
+          <div class="badge-card ${b.isUnlocked ? 'is-badge-unlocked' : 'is-badge-locked'}">
+            <div class="badge-icon-wrap">${b.icon}</div>
+            <span class="badge-name">${b.name}</span>
+            <span class="badge-desc">${b.desc}</span>
+            
+            <div class="badge-progress-wrap">
+              <div class="badge-progress-track">
+                <div class="badge-progress-fill" style="width: ${pct}%;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <span class="badge-progress-label">${b.current}/${b.target} ${b.unit}</span>
+                ${b.isUnlocked
+                  ? '<span class="badge-tag-achieved">✅ ĐÃ ĐẠT</span>'
+                  : `<span class="badge-tag-locked">🔒 ${pct}%</span>`
+                }
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      badgeGrid.innerHTML = headerHtml + cardsHtml;
     }
   }
 
@@ -1563,8 +1730,10 @@ export class SpicyNoodleGame {
     if (reviewsList) {
       if (this.state.reviews.length === 0) {
         reviewsList.innerHTML = `
-          <div style="text-align: center; padding: 24px 0; color: var(--text-muted);">
-            Chưa có đánh giá nào. Hãy mở cửa đón thực khách vào thưởng thức mì cay nhé!
+          <div style="text-align: center; padding: 28px 16px; color: var(--text-muted); background: var(--bg-card); border-radius: 14px; border: 1.5px dashed var(--border-card);">
+            <div style="font-size: 36px; margin-bottom: 8px;">🏮</div>
+            <div style="font-weight: 800; font-size: 14px; color: var(--text-title); margin-bottom: 4px;">Tiệm Chưa Có Đánh Giá Nào</div>
+            <div style="font-size: 12px; line-height: 1.4;">Quán mới khai trương chưa đón khách ăn mì! Hãy mở cửa và phục vụ những niêu mì cay nóng hổi đầu tiên để nhận đánh giá và tiền tip nhé!</div>
           </div>
         `;
       } else {
@@ -3038,6 +3207,14 @@ export class SpicyNoodleGame {
       this.state.stats.spicyMasterServed += 1;
     }
 
+    // Mở khóa hoặc tăng số lần phục vụ trong Bộ sưu tập
+    if (slot.customer) {
+      this.unlockCustomer(slot.customer, true);
+      if (slot.customer.isVip) {
+        this.state.stats.vipServed = (this.state.stats.vipServed || 0) + 1;
+      }
+    }
+
     if (this.sound && typeof this.sound.playServeSound === "function") {
       this.sound.playServeSound();
     } else {
@@ -3360,6 +3537,9 @@ export class SpicyNoodleGame {
       maxPatience: 100
     };
 
+    // Khám phá khách hàng khi ghé tiệm
+    this.unlockCustomer(chosenCust, false);
+
     if (chosenCust.isVip) {
       if (this.sound && typeof this.sound.playUpgradeSound === "function") {
         this.sound.playUpgradeSound();
@@ -3474,8 +3654,9 @@ export class SpicyNoodleGame {
     this.initTables();
 
     // 1. Tính toán điểm sao và độ nổi tiếng của quán
+    const hasReviews = this.state.reviews && this.state.reviews.length > 0;
     let avgStars = 5.0;
-    if (this.state.reviews.length > 0) {
+    if (hasReviews) {
       const sum = this.state.reviews.reduce((s, r) => s + (r.stars || 5), 0);
       avgStars = (sum / this.state.reviews.length).toFixed(1);
     }
@@ -3498,7 +3679,9 @@ export class SpicyNoodleGame {
     // Cập nhật các bảng trạng thái tấp nập
     const prepCrowdText = document.getElementById("prep-crowd-status-text");
     if (prepCrowdText) {
-      if (avgStars >= 4.5) {
+      if (!hasReviews) {
+        prepCrowdText.textContent = "🏮 Tiệm mới khai trương ngày đầu! Hãy mở cửa đón những vị khách đầu tiên ghé quán ✨";
+      } else if (avgStars >= 4.5) {
         prepCrowdText.textContent = `Độ nổi tiếng: ${avgStars} ⭐ · Khách trên phố đang ngóng chờ mở quán nườm nượp! 🔥`;
       } else if (avgStars >= 3.5) {
         prepCrowdText.textContent = `Độ nổi tiếng: ${avgStars} ⭐ · Khách dạo phố ghé nhìn menu đều đặn. ✨`;
@@ -3510,7 +3693,10 @@ export class SpicyNoodleGame {
     const openCrowdHeadline = document.getElementById("open-crowd-headline-text");
     const openCrowdWrap = document.querySelector(".stage-crowd-headline");
     if (openCrowdHeadline) {
-      if (avgStars >= 4.5) {
+      if (!hasReviews) {
+        openCrowdHeadline.textContent = "🏮 Tiệm mới khai trương! Sẵn sàng phục vụ những niêu mì thơm phức đầu tiên! ✨";
+        if (openCrowdWrap) openCrowdWrap.className = "stage-crowd-headline";
+      } else if (avgStars >= 4.5) {
         openCrowdHeadline.textContent = `🔥 QUÁN ĐANG ĐÔNG NGHẸT KHÁCH! (Độ nổi tiếng: ${avgStars} ⭐ · Khách dồn dập)`;
         if (openCrowdWrap) {
           openCrowdWrap.className = "stage-crowd-headline is-crowded";

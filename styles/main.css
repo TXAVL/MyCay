@@ -3848,6 +3848,49 @@ html, body {
   margin-top: 8px;
 }
 
+@media (max-width: 480px) {
+  .customers-collection-grid, .badges-collection-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.collection-progress-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-card);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+
+.collection-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+.collection-progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-tray);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-card);
+}
+
+.collection-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B 0%, #10B981 100%);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
 .collection-card {
   background-color: var(--bg-card);
   border: 1.5px solid var(--border-card);
@@ -3858,11 +3901,33 @@ html, body {
   align-items: center;
   text-align: center;
   box-shadow: var(--shadow-card);
-  transition: transform 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
 }
 
 .collection-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Card trạng thái ĐÃ MỞ KHÓA */
+.collection-card.is-unlocked-card {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: linear-gradient(180deg, var(--bg-card) 0%, rgba(254, 243, 199, 0.15) 100%);
+}
+
+.collection-card.is-vip-card {
+  border: 2px solid #F59E0B;
+  background: linear-gradient(180deg, #FFFDF8 0%, #FEF3C7 100%);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.18);
+}
+
+/* Card trạng thái KHÓA (CHƯA GẶP) */
+.collection-card.is-locked-card {
+  background-color: var(--bg-tray);
+  border: 1.5px dashed var(--border-card);
+  opacity: 0.85;
 }
 
 .collection-avatar {
@@ -3872,7 +3937,19 @@ html, body {
   object-fit: cover;
   background-color: var(--bg-tray);
   border: 2px solid var(--border-card);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  transition: filter 0.2s ease;
+}
+
+.collection-avatar.is-locked-avatar {
+  filter: grayscale(1) opacity(0.35);
+  background-color: #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #64748B;
+  border-style: dashed;
 }
 
 .collection-name {
@@ -3880,12 +3957,178 @@ html, body {
   font-weight: 800;
   color: var(--text-title);
   margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .collection-bio {
   font-size: 11px;
   color: var(--text-muted);
   line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.collection-sub-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: auto;
+}
+
+.collection-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-top: 6px;
+}
+
+.collection-status-pill.pill-vip {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #F59E0B;
+}
+
+.collection-status-pill.pill-met {
+  background: #EAF5EE;
+  color: #15803D;
+  border: 1px solid #86EFAC;
+}
+
+.collection-status-pill.pill-locked {
+  background: #F1F5F9;
+  color: #64748B;
+  border: 1px solid #CBD5E1;
+}
+
+/* ==========================================================
+   HUY HIỆU (BADGES)
+   ========================================================== */
+.badge-card {
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border-card);
+  border-radius: 14px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s;
+  position: relative;
+}
+
+.badge-card:hover {
+  transform: translateY(-2px);
+}
+
+.badge-card.is-badge-unlocked {
+  border: 2px solid #F59E0B;
+  background: linear-gradient(145deg, #FFFDF8 0%, #FEF3C7 100%);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.18);
+}
+
+.badge-card.is-badge-locked {
+  background-color: var(--bg-tray);
+  border: 1.5px dashed var(--border-card);
+  opacity: 0.82;
+}
+
+.badge-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 6px;
+  background: var(--bg-tray);
+  border: 1.5px solid var(--border-card);
+}
+
+.badge-card.is-badge-unlocked .badge-icon-wrap {
+  background: #FFF;
+  border-color: #F59E0B;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+  animation: anime-subtle-bounce 2s infinite ease-in-out;
+}
+
+.badge-card.is-badge-locked .badge-icon-wrap {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.badge-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-title);
+  margin-bottom: 2px;
+}
+
+.badge-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.badge-progress-wrap {
+  width: 100%;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.badge-progress-track {
+  width: 100%;
+  height: 6px;
+  background: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.badge-progress-fill {
+  height: 100%;
+  background: #F59E0B;
+  border-radius: 4px;
+}
+
+.badge-progress-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.badge-tag-achieved {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #86EFAC;
+}
+
+.badge-tag-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #F1F5F9;
+  color: #64748B;
+  border: 1px solid #CBD5E1;
 }
 
 /* ==========================================================
