@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadingScreen = document.getElementById("loading-screen");
   const loadingProgressBar = document.getElementById("loading-progress-fill");
   const loadingPercent = document.getElementById("loading-percent");
+  const loadingStatusText = document.getElementById("loading-status-text");
   const loadingTip = document.getElementById("loading-tip-text");
   const btnStartPlay = document.getElementById("btn-start-play");
 
@@ -67,17 +68,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Mẹo hoạt hình và các trạng thái khi tải trang
   const loadingStages = [
-    { text: "Đang ninh nước dùng xương hầm cùng thảo mộc thơm lừng... 🍲", targetPct: 22 },
-    { text: "Bé Mèo Mochi đang lau dọn bàn ghế gỗ sồi sạch bóng... 🪑", targetPct: 45 },
-    { text: "Đang chuẩn bị ớt hiểm 7 cấp độ cay nồng ấm bụng... 🌶️", targetPct: 68 },
-    { text: "Bật điều hòa Daikin mát rượi và giai điệu Lo-Fi anime thư giãn... ❄️🎵", targetPct: 88 },
-    { text: "Kích hoạt Giờ Vàng FEVER RUSH & sẵn sàng đón khách VIP... 👑✨", targetPct: 100 }
+    { 
+      status: "Đang ninh nước dùng & chuẩn bị niêu đất...", 
+      tip: "Đang ninh nước dùng xương hầm cùng thảo mộc thơm lừng... 🍲", 
+      targetPct: 22 
+    },
+    { 
+      status: "Đang dọn dẹp bàn ghế gỗ sồi Cozy...", 
+      tip: "Bé Mèo Mochi đang lau dọn bàn ghế gỗ sồi sạch bóng... 🪑", 
+      targetPct: 45 
+    },
+    { 
+      status: "Đang chuẩn bị ớt hiểm 7 cấp độ cay...", 
+      tip: "Đang chuẩn bị ớt hiểm 7 cấp độ cay nồng ấm bụng... 🌶️", 
+      targetPct: 68 
+    },
+    { 
+      status: "Bật điều hòa Daikin & bật nhạc Lo-Fi...", 
+      tip: "Bật điều hòa Daikin mát rượi và giai điệu Lo-Fi anime thư giãn... ❄️🎵", 
+      targetPct: 88 
+    },
+    { 
+      status: "Khởi động Giờ Vàng FEVER RUSH...", 
+      tip: "Kích hoạt Giờ Vàng FEVER RUSH & sẵn sàng đón khách VIP... 👑✨", 
+      targetPct: 100 
+    }
   ];
 
   // 1. Quản lý Màn hình Loading mượt mà hiển thị đủ toàn bộ trạng thái
   let currentStageIdx = 0;
   let loadProgress = 0;
-  if (loadingTip) loadingTip.textContent = loadingStages[0].text;
+  if (loadingStatusText) loadingStatusText.textContent = loadingStages[0].status;
+  if (loadingTip) loadingTip.textContent = loadingStages[0].tip;
 
   const loadInterval = setInterval(() => {
     const currentStage = loadingStages[currentStageIdx];
@@ -91,11 +113,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loadProgress >= currentStage.targetPct) {
       if (currentStageIdx < loadingStages.length - 1) {
         currentStageIdx++;
-        if (loadingTip) loadingTip.textContent = loadingStages[currentStageIdx].text;
+        if (loadingStatusText) loadingStatusText.textContent = loadingStages[currentStageIdx].status;
+        if (loadingTip) loadingTip.textContent = loadingStages[currentStageIdx].tip;
       } else {
         clearInterval(loadInterval);
         if (loadingProgressBar) loadingProgressBar.style.width = "100%";
         if (loadingPercent) loadingPercent.textContent = "100%";
+        if (loadingStatusText) loadingStatusText.textContent = "Hoàn tất chuẩn bị! Tiệm đã sẵn sàng!";
         if (loadingTip) loadingTip.textContent = "Tiệm mì cay đã sẵn sàng mở cửa đón thực khách! 🍜✨";
 
         if (btnStartPlay) {
@@ -147,25 +171,79 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 3. Đổi tên tiệm trà (Name Prompt)
+  let nameWarningTimer = null;
+
+  function triggerShake(element) {
+    if (!element) return;
+    element.classList.remove("anime-shake");
+    // Ép reflow để kích hoạt lại animation CSS
+    void element.offsetWidth;
+    element.classList.add("anime-shake");
+  }
+
   function openNamePrompt() {
     if (!nameModal) return;
     nameModal.style.display = "flex";
     if (nameInput) {
       nameInput.value = game.state.shopName || "Tiệm Mỳ Cay";
       nameInput.focus();
+      nameInput.select();
     }
-    updateNameValidation(nameInput.value);
+    updateNameValidation(nameInput ? nameInput.value : "");
   }
 
-  function updateNameValidation(val) {
-    const check = NameValidator.validate(val);
-    if (!check.isValid) {
-      nameWarning.textContent = check.message;
-      nameWarning.className = "name-warning-box warning-red visible";
+  function updateNameValidation(val, isTriggeredBySubmit = false) {
+    if (!nameWarning) return;
+
+    if (nameWarningTimer) {
+      clearTimeout(nameWarningTimer);
+      nameWarningTimer = null;
+    }
+
+    const trimmed = (val !== undefined && val !== null) ? String(val).trim() : "";
+    if (trimmed === "") {
+      nameWarning.className = "name-warning-box";
+      nameWarning.textContent = "";
+      if (nameInput) {
+        nameInput.classList.remove("is-invalid", "is-valid", "anime-shake");
+      }
       if (btnConfirmName) btnConfirmName.disabled = true;
+      return;
+    }
+
+    const check = NameValidator.validate(trimmed);
+
+    if (!check.isValid) {
+      nameWarning.innerHTML = `⚠️ <span>${check.message}</span>`;
+      nameWarning.className = "name-warning-box warning-red visible";
+      
+      if (nameInput) {
+        nameInput.classList.remove("is-valid");
+        nameInput.classList.add("is-invalid");
+      }
+
+      // Kích hoạt rung cả input và hộp cảnh báo
+      triggerShake(nameInput);
+      triggerShake(nameWarning);
+
+      if (btnConfirmName) btnConfirmName.disabled = true;
+
+      // Tự động mờ dần và ẩn cảnh báo đỏ sau 3.5 giây nếu không thao tác tiếp
+      nameWarningTimer = setTimeout(() => {
+        nameWarning.classList.remove("visible");
+        if (nameInput) nameInput.classList.remove("anime-shake");
+      }, 3500);
+
     } else {
-      nameWarning.textContent = check.message;
+      // Hợp lệ: Chuyển ngay sang trạng thái xanh lá tích cực
+      nameWarning.innerHTML = `✨ <span>✓ Tên quán hợp lệ! Sẵn sàng treo biển hiệu.</span>`;
       nameWarning.className = "name-warning-box warning-green visible";
+      
+      if (nameInput) {
+        nameInput.classList.remove("is-invalid", "anime-shake");
+        nameInput.classList.add("is-valid");
+      }
+
       if (btnConfirmName) btnConfirmName.disabled = false;
     }
   }
@@ -174,23 +252,35 @@ document.addEventListener("DOMContentLoaded", () => {
     nameInput.addEventListener("input", e => {
       const val = e.target.value;
       if (val.trim() === "") {
+        if (nameWarningTimer) clearTimeout(nameWarningTimer);
         nameWarning.className = "name-warning-box";
         nameWarning.textContent = "";
+        nameInput.classList.remove("is-invalid", "is-valid", "anime-shake");
         if (btnConfirmName) btnConfirmName.disabled = true;
       } else {
         updateNameValidation(val);
+      }
+    });
+
+    nameInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (btnConfirmName) btnConfirmName.click();
       }
     });
   }
 
   if (btnConfirmName) {
     btnConfirmName.addEventListener("click", () => {
-      const val = nameInput.value.trim();
+      const val = (nameInput ? nameInput.value : "").trim();
       const check = NameValidator.validate(val);
       if (!check.isValid) {
-        updateNameValidation(val);
+        updateNameValidation(val, true);
+        if (game && game.sound) game.sound.playClick();
         return;
       }
+
+      if (nameWarningTimer) clearTimeout(nameWarningTimer);
 
       game.state.shopName = val;
       game.saveGame();
