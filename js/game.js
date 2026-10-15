@@ -720,6 +720,12 @@ export class SpicyNoodleGame {
 
     // Tiền hiển thị chính xác định dạng VNĐ chuẩn ảnh: 400.000đ, 253.500đ
     if (moneyEl) {
+      if (typeof this.lastDisplayedMoney === "number" && this.state.money > this.lastDisplayedMoney) {
+        moneyEl.classList.remove("money-counter-pulse");
+        void moneyEl.offsetWidth;
+        moneyEl.classList.add("money-counter-pulse");
+      }
+      this.lastDisplayedMoney = this.state.money;
       moneyEl.textContent = txaformat.formatVND(this.state.money);
     }
 
@@ -1409,6 +1415,11 @@ export class SpicyNoodleGame {
   deliverOnlineOrder(index) {
     const order = this.state.onlineOrders[index];
     if (!order) return;
+
+    const cards = document.querySelectorAll(".online-order-card");
+    if (cards && cards[index]) {
+      GameUIModal.spawnFloatingFx(cards[index], `+${order.price}k 🛵`, true);
+    }
 
     this.state.money += order.price;
     this.state.deliveredOnlineCount++;
@@ -2160,7 +2171,7 @@ export class SpicyNoodleGame {
       const isNoodleOutOfStock = !noodleItem || (noodleItem.stock <= 0);
 
       return `
-        <div class="order-slot-card ${isSpecialCombo ? 'is-special-combo-slot' : ''} ${isMatch ? 'is-matching-dish' : ''}">
+        <div id="order-slot-${idx}" class="order-slot-card ${isSpecialCombo ? 'is-special-combo-slot' : ''} ${isMatch ? 'is-matching-dish' : ''}">
           <div class="order-customer-head">
             <div class="order-cust-avatar-wrap">
               <img src="${cust.avatar}" alt="${cust.name}" class="order-cust-avatar" onerror="this.src='assets/cust_cat.png'" />
@@ -2217,12 +2228,15 @@ export class SpicyNoodleGame {
 
     const pot = this.currentPot;
 
-    // Cập nhật size niêu đất
+    // Cập nhật size niêu đất và hiệu ứng bốc lửa khi cấp cay 6-7
+    const steamEl = document.getElementById("pot-steam-particles");
     if (potEl) {
-      potEl.className = `korean-clay-pot size-${pot.size.toLowerCase()}`;
+      const isBlazing = Boolean(pot.noodleId && pot.spicyLevel >= 6);
+      potEl.className = `korean-clay-pot size-${pot.size.toLowerCase()} ${isBlazing ? "is-spicy-blaze" : ""}`;
     }
 
     if (!pot.noodleId) {
+      if (steamEl) steamEl.style.display = "none";
       titleEl.textContent = pot.size === "L" ? "Niêu Lớn (Đang Trống)" : "Niêu Vừa (Đang Trống)";
       subEl.textContent = "Chạm chọn Mì & Nước Dùng bên dưới để bắt đầu nấu";
       if (soupLake) {
@@ -2243,6 +2257,14 @@ export class SpicyNoodleGame {
       if (drinkPreview) drinkPreview.textContent = "";
       if (gasBurner) gasBurner.style.opacity = "0.35";
     } else {
+      if (steamEl) {
+        steamEl.style.display = "flex";
+        if (pot.spicyLevel >= 6) {
+          steamEl.innerHTML = `<span class="steam-wisp steam-1">🔥</span><span class="steam-wisp steam-2">🌶️</span><span class="steam-wisp steam-3">♨️</span>`;
+        } else {
+          steamEl.innerHTML = `<span class="steam-wisp steam-1">♨️</span><span class="steam-wisp steam-2">♨️</span>`;
+        }
+      }
       const noodle = this.state.noodles[pot.noodleId];
       const noodleName = noodle ? noodle.name : "Mì cay";
       titleEl.textContent = `${noodleName} (Cấp ${pot.spicyLevel})`;
@@ -2425,6 +2447,7 @@ export class SpicyNoodleGame {
     this.currentPot.drinkId = null;
 
     this.sound.playCookingSizzle();
+    this.triggerPotBounce();
     GameUIModal.showToast(`⚡ Đã nấu niêu ${noodle.name} (Cấp ${spicy})! Bấm "Bưng ngay" để phục vụ!`, "success", noodle.icon);
 
     this.renderPotWorkstation();
@@ -2542,10 +2565,21 @@ export class SpicyNoodleGame {
     }
   }
 
+  triggerPotBounce() {
+    const pot = document.getElementById("korean-clay-pot");
+    if (pot) {
+      pot.classList.remove("pot-pop-bounce");
+      void pot.offsetWidth; // force reflow
+      pot.classList.add("pot-pop-bounce");
+      setTimeout(() => pot.classList.remove("pot-pop-bounce"), 400);
+    }
+  }
+
   // Tương tác nấu trong niêu
   selectPotSize(size) {
     this.currentPot.size = size;
     this.sound.playButtonClick();
+    this.triggerPotBounce();
     this.renderPotWorkstation();
     this.renderCookingSteps();
     this.renderOrderQueue();
@@ -2554,6 +2588,7 @@ export class SpicyNoodleGame {
   selectSpicyLevel(lvl) {
     this.currentPot.spicyLevel = lvl;
     this.sound.playCookingSizzle();
+    this.triggerPotBounce();
     this.renderPotWorkstation();
     this.renderCookingSteps();
     this.renderOrderQueue();
@@ -2568,6 +2603,7 @@ export class SpicyNoodleGame {
 
     this.currentPot.noodleId = noodleId;
     this.sound.playCookingSizzle();
+    this.triggerPotBounce();
     GameUIModal.showToast(`Đã bỏ ${noodle.name} vào niêu đất!`, "success", noodle.icon);
     this.renderPotWorkstation();
     this.renderCookingSteps();
@@ -2589,6 +2625,7 @@ export class SpicyNoodleGame {
       }
       this.currentPot.toppings.push(toppingId);
       this.sound.playCookingSizzle();
+      this.triggerPotBounce();
       GameUIModal.showToast(`Đã thêm ${top.name} vào niêu!`, "info", top.icon);
     }
     this.renderPotWorkstation();
@@ -2654,6 +2691,7 @@ export class SpicyNoodleGame {
     this.currentPot.drinkId = null;
 
     this.sound.playCookingSizzle();
+    this.triggerPotBounce();
     GameUIModal.showToast(`⚡ Đã nấu niêu đúng đơn cho ${slot.customer.name}! Bấm "✨ Bưng ngay" để phục vụ!`, "success", "🍲");
 
     this.renderPotWorkstation();
@@ -2703,13 +2741,20 @@ export class SpicyNoodleGame {
     const pot = this.currentPot;
 
     // Kiểm tra độ khớp của món ăn
-    let isMatch = true;
-    if (pot.noodleId !== order.noodleId) isMatch = false;
-    if (order.toppingId && !pot.toppings.includes(order.toppingId)) isMatch = false;
+    let mismatchReason = null;
+    if (pot.noodleId !== order.noodleId) {
+      mismatchReason = `Khách muốn ${order.noodleName}, niêu hiện tại là ${this.state.noodles[pot.noodleId]?.name || 'món khác'}!`;
+    } else if (order.size && pot.size !== order.size) {
+      mismatchReason = `Khách gọi niêu Size ${order.size}, niêu trên bếp đang là Size ${pot.size}!`;
+    } else if (pot.spicyLevel !== order.spicyLevel) {
+      mismatchReason = `Khách muốn cay Cấp ${order.spicyLevel}, niêu trên bếp đang là Cấp ${pot.spicyLevel}!`;
+    } else if (order.toppingId && !pot.toppings.includes(order.toppingId)) {
+      mismatchReason = `Khách muốn thêm ${order.toppingName || 'topping'}, niêu hiện tại chưa có!`;
+    }
 
-    if (!isMatch) {
+    if (mismatchReason) {
       if (!isAutoUsagi) {
-        GameUIModal.showToast(`Khách muốn ${order.noodleName} cấp ${order.spicyLevel}! Hãy kiểm tra lại niêu đất nhé.`, "warning", "⚠️");
+        GameUIModal.showToast(mismatchReason, "warning", "⚠️");
       }
       return;
     }
@@ -2733,6 +2778,9 @@ export class SpicyNoodleGame {
       bowlPrice += drinkPrice;
       this.state.stats.drinksServed++;
       this.state.todayDrinksSold++;
+      if (this.state.drinks[pot.drinkId].stock > 0) {
+        this.state.drinks[pot.drinkId].stock -= 1;
+      }
     }
 
     // Nâng cấp Sốt Ớt Hiểm Bí Truyền (chiliSecret): Tăng 15% doanh thu mỗi cấp!
@@ -2809,6 +2857,17 @@ export class SpicyNoodleGame {
     }
 
     this.sound.playCoinChime();
+
+    const slotCard = document.getElementById(`order-slot-${slotIdx}`);
+    if (slotCard && typeof GameUIModal.spawnFloatingFx === "function") {
+      GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🍜`, true);
+      if (specialBonus > 0) {
+        setTimeout(() => {
+          GameUIModal.spawnFloatingFx(slotCard, `+${specialBonus}k 🎁 BONUS!`, true);
+        }, 260);
+      }
+    }
+
     const duckyText = duckyBonus > 0 ? " (🦆 Ducky Barista +25% nước)" : "";
     if (isSpecialCombo) {
       GameUIModal.showToast(`🌟 KHÁCH MÊ MẨN ĐƠN ĐẶC BIỆT! Nhận +${totalEarned}k (Mì + Tip x2 & 🎁 BONUS COMBO +${specialBonus}k)${duckyText}!`, "success", "🔥");
@@ -3275,7 +3334,7 @@ export class SpicyNoodleGame {
     const tablesHtml = this.state.tables.map(table => {
       if (table.status === "empty") {
         return `
-          <div class="dining-table-box is-empty">
+          <div id="dining-table-${table.id}" class="dining-table-box is-empty">
             <span style="font-size: 26px;">🪑</span>
             <span style="font-size: 11px; font-weight: 800; color: #3B180E;">Bàn #${table.id} Trống</span>
             <span style="font-size: 10px; color: #8C431A; opacity: 0.75;">Sẵn sàng đón khách</span>
@@ -3285,7 +3344,7 @@ export class SpicyNoodleGame {
 
       if (table.status === "dirty") {
         return `
-          <div class="dining-table-box is-dirty">
+          <div id="dining-table-${table.id}" class="dining-table-box is-dirty">
             <span style="font-size: 22px;">🍲✨</span>
             <span style="font-size: 11px; font-weight: 800; color: #8C431A;">Bàn #${table.id} đã ăn xong</span>
             <button class="btn-clean-table" onclick="window.game.cleanTable(${table.id})">🧹 Dọn Bàn (+Tip)</button>
@@ -3308,7 +3367,7 @@ export class SpicyNoodleGame {
       }
 
       return `
-        <div class="dining-table-box is-eating" style="position: relative;">
+        <div id="dining-table-${table.id}" class="dining-table-box is-eating" style="position: relative;">
           ${acLv >= 2 ? '<span class="dining-cool-badge" title="Mát rượi nhờ Daikin">❄️ Mát</span>' : ''}
           <img src="${cust.avatar || 'assets/cust_cat.png'}" class="dining-customer-avatar" alt="${cust.name}" onerror="this.src='assets/cust_cat.png'" />
           <span style="font-size: 11px; font-weight: 800; color: #3B180E;">${cust.name}</span>
@@ -3384,6 +3443,11 @@ export class SpicyNoodleGame {
     this.state.todayEarnings += tipEarned;
     this.state.stats.tipsEarned += tipEarned;
     this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + tipEarned;
+
+    const tableEl = document.getElementById(`dining-table-${tableId}`);
+    if (tableEl && typeof GameUIModal.spawnFloatingFx === "function") {
+      GameUIModal.spawnFloatingFx(tableEl, `+${tipEarned}k 🪙`, true);
+    }
 
     this.sound.playCoinChime();
     GameUIModal.showToast(`Đã dọn sạch bàn #${tableId}! Nhận thêm +${tipEarned}k tiền tip để lại 🪙`, "success", "🧹");
@@ -3519,6 +3583,21 @@ export class SpicyNoodleGame {
     if (kBar) {
       kBar.classList.add("is-turbo-blasting");
       setTimeout(() => kBar.classList.remove("is-turbo-blasting"), 3000);
+    }
+
+    // Hiệu ứng luồng gió lạnh băng giá phà khắp quán
+    const openModeLayout = document.getElementById("view-open-mode");
+    if (openModeLayout) {
+      for (let i = 0; i < 7; i++) {
+        const flake = document.createElement("div");
+        flake.className = "daikin-wind-breeze";
+        flake.textContent = ["❄️", "🌬️", "✨", "🧊"][i % 4];
+        flake.style.left = `${12 + Math.random() * 75}%`;
+        flake.style.top = `${25 + Math.random() * 45}%`;
+        flake.style.animationDelay = `${i * 0.1}s`;
+        openModeLayout.appendChild(flake);
+        setTimeout(() => flake.remove(), 1600);
+      }
     }
 
     this.renderOrderQueue();
@@ -3696,6 +3775,10 @@ export class SpicyNoodleGame {
               this.state.stats.tipsEarned += autoTip;
               this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + autoTip;
               this.sound.playCoinChime();
+              const tableEl = document.getElementById(`dining-table-${table.id}`);
+              if (tableEl && typeof GameUIModal.spawnFloatingFx === "function") {
+                GameUIModal.spawnFloatingFx(tableEl, `+${autoTip}k 🐶`, true);
+              }
               GameUIModal.showToast(`🐶 Cún Shiba đã lau dọn sạch bàn #${table.id}! Nhặt được +${autoTip}k tip!`, "success", "✨");
             } else {
               table.status = "dirty";
@@ -3896,6 +3979,9 @@ export class SpicyNoodleGame {
     if (packBtn) {
       packBtn.classList.add("is-packed");
       packBtn.innerHTML = `✨ Đã Ép Màng & Thùng Giữ Nhiệt (+15k)`;
+      if (typeof GameUIModal.spawnFloatingFx === "function") {
+        GameUIModal.spawnFloatingFx(packBtn, "+15k 📦", true);
+      }
     }
 
     const priceEl = document.getElementById("open-shipper-price");
@@ -4138,9 +4224,16 @@ export class SpicyNoodleGame {
     }
     this.activeLiveShipperOrder = null;
 
-    // Ẩn thẻ shipper
+    // Ẩn thẻ shipper & hiệu ứng thưởng tiền
     const shipperCard = document.getElementById("open-mode-shipper-card");
-    if (shipperCard) shipperCard.style.display = "none";
+    if (shipperCard && typeof GameUIModal.spawnFloatingFx === "function") {
+      GameUIModal.spawnFloatingFx(shipperCard, `+${order.price}k 🛵`, true);
+    }
+    if (shipperCard) {
+      setTimeout(() => {
+        shipperCard.style.display = "none";
+      }, 350);
+    }
 
     this.sound.playCoinChime();
     const fawnTxt = fawnDeliveryBonus > 0 ? ` + 🦌 Nai Fawn thưởng sỉ +${fawnDeliveryBonus}k!` : "";
@@ -4171,6 +4264,12 @@ export class SpicyNoodleGame {
         this.endDay();
       }
     });
+  }
+
+  resumeShift() {
+    this.isPaused = false;
+    GameUIModal.closeModal();
+    GameUIModal.showToast("Tiệm đã tiếp tục ca bán! ▶️", "info", "🍜");
   }
 
   endDay() {
@@ -4334,6 +4433,11 @@ export class SpicyNoodleGame {
   }
 
   switchTab(tabId) {
+    if (this.state.dayPhase === "open") {
+      GameUIModal.showToast("Quán đang trong ca bán mở cửa! Hãy tập trung phục vụ khách nhé!", "info", "⏱️");
+      return;
+    }
+
     document.querySelectorAll(".nav-grid-btn").forEach(b => {
       b.classList.toggle("active", b.getAttribute("data-tab") === tabId);
     });

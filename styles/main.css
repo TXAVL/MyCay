@@ -7268,6 +7268,66 @@ html, body {
   filter: brightness(1.1);
 }
 
+/* ==========================================================
+   23. HIỆU ỨNG THỊ GIÁC ĐẶC BIỆT & PHẢN HỒI XÚC GIÁC (VISUAL FX)
+   ========================================================== */
+
+/* Lửa bốc khói niêu đất khi nấu cấp độ cay 6 - 7 */
+.korean-clay-pot.is-spicy-blaze {
+  filter: drop-shadow(0 0 14px rgba(235, 47, 6, 0.8)) drop-shadow(0 0 4px rgba(255, 165, 2, 0.9));
+  animation: potBlazeShake 0.4s infinite alternate ease-in-out;
+}
+@keyframes potBlazeShake {
+  0% { transform: translateY(0) rotate(-0.8deg); }
+  100% { transform: translateY(-1.5px) rotate(0.8deg); }
+}
+
+/* Nảy niêu đất khi thả nguyên liệu vào */
+.pot-pop-bounce {
+  animation: potPopBounce 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+@keyframes potPopBounce {
+  0% { transform: scale(0.92); }
+  55% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* Hiệu ứng nổi bật slot đơn khách đang trùng khớp hoàn hảo với niêu */
+.order-slot-card.is-matching-dish {
+  border: 2px solid #10B981 !important;
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-card) 100%) !important;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.45) !important;
+  animation: matchingSlotPulse 1.2s infinite alternate ease-in-out;
+}
+@keyframes matchingSlotPulse {
+  0% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35); }
+  100% { box-shadow: 0 8px 24px rgba(16, 185, 129, 0.65); transform: translateY(-3px); }
+}
+
+/* Làn gió mát tuyết rơi từ điều hòa Daikin */
+.daikin-wind-breeze {
+  position: fixed;
+  pointer-events: none;
+  font-size: 16px;
+  animation: breezeFloat 1.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  z-index: 999999;
+}
+@keyframes breezeFloat {
+  0% { opacity: 0; transform: translateY(0) scale(0.6) rotate(0deg); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(50px) translateX(-25px) scale(1.25) rotate(45deg); }
+}
+
+/* Nháy sáng tiền vàng khi thu tiền */
+.money-counter-pulse {
+  animation: moneyPulse 0.4s ease-out;
+}
+@keyframes moneyPulse {
+  0% { transform: scale(1); color: var(--accent-gold); }
+  50% { transform: scale(1.22); color: #10B981; }
+  100% { transform: scale(1); }
+}
+
 
 
 

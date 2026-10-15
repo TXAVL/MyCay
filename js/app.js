@@ -530,14 +530,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btnClearPot.addEventListener("click", () => game.clearCurrentPot());
   }
 
-  // 11. Giao niêu mì cho Shipper trong ca bán trực tiếp
-  const btnOpenHandover = document.getElementById("btn-open-handover");
-  if (btnOpenHandover) {
-    btnOpenHandover.addEventListener("click", () => {
-      game.handoverToShipper(false);
-    });
-  }
-
   // 12. Hồ sơ Chủ Tiệm Mì Cay
   const btnOwnerProfile = document.getElementById("btn-owner-profile");
   const btnCloseOwner = document.getElementById("btn-close-owner");
