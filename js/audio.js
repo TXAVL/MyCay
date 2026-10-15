@@ -540,4 +540,31 @@ export class SoundManager {
       osc.stop(t + 0.35);
     });
   }
+
+  // SFX: Tiếng bùng nổ Giờ Vàng FEVER RUSH thần tài rực rỡ
+  playFeverSound() {
+    if (!this.sfxEnabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const feverChords = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98]; // C5, E5, G5, C6, E6, G6
+    feverChords.forEach((freq, idx) => {
+      const t = now + idx * 0.06;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(this.sfxVolume * 0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.45);
+    });
+  }
 }

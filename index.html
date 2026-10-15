@@ -18,7 +18,7 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=1.5.0" />
+  <link rel="stylesheet" href="styles/main.css?v=1.5.5" />
 
   <script>
     // Áp dụng theme lưu trước để chống giật giao diện (Anti-FOUC)
@@ -554,6 +554,21 @@
                   <span class="shift-clock-digits" id="cockpit-clock-digits">4:00</span>
                 </div>
                 <div class="shift-clock-sub" id="cockpit-shift-sub">⚡ Phục vụ & giao đơn trước khi hết giờ!</div>
+              </div>
+
+              <!-- THANH BÙNG NỔ GIỜ VÀNG FEVER RUSH (VIP FEATURE v1.5.5) -->
+              <div class="cockpit-fever-bar" id="cockpit-fever-bar" onclick="window.game.handleFeverBarClick()" title="Giờ Vàng FEVER RUSH: Phục vụ khách chuẩn để tích đầy Giờ Vàng bùng nổ x2 Doanh Thu!">
+                <div class="fever-bar-inner">
+                  <div class="fever-title-row">
+                    <span class="fever-fire-icon" id="fever-fire-icon">🔥</span>
+                    <span class="fever-label" id="fever-label">GIỜ VÀNG FEVER RUSH:</span>
+                    <span class="fever-status-text" id="fever-status-text">0 / 100 Điểm</span>
+                    <span class="fever-mult-badge" id="fever-mult-badge">x1 THƯỜNG</span>
+                  </div>
+                  <div class="fever-track">
+                    <div class="fever-fill" id="fever-fill" style="width: 0%;"></div>
+                  </div>
+                </div>
               </div>
 
               <!-- 1. HÀNG 3 KHAY ĐƠN HÀNG CỦA THỰC KHÁCH (ORDER QUEUE SLOTS) -->
@@ -1169,6 +1184,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=1.5.0"></script>
+  <script type="module" src="js/app.js?v=1.5.5"></script>
 </body>
 </html>

@@ -8007,6 +8007,220 @@ html, body {
   font-weight: 600;
 }
 
+/* ==========================================================
+   27. CHẾ ĐỘ GIỜ VÀNG FEVER RUSH & KHÁCH VIP THẦN TÀI (v1.5.5)
+   ========================================================== */
+.cockpit-fever-bar {
+  background: var(--bg-card);
+  border: 1.5px solid #F1C40F;
+  border-radius: 12px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 10px rgba(241, 196, 15, 0.15);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.cockpit-fever-bar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(241, 196, 15, 0.28);
+}
+
+.cockpit-fever-bar.is-fever-blazing {
+  background: linear-gradient(135deg, rgba(254, 240, 138, 0.35) 0%, rgba(249, 115, 22, 0.25) 100%);
+  border-color: #F59E0B;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
+  animation: feverBlazeGlow 1s infinite alternate ease-in-out;
+}
+
+@keyframes feverBlazeGlow {
+  0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.35); border-color: #F59E0B; }
+  100% { box-shadow: 0 0 22px rgba(239, 68, 68, 0.65); border-color: #EF4444; }
+}
+
+.fever-bar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fever-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.fever-fire-icon {
+  font-size: 16px;
+  animation: fireBounce 1.2s infinite ease-in-out;
+}
+
+@keyframes fireBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.22) rotate(-6deg); }
+}
+
+.fever-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #B45309;
+  letter-spacing: 0.3px;
+}
+
+.fever-status-text {
+  font-size: 12px;
+  font-weight: 900;
+  color: #D97706;
+  margin-left: auto;
+  font-family: monospace, system-ui;
+}
+
+.fever-mult-badge {
+  font-size: 10.5px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+  transition: all 0.25s ease;
+}
+
+.fever-mult-badge.badge-fever-active {
+  background: linear-gradient(135deg, #EF4444 0%, #F59E0B 100%);
+  color: #FFFFFF;
+  border-color: #B91C1C;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  animation: badgeFeverPulse 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes badgeFeverPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+.fever-track {
+  width: 100%;
+  height: 9px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.fever-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FCD34D 0%, #F59E0B 60%, #EF4444 100%);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.fever-fill.blazing-fever {
+  background: linear-gradient(90deg, #F59E0B 0%, #EF4444 50%, #EC4899 100%);
+  animation: feverStripes 1s linear infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes feverStripes {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* KHÁCH HÀNG VIP THẦN TÀI TRÊN KHAY ĐƠN HÀNG */
+.order-slot-card.is-vip-customer-card {
+  background: linear-gradient(145deg, #FFFDF0 0%, #FEF9C3 100%) !important;
+  border: 2px solid #EAB308 !important;
+  box-shadow: 0 4px 16px rgba(234, 179, 8, 0.35) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.order-slot-card.is-vip-customer-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: skewX(-25deg);
+  animation: vipShimmer 3s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes vipShimmer {
+  0% { left: -75%; }
+  30%, 100% { left: 135%; }
+}
+
+.cust-vip-crown-icon {
+  position: absolute;
+  top: -8px;
+  right: -5px;
+  font-size: 16px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  animation: crownWiggle 2s infinite ease-in-out;
+}
+
+@keyframes crownWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+.vip-cust-gold-badge {
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #854D0E;
+  background: linear-gradient(135deg, #FEF08A 0%, #FDE047 100%);
+  border: 1px solid #EAB308;
+  border-radius: 6px;
+  padding: 2px 6px;
+  text-align: center;
+  margin-bottom: 3px;
+  box-shadow: 0 1px 4px rgba(234, 179, 8, 0.3);
+}
+
+/* HIỆU ỨNG TIA SÁNG VÀNG BÙNG NỔ FEVER */
+.fever-gold-sparkle {
+  position: absolute;
+  font-size: 24px;
+  pointer-events: none;
+  z-index: 99;
+  animation: sparkleFlyUp 2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes sparkleFlyUp {
+  0% { opacity: 0; transform: translateY(0) scale(0.4) rotate(0deg); }
+  25% { opacity: 1; transform: translateY(-20px) scale(1.3) rotate(15deg); }
+  100% { opacity: 0; transform: translateY(-70px) scale(0.9) rotate(45deg); }
+}
+
+.open-mode-responsive-layout.is-fever-mode {
+  position: relative;
+}
+
+.open-mode-responsive-layout.is-fever-mode::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 18px;
+  border: 2.5px solid rgba(245, 158, 11, 0.5);
+  box-shadow: inset 0 0 25px rgba(245, 158, 11, 0.2), 0 0 20px rgba(245, 158, 11, 0.3);
+  pointer-events: none;
+  z-index: 10;
+  animation: feverAuraPulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes feverAuraPulse {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; border-color: rgba(239, 68, 68, 0.65); box-shadow: inset 0 0 35px rgba(239, 68, 68, 0.25), 0 0 30px rgba(245, 158, 11, 0.5); }
+}
+
 
 
 

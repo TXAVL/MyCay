@@ -9,57 +9,22 @@ export class txaversion {
     this.features = features; // Danh sách { title, desc, icon, badge }
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.5.0 - Đại Tiệc Trà Sữa & Đội Ngũ Nhân Sự Toàn Năng)
+  // Khai báo phiên bản hiện tại của game (Bản 1.5.5 - Giờ Vàng FEVER RUSH & Khách VIP Thần Tài)
   static get CURRENT_VERSION() {
-    return new txaversion("1.5.0", 150, "15/10/2026", [
+    return new txaversion("1.5.5", 155, "15/10/2026", [
       {
-        title: "3 Nhân Viên Mới Toàn Năng (Ducky, Owl, Fawn)",
-        desc: "Tuyển dụng Vịt Ducky (Barista pha chế tự động, +25% doanh thu nước), Cú Mèo Owl (Trưởng Marketing kéo bão khách +40%, đơn online 10s, x2 review 5 sao) và Nai Fawn (Quản lý kho chiết khấu sỉ -15%, tự động nhập kho khi cạn & thưởng +50% hoa hồng giao hàng)!",
-        icon: "🧑‍🍳",
-        badge: "Nhân viên mới 🌟",
+        title: "Chế Độ Giờ Vàng FEVER RUSH & Khách VIP Thần Tài",
+        desc: "Khai mở tính năng FEVER RUSH cực đỉnh: Phục vụ chuỗi khách hoàn hảo để kích hoạt Giờ Vàng bùng nổ, gấp đôi (x2) doanh thu và đóng băng thời gian kiên nhẫn! Đón tiếp những vị khách VIP quý tộc (Mèo Thần Tài Maneki, Đại Gia Shiba, Cửu Vĩ VIP) mang lại tiền tip khổng lồ cho tiệm mì!",
+        icon: "👑",
+        badge: "VIP Mới 🔥",
         badgeType: "hot"
       },
       {
-        title: "Menu Trà Sữa Chuẩn Vị & 5 Topping Boba",
-        desc: "Mở rộng 6 loại trà sữa hot trend: Oolong nướng, Matcha Latte boba, Khoai môn béo, Sữa tươi trân châu đường đen, Cà phê muối boba, Trà trái cây nhiệt đới kèm 5 topping: Trân châu đen dẻo, 3Q trắng giòn, Pudding trứng tươi, Thạch dừa non và Kem cheese Macchiato!",
-        icon: "🧋",
-        badge: "Menu mới 🔥",
-        badgeType: "hot"
-      },
-      {
-        title: "2 Theme Độc Quyền: Boba Pastel & Midnight Boba",
-        desc: "Biến hóa diện mạo tiệm với sắc hồng kem sữa Boba Pastel ngọt ngào hoặc không gian bar trà sữa đêm tím neon Midnight Boba thời thượng cùng hiệu ứng Glassmorphism hiện đại!",
-        icon: "🎨",
-        badge: "Theme mới ✨",
-        badgeType: "visual"
-      },
-      {
-        title: "8 Khách Hàng Anime Chibi Mới (Tổng 24 Khách)",
-        desc: "Chào đón thêm 8 thực khách thú cưng sành điệu: Cú Tú Cú Đêm, Vịt Quỳnh Nghiện Boba, Nai Bambi, Sóc Nutty, Rái Cá Otto Chill, Cánh Cụt Pen, Mèo Mun Luna và Gấu Teddy Hảo Ngọt!",
-        icon: "🐾",
-        badge: "Khách mới 💖",
-        badgeType: "star"
-      },
-      {
-        title: "Âm Thanh Shaker Trà Sữa & Tự Động Hóa Quán",
-        desc: "Hiệu ứng âm thanh lắc bình shaker rộn rã khi pha chế đồ uống, tích hợp tự động hóa trọn gói quầy nước và kho bãi không lo đứt hàng!",
-        icon: "🎵",
-        badge: "Âm thanh 🎶",
+        title: "Tối ưu hóa & Sửa lỗi",
+        desc: "Fix lỗi .......",
+        icon: "🛠️",
+        badge: "Sửa lỗi 🛠️",
         badgeType: "manage"
-      },
-      {
-        title: "Shipper Sống Động & Ép Màng Niêm Phong Thùng",
-        desc: "Đội ngũ tài xế đối tác GrabFood, ShopeeFood, BeFood, Baemin với hồ sơ và câu thoại chân thực. Thêm tính năng ép màng nắp niêu & thùng xốp giữ nhiệt nhận thêm +15k tip!",
-        icon: "🛵",
-        badge: "Shipper 2.0 📦",
-        badgeType: "hot"
-      },
-      {
-        title: "Hệ Thống Đánh Giá 2.0 & Voucher Đền Trà Sữa",
-        desc: "Biểu đồ phân bổ sao 1-5★, thanh bộ lọc danh mục (5★, 1-3★, Chưa trả lời, Đơn online). Tặng voucher 20% & đền bù ly trà sữa để hóa giải review 1★ thành 5★ xuất sắc!",
-        icon: "⭐",
-        badge: "Review 2.0 🌟",
-        badgeType: "hot"
       }
     ]);
   }
@@ -68,6 +33,57 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion("1.5.0", 150, "15/10/2026", [
+        {
+          title: "3 Nhân Viên Mới Toàn Năng (Ducky, Owl, Fawn)",
+          desc: "Tuyển dụng Vịt Ducky (Barista pha chế tự động, +25% doanh thu nước), Cú Mèo Owl (Trưởng Marketing kéo bão khách +40%, đơn online 10s, x2 review 5 sao) và Nai Fawn (Quản lý kho chiết khấu sỉ -15%, tự động nhập kho khi cạn & thưởng +50% hoa hồng giao hàng)!",
+          icon: "🧑‍🍳",
+          badge: "Nhân viên mới 🌟",
+          badgeType: "hot"
+        },
+        {
+          title: "Menu Trà Sữa Chuẩn Vị & 5 Topping Boba",
+          desc: "Mở rộng 6 loại trà sữa hot trend: Oolong nướng, Matcha Latte boba, Khoai môn béo, Sữa tươi trân châu đường đen, Cà phê muối boba, Trà trái cây nhiệt đới kèm 5 topping: Trân châu đen dẻo, 3Q trắng giòn, Pudding trứng tươi, Thạch dừa non và Kem cheese Macchiato!",
+          icon: "🧋",
+          badge: "Menu mới 🔥",
+          badgeType: "hot"
+        },
+        {
+          title: "2 Theme Độc Quyền: Boba Pastel & Midnight Boba",
+          desc: "Biến hóa diện mạo tiệm với sắc hồng kem sữa Boba Pastel ngọt ngào hoặc không gian bar trà sữa đêm tím neon Midnight Boba thời thượng cùng hiệu ứng Glassmorphism hiện đại!",
+          icon: "🎨",
+          badge: "Theme mới ✨",
+          badgeType: "visual"
+        },
+        {
+          title: "8 Khách Hàng Anime Chibi Mới (Tổng 24 Khách)",
+          desc: "Chào đón thêm 8 thực khách thú cưng sành điệu: Cú Tú Cú Đêm, Vịt Quỳnh Nghiện Boba, Nai Bambi, Sóc Nutty, Rái Cá Otto Chill, Cánh Cụt Pen, Mèo Mun Luna và Gấu Teddy Hảo Ngọt!",
+          icon: "🐾",
+          badge: "Khách mới 💖",
+          badgeType: "star"
+        },
+        {
+          title: "Âm Thanh Shaker Trà Sữa & Tự Động Hóa Quán",
+          desc: "Hiệu ứng âm thanh lắc bình shaker rộn rã khi pha chế đồ uống, tích hợp tự động hóa trọn gói quầy nước và kho bãi không lo đứt hàng!",
+          icon: "🎵",
+          badge: "Âm thanh 🎶",
+          badgeType: "manage"
+        },
+        {
+          title: "Shipper Sống Động & Ép Màng Niêm Phong Thùng",
+          desc: "Đội ngũ tài xế đối tác GrabFood, ShopeeFood, BeFood, Baemin với hồ sơ và câu thoại chân thực. Thêm tính năng ép màng nắp niêu & thùng xốp giữ nhiệt nhận thêm +15k tip!",
+          icon: "🛵",
+          badge: "Shipper 2.0 📦",
+          badgeType: "hot"
+        },
+        {
+          title: "Hệ Thống Đánh Giá 2.0 & Voucher Đền Trà Sữa",
+          desc: "Biểu đồ phân bổ sao 1-5★, thanh bộ lọc danh mục (5★, 1-3★, Chưa trả lời, Đơn online). Tặng voucher 20% & đền bù ly trà sữa để hóa giải review 1★ thành 5★ xuất sắc!",
+          icon: "⭐",
+          badge: "Review 2.0 🌟",
+          badgeType: "hot"
+        }
+      ]),
       new txaversion("1.4.0", 140, "14/10/2026", [
         {
           title: "Mã QR Rủ Bạn Bè & Tải Ảnh Sắc Nét",

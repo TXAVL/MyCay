@@ -1,14 +1,14 @@
-// Service Worker cho Tiệm Mỳ Cay & Trà Sữa Boba v1.5.0
+// Service Worker cho Tiệm Mỳ Cay & Trà Sữa Boba v1.5.5
 // Hỗ trợ chơi game 100% Offline không cần mạng sau lần tải đầu tiên
 
-const CACHE_NAME = "mycay-pwa-v1.5.0";
+const CACHE_NAME = "mycay-pwa-v1.5.5";
 
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./styles/main.css",
-  "./styles/main.css?v=1.5.0",
+  "./styles/main.css?v=1.5.5",
   "./js/app.js",
   "./js/game.js",
   "./js/audio.js",

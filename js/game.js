@@ -4,11 +4,11 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.5.0";
-import { txaformat } from "./txaformat.js?v=1.5.0";
-import { NameValidator } from "./filter.js?v=1.5.0";
-import { SoundManager } from "./audio.js?v=1.5.0";
-import { GameUIModal } from "./modal.js?v=1.5.0";
+import { txaversion } from "./txaversion.js?v=1.5.5";
+import { txaformat } from "./txaformat.js?v=1.5.5";
+import { NameValidator } from "./filter.js?v=1.5.5";
+import { SoundManager } from "./audio.js?v=1.5.5";
+import { GameUIModal } from "./modal.js?v=1.5.5";
 
 export class SpicyNoodleGame {
   constructor() {
@@ -357,6 +357,39 @@ export class SpicyNoodleGame {
         preferredSpicy: [0, 1, 2],
         tipMultiplier: 2.2,
         patience: 50
+      },
+      // ==========================================================
+      // KHÁCH VIP THẦN TÀI HOÀNG GIA (VIP UPDATE 1.5.5)
+      // ==========================================================
+      {
+        id: "cust_maneki",
+        name: "Mèo Thần Tài Maneki Neko",
+        avatar: "assets/cust_cat.png",
+        bio: "Thần tài phú quý mang vận may triệu đô, tip vàng rủng rỉnh và thích mì tôm hùm hải sản!",
+        preferredSpicy: [1, 2, 3],
+        tipMultiplier: 3.8,
+        patience: 65,
+        isVip: true
+      },
+      {
+        id: "cust_shiba_vip",
+        name: "Đại Gia Cún Shiba VIP",
+        avatar: "assets/cust_shiba.png",
+        bio: "Chủ tịch tập đoàn công nghệ siêu giàu, thưởng nóng cọc tiền cho tô mì chuẩn vị!",
+        preferredSpicy: [3, 4, 5],
+        tipMultiplier: 3.5,
+        patience: 55,
+        isVip: true
+      },
+      {
+        id: "cust_fox_vip",
+        name: "Bạch Cáo Cửu Vĩ VIP",
+        avatar: "assets/cust_fox.png",
+        bio: "Quý tộc cửu vĩ hồ quyền quý, thưởng thêm vàng bạc châu báu khi được phục vụ chu đáo!",
+        preferredSpicy: [2, 3, 4],
+        tipMultiplier: 3.6,
+        patience: 60,
+        isVip: true
       }
     ];
 
@@ -371,6 +404,11 @@ export class SpicyNoodleGame {
       toppings: [],
       drinkId: null
     };
+
+    // Chế độ Giờ Vàng FEVER RUSH (Tính năng VIP v1.5.5)
+    this.feverPoints = 0; // 0 -> 100 điểm
+    this.isFeverActive = false;
+    this.feverRemainingSeconds = 0;
 
     // Thời gian ngày (4 phút = 240s)
     this.dayDuration = 240;
@@ -2043,11 +2081,114 @@ export class SpicyNoodleGame {
   renderOpenMode() {
     this.renderStaffKitchenBar();
     this.renderActiveBuffsIndicator();
+    this.updateFeverUI();
     this.renderOrderQueue();
     this.renderPotWorkstation();
     this.renderCookingSteps();
     this.renderDiningStage();
     this.renderDaikinAC();
+  }
+
+  // ==========================================================
+  // HỆ THỐNG GIỜ VÀNG FEVER RUSH (VIP FEATURE v1.5.5)
+  // ==========================================================
+  addFeverPoints(pts) {
+    if (this.isFeverActive) return; // Đang trong giờ vàng thì giữ nguyên
+    this.feverPoints = Math.min(100, (this.feverPoints || 0) + pts);
+    this.updateFeverUI();
+
+    if (this.feverPoints >= 100) {
+      this.triggerFeverRush();
+    }
+  }
+
+  updateFeverUI() {
+    const feverBar = document.getElementById("cockpit-fever-bar");
+    const fillEl = document.getElementById("fever-fill");
+    const statusText = document.getElementById("fever-status-text");
+    const multBadge = document.getElementById("fever-mult-badge");
+    const iconEl = document.getElementById("fever-fire-icon");
+    const labelEl = document.getElementById("fever-label");
+
+    if (!fillEl || !statusText || !multBadge) return;
+
+    if (this.isFeverActive) {
+      if (feverBar) feverBar.classList.add("is-fever-blazing");
+      const pct = Math.max(0, Math.min(100, (this.feverRemainingSeconds / 15) * 100));
+      fillEl.style.width = `${pct}%`;
+      fillEl.className = "fever-fill blazing-fever";
+      statusText.textContent = `BÙNG NỔ! ${this.feverRemainingSeconds}s`;
+      multBadge.textContent = "🔥 x2 DOANH THU";
+      multBadge.className = "fever-mult-badge badge-fever-active";
+      if (iconEl) iconEl.textContent = "👑";
+      if (labelEl) labelEl.textContent = "GIỜ VÀNG ĐANG BẬT:";
+    } else {
+      if (feverBar) feverBar.classList.remove("is-fever-blazing");
+      fillEl.style.width = `${this.feverPoints || 0}%`;
+      fillEl.className = "fever-fill";
+      statusText.textContent = `${this.feverPoints || 0} / 100 Điểm`;
+      multBadge.textContent = "x1 THƯỜNG";
+      multBadge.className = "fever-mult-badge";
+      if (iconEl) iconEl.textContent = "🔥";
+      if (labelEl) labelEl.textContent = "GIỜ VÀNG FEVER RUSH:";
+    }
+  }
+
+  triggerFeverRush() {
+    this.isFeverActive = true;
+    this.feverRemainingSeconds = 15;
+    this.feverPoints = 100;
+
+    if (this.sound && typeof this.sound.playFeverSound === "function") {
+      this.sound.playFeverSound();
+    }
+
+    const openLayout = document.getElementById("view-open-mode");
+    if (openLayout) {
+      openLayout.classList.add("is-fever-mode");
+      // Hiệu ứng tia sáng vàng bùng nổ
+      for (let i = 0; i < 12; i++) {
+        const star = document.createElement("div");
+        star.className = "fever-gold-sparkle";
+        star.textContent = ["👑", "✨", "💰", "🌟", "🔥"][i % 5];
+        star.style.left = `${10 + Math.random() * 80}%`;
+        star.style.top = `${15 + Math.random() * 60}%`;
+        star.style.animationDelay = `${i * 0.07}s`;
+        openLayout.appendChild(star);
+        setTimeout(() => star.remove(), 2000);
+      }
+    }
+
+    // Tăng kiên nhẫn cho tất cả khách trên khay lên tối đa
+    this.orderSlots.forEach(slot => {
+      if (slot) slot.patience = slot.maxPatience;
+    });
+    this.renderOrderQueue();
+
+    this.updateFeverUI();
+    GameUIModal.showToast("👑🔥 BÙNG NỔ GIỜ VÀNG FEVER RUSH (15s)! Nhân đôi (x2) Doanh Thu & Đóng băng kiên nhẫn khách!", "success", "👑");
+  }
+
+  endFeverRush() {
+    this.isFeverActive = false;
+    this.feverRemainingSeconds = 0;
+    this.feverPoints = 0;
+
+    const openLayout = document.getElementById("view-open-mode");
+    if (openLayout) {
+      openLayout.classList.remove("is-fever-mode");
+    }
+
+    this.updateFeverUI();
+    GameUIModal.showToast("✨ Giờ Vàng Fever Rush đã kết thúc! Doanh thu đã được nhân đôi rực rỡ!", "info", "🏮");
+  }
+
+  handleFeverBarClick() {
+    if (this.isFeverActive) {
+      GameUIModal.showToast(`🔥 Giờ Vàng đang bùng nổ! Còn ${this.feverRemainingSeconds}s với x2 Doanh Thu và khách kiên nhẫn vô hạn!`, "info", "👑");
+    } else {
+      GameUIModal.showToast(`🔥 Đang tích lũy: ${this.feverPoints || 0}/100 Điểm. Phục vụ đơn để kích hoạt Giờ Vàng x2 Doanh Thu!`, "info", "⚡");
+    }
   }
 
   // Render các buff nâng cấp đang kích hoạt trong ca bán
@@ -2194,23 +2335,26 @@ export class SpicyNoodleGame {
         (!order.toppingId || pot.toppings.includes(order.toppingId));
 
       const isSpecialCombo = Boolean(slot.isSpecialCombo || this.isSpecialComboOrder(order));
+      const isVipCust = Boolean(cust.isVip);
       const noodleItem = this.state.noodles[order.noodleId];
       const isNoodleOutOfStock = !noodleItem || (noodleItem.stock <= 0);
 
       return `
-        <div id="order-slot-${idx}" class="order-slot-card ${isSpecialCombo ? 'is-special-combo-slot' : ''} ${isMatch ? 'is-matching-dish' : ''}">
+        <div id="order-slot-${idx}" class="order-slot-card ${isVipCust ? 'is-vip-customer-card' : ''} ${isSpecialCombo ? 'is-special-combo-slot' : ''} ${isMatch ? 'is-matching-dish' : ''}">
           <div class="order-customer-head">
             <div class="order-cust-avatar-wrap">
               <img src="${cust.avatar}" alt="${cust.name}" class="order-cust-avatar" onerror="this.src='assets/cust_cat.png'" />
+              ${isVipCust ? '<span class="cust-vip-crown-icon">👑</span>' : ''}
             </div>
             <div class="order-cust-info">
-              <span class="order-cust-title">${isSpecialCombo ? '🌟 ' : (slot.isSpecial ? '⭐ ' : '')}${cust.name}</span>
+              <span class="order-cust-title">${isVipCust ? '👑 ' : (isSpecialCombo ? '🌟 ' : (slot.isSpecial ? '⭐ ' : ''))}${cust.name}</span>
               <span class="order-cust-mood ${patienceClass}">
-                ${patiencePct > 55 ? '😊 Đang đợi món' : (patiencePct > 25 ? '🤤 Sốt ruột' : '💦 Sắp về')}
+                ${this.isFeverActive ? '🔥 Giờ vàng x2' : (patiencePct > 55 ? '😊 Đang đợi món' : (patiencePct > 25 ? '🤤 Sốt ruột' : '💦 Sắp về'))}
               </span>
             </div>
           </div>
           <div class="order-speech-bubble" onclick="window.game.quickCookForSlot(${idx})" style="cursor: pointer;" title="Chạm để nạp nhanh công thức này vào niêu đất!">
+            ${isVipCust ? '<div class="vip-cust-gold-badge">👑 KHÁCH VIP THẦN TÀI (+TIP VÀNG) 💰</div>' : ''}
             ${isSpecialCombo ? '<div class="special-combo-order-badge">✨ ĐƠN ĐẶC BIỆT (+BONUS) ✨</div>' : (slot.isSpecial ? '<div style="font-size:9.5px; color:#C44569; font-weight:800; margin-bottom:1px;">Món tâm đắc:</div>' : '')}
             ${isSpecialCombo ? '<div style="font-size:9px; color:#D35400; font-weight:800; margin-bottom:2px;">🔥 Món đặc biệt: Tip x2 + Siêu Bonus!</div>' : ''}
             <span class="dish-highlight-badge">${order.noodleName}</span>
@@ -2856,7 +3000,18 @@ export class SpicyNoodleGame {
       this.state.stats.specialBonusEarned = (this.state.stats.specialBonusEarned || 0) + specialBonus;
     }
 
-    const totalEarned = bowlPrice + tip + specialBonus;
+    // TÍNH NĂNG VIP v1.5.5: GIỜ VÀNG FEVER RUSH (x2 Doanh Thu) & KHÁCH VIP THẦN TÀI
+    const feverMultiplier = this.isFeverActive ? 2 : 1;
+    let vipBonus = 0;
+    if (slot.customer.isVip) {
+      vipBonus = Math.floor(Math.random() * 41) + 88; // Thưởng nóng 88k - 128k tip vàng thần tài
+    }
+
+    const subTotal = (bowlPrice + tip + specialBonus) * feverMultiplier;
+    const totalEarned = subTotal + vipBonus;
+
+    // Tích điểm Giờ Vàng FEVER RUSH (+35 điểm mỗi đơn thành công)
+    this.addFeverPoints(35);
 
     // Trừ 1 suất nguyên liệu trong kho
     if (noodle.stock > 0) noodle.stock -= 1;
@@ -2875,9 +3030,9 @@ export class SpicyNoodleGame {
     this.state.todayEarnings += totalEarned;
     this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + totalEarned;
     this.state.todayBowlsSold += 1;
-    this.state.todayTips += (tip + specialBonus);
+    this.state.todayTips += (tip + specialBonus + vipBonus);
     this.state.stats.bowlsServed += 1;
-    this.state.stats.tipsEarned += (tip + specialBonus);
+    this.state.stats.tipsEarned += (tip + specialBonus + vipBonus);
     if (pot.spicyLevel >= 6) {
       this.state.todaySpicy7Sold += 1;
       this.state.stats.spicyMasterServed += 1;
@@ -2891,7 +3046,18 @@ export class SpicyNoodleGame {
 
     const slotCard = document.getElementById(`order-slot-${slotIdx}`);
     if (slotCard && typeof GameUIModal.spawnFloatingFx === "function") {
-      GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🍜`, true);
+      if (this.isFeverActive) {
+        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🔥 x2 FEVER!`, true);
+      } else if (vipBonus > 0) {
+        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 👑 VIP!`, true);
+      } else {
+        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🍜`, true);
+      }
+      if (vipBonus > 0 && !this.isFeverActive) {
+        setTimeout(() => {
+          GameUIModal.spawnFloatingFx(slotCard, `+${vipBonus}k 💰 THẦN TÀI!`, true);
+        }, 220);
+      }
       if (specialBonus > 0) {
         setTimeout(() => {
           GameUIModal.spawnFloatingFx(slotCard, `+${specialBonus}k 🎁 BONUS!`, true);
@@ -2900,7 +3066,11 @@ export class SpicyNoodleGame {
     }
 
     const duckyText = duckyBonus > 0 ? " (🦆 Ducky Barista +25% nước)" : "";
-    if (isSpecialCombo) {
+    if (this.isFeverActive) {
+      GameUIModal.showToast(`🔥 GIỜ VÀNG FEVER x2! Bưng niêu thành công nhận +${totalEarned}k (Gấp đôi doanh thu${vipBonus > 0 ? ` + 💰 Tip Thần Tài +${vipBonus}k` : ''})!`, "success", "👑");
+    } else if (vipBonus > 0) {
+      GameUIModal.showToast(`👑 KHÁCH VIP ${slot.customer.name} RẤT HÀI LÒNG! Thưởng thêm +${vipBonus}k tip thần tài! Tổng nhận +${totalEarned}k!`, "success", "💰");
+    } else if (isSpecialCombo) {
       GameUIModal.showToast(`🌟 KHÁCH MÊ MẨN ĐƠN ĐẶC BIỆT! Nhận +${totalEarned}k (Mì + Tip x2 & 🎁 BONUS COMBO +${specialBonus}k)${duckyText}!`, "success", "🔥");
     } else if (isAutoUsagi) {
       GameUIModal.showToast(`🐰 Thỏ Usagi nhanh tay bưng mì cho ${slot.customer.name}! +${totalEarned}k (tip +${tip}k)${duckyText}`, "success", "✨");
@@ -3110,15 +3280,19 @@ export class SpicyNoodleGame {
       }
     }
 
+    const vipList = this.customerTemplates.filter(c => c.isVip);
+    const normalList = this.customerTemplates.filter(c => !c.isVip);
+    const chosenCust = (vipList.length > 0 && Math.random() < 0.20)
+      ? vipList[Math.floor(Math.random() * vipList.length)]
+      : (normalList.length > 0 ? normalList[Math.floor(Math.random() * normalList.length)] : this.customerTemplates[0]);
+
     if (!chosenNoodle) {
       chosenNoodle = activeNoodles[Math.floor(Math.random() * activeNoodles.length)];
-      const chosenCust = this.customerTemplates[Math.floor(Math.random() * this.customerTemplates.length)];
       spicyLevel = chosenCust.preferredSpicy[Math.floor(Math.random() * chosenCust.preferredSpicy.length)];
       const activeTops = Object.values(this.state.toppings).filter(t => t.unlocked && t.inMenu);
       chosenTop = activeTops.length > 0 && Math.random() > 0.4 ? activeTops[Math.floor(Math.random() * activeTops.length)] : null;
     }
 
-    const chosenCust = this.customerTemplates[Math.floor(Math.random() * this.customerTemplates.length)];
     const isSpecial = Math.random() > 0.7;
 
     // ==========================================================
@@ -3186,7 +3360,16 @@ export class SpicyNoodleGame {
       maxPatience: 100
     };
 
-    this.sound.playDoorBell();
+    if (chosenCust.isVip) {
+      if (this.sound && typeof this.sound.playUpgradeSound === "function") {
+        this.sound.playUpgradeSound();
+      } else {
+        this.sound.playDoorBell();
+      }
+      GameUIModal.showToast(`👑 KHÁCH VIP THẦN TÀI: ${chosenCust.name} vừa ghé tiệm! Phục vụ ngay để nhận tiền tip khủng!`, "success", "💰");
+    } else {
+      this.sound.playDoorBell();
+    }
     this.renderOrderQueue();
   }
 
@@ -3865,6 +4048,12 @@ export class SpicyNoodleGame {
     this.orderSlots = [null, null, null];
     this.clearCurrentPot();
 
+    // Reset Giờ Vàng FEVER RUSH đầu ca
+    this.feverPoints = 0;
+    this.isFeverActive = false;
+    this.feverRemainingSeconds = 0;
+    this.updateFeverUI();
+
     // Chuyển view: Ẩn prep view, hiện open cooking view
     const prepView = document.getElementById("view-prep-mode");
     const openView = document.getElementById("view-open-mode");
@@ -3917,55 +4106,68 @@ export class SpicyNoodleGame {
         }
       }
 
+      // Cập nhật đếm ngược Giờ Vàng FEVER RUSH (Tính năng VIP v1.5.5)
+      if (this.isFeverActive) {
+        this.feverRemainingSeconds = (this.feverRemainingSeconds || 15) - 1;
+        this.updateFeverUI();
+        if (this.feverRemainingSeconds <= 0) {
+          this.endFeverRush();
+        }
+      }
+
       // Nâng cấp Điều Hòa Daikin (acCooling): Không khí mát lành giảm độ bức bối giúp khách kiên nhẫn hơn
       const acLv = this.state.upgrades.acCooling || 1;
       const dayRush = Math.min(0.35, (this.state.day - 1) * 0.05); // Các ngày sau khách đông và sốt ruột hơn một chút
       const patienceLoss = Math.max(0.6, 1.1 + dayRush - (acLv - 1) * 0.15);
 
-      // Giảm độ kiên nhẫn của khách ở các slot (Điều hòa Daikin & Tác động giá bán)
-      this.orderSlots.forEach((slot, idx) => {
-        if (slot) {
-          // Khách gọi món đắt đỏ sẽ khắt khe và sốt ruột hơn, món rẻ khách kiên nhẫn hơn
-          const slotPriceRatio = slot.orderPriceRatio || 1.0;
-          let pricePatienceMod = 1.0;
-          if (slotPriceRatio > 1.35) {
-            pricePatienceMod = 1.35; // Quá đắt: sốt ruột x1.35
-          } else if (slotPriceRatio > 1.15) {
-            pricePatienceMod = 1.15; // Hơi đắt: sốt ruột x1.15
-          } else if (slotPriceRatio <= 0.85) {
-            pricePatienceMod = 0.82; // Rẻ hạt dẻ: kiên nhẫn, chờ được lâu hơn
+      // Khi đang trong Giờ Vàng FEVER RUSH: ĐÓNG BĂNG KIÊN NHẪN (patience loss = 0)! Khách luôn tươi cười kiên nhẫn chờ!
+      const isPatienceFrozen = this.isFeverActive;
+      if (!isPatienceFrozen) {
+        // Giảm độ kiên nhẫn của khách ở các slot (Điều hòa Daikin & Tác động giá bán)
+        this.orderSlots.forEach((slot, idx) => {
+          if (slot) {
+            // Khách gọi món đắt đỏ sẽ khắt khe và sốt ruột hơn, món rẻ khách kiên nhẫn hơn
+            const slotPriceRatio = slot.orderPriceRatio || 1.0;
+            let pricePatienceMod = 1.0;
+            if (slotPriceRatio > 1.35) {
+              pricePatienceMod = 1.35; // Quá đắt: sốt ruột x1.35
+            } else if (slotPriceRatio > 1.15) {
+              pricePatienceMod = 1.15; // Hơi đắt: sốt ruột x1.15
+            } else if (slotPriceRatio <= 0.85) {
+              pricePatienceMod = 0.82; // Rẻ hạt dẻ: kiên nhẫn, chờ được lâu hơn
+            }
+
+            slot.patience -= (patienceLoss * pricePatienceMod);
+            if (slot.patience <= 0) {
+              GameUIModal.showToast(`${slot.customer.name} đã tức giận bỏ về vì chờ quá lâu! (-1 ⭐)`, "warning", "😡");
+              this.sound.playReviewChime();
+
+              const angryComments = [
+                `Chờ mòn mỏi cả 20 phút không thấy tô mì đâu! Đói lả cả người đành phải bỏ về, quán phục vụ quá chậm chạp! 😡`,
+                `Quán gì để khách chờ sốt ruột toát mồ hôi hột. Gọi món xong ngồi ngó nhân viên, bực mình bỏ về luôn. 1 sao! 👎`,
+                `Bảo quán mì cay đệ nhất mà làm ăn như rùa bò, không bao giờ quay lại lần thứ hai! 💢`
+              ];
+              const angryText = angryComments[Math.floor(Math.random() * angryComments.length)];
+
+              this.state.reputation = Math.max(5, this.state.reputation - 4);
+              this.state.reviews.unshift({
+                id: Date.now() + Math.random().toString(36).substr(2, 4),
+                customerName: slot.customer.name,
+                customerAvatar: slot.customer.avatar || "assets/cust_cat.png",
+                stars: 1,
+                comment: angryText,
+                date: `Ngày ${this.state.day}`,
+                replied: false,
+                ownerReply: null,
+                customerFeedback: null
+              });
+
+              this.orderSlots[idx] = null;
+              this.renderHeader();
+            }
           }
-
-          slot.patience -= (patienceLoss * pricePatienceMod);
-          if (slot.patience <= 0) {
-            GameUIModal.showToast(`${slot.customer.name} đã tức giận bỏ về vì chờ quá lâu! (-1 ⭐)`, "warning", "😡");
-            this.sound.playReviewChime();
-
-            const angryComments = [
-              `Chờ mòn mỏi cả 20 phút không thấy tô mì đâu! Đói lả cả người đành phải bỏ về, quán phục vụ quá chậm chạp! 😡`,
-              `Quán gì để khách chờ sốt ruột toát mồ hôi hột. Gọi món xong ngồi ngó nhân viên, bực mình bỏ về luôn. 1 sao! 👎`,
-              `Bảo quán mì cay đệ nhất mà làm ăn như rùa bò, không bao giờ quay lại lần thứ hai! 💢`
-            ];
-            const angryText = angryComments[Math.floor(Math.random() * angryComments.length)];
-
-            this.state.reputation = Math.max(5, this.state.reputation - 4);
-            this.state.reviews.unshift({
-              id: Date.now() + Math.random().toString(36).substr(2, 4),
-              customerName: slot.customer.name,
-              customerAvatar: slot.customer.avatar || "assets/cust_cat.png",
-              stars: 1,
-              comment: angryText,
-              date: `Ngày ${this.state.day}`,
-              replied: false,
-              ownerReply: null,
-              customerFeedback: null
-            });
-
-            this.orderSlots[idx] = null;
-            this.renderHeader();
-          }
-        }
-      });
+        });
+      }
       this.renderOrderQueue();
 
       // Cập nhật đếm ngược của Shipper trực tiếp trong ca bán (20s)
