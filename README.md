@@ -1,53 +1,49 @@
-# 🍜 Tiệm Mỳ Cay (Phiên Bản 1.0)
+# 🍜 Tiệm Mỳ Cay & Trà Sữa Boba
 
-> Trò chơi mô phỏng quản lý Tiệm Mỳ Cay, tương thích mượt mà từ điện thoại di động đến máy tính để bàn. Tối ưu sẵn sàng deploy 1-click lên **Cloudflare Workers** (`tmc.*.workers.dev`)!
+[![Phiên Bản](https://img.shields.io/github/package-json/v/TXAVL/MyCay?color=F59E0B&label=Phi%C3%AAn%20B%E1%BA%A3n&logo=github)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-15%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline%20%7C%20Cloudflare-2ECC71)](https://github.com/TXAVL/MyCay)
+[![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
+
+> Trò chơi mô phỏng quản lý Tiệm Mỳ Cay Cozy Anime, tương thích mượt mà từ điện thoại di động đến máy tính để bàn. Tối ưu sẵn sàng deploy 1-click lên **Cloudflare Workers** (`tmc.*.workers.dev`) và hỗ trợ chơi Offline PWA 100%!
 
 ---
 
-## 🌟 Tính Năng Nổi Bật
+## 🌟 Tính Năng Nổi Bật (Bản 1.5.5)
 
-### 1. 🍲 Màn Hình Loading Đầy Đủ
-- Hoạt họa nồi mì cay niêu đất sôi sùng sục, bốc khói nghi ngút.
-- Thanh tiến trình tải mượt mà từ 0% đến 100% kèm các mẹo/câu đùa tiệm mì anime ngộ nghĩnh.
-- Nút bấm **"Mở Cửa Quán Ngay"** với hiệu ứng nảy nhịp nhàng sau khi nạp xong.
+### 1. 🔥 Chế Độ Giờ Vàng FEVER RUSH & Khách VIP Thần Tài (v1.5.5)
+- **Giờ Vàng FEVER RUSH**: Phục vụ chuỗi khách hoàn hảo để tích đầy thanh Giờ Vàng HUD, kích hoạt 15 giây bùng nổ **nhân đôi (x2) toàn bộ doanh thu** và đóng băng độ kiên nhẫn của khách!
+- **Khách VIP Thần Tài**: Đón tiếp Mèo Thần Tài Maneki Neko, Đại Gia Cún Shiba VIP, Bạch Cáo Cửu Vĩ VIP với viền khay mạ vàng óng ánh, vương miện 3D lắc lư và thưởng nóng thêm **+88k đến +128k tip vàng thần tài**!
 
-### 2. 🏮 Nhập Tên Quán & Bộ Lọc Kiểm Duyệt (Validation Tên)
-- Lần đầu mở game sẽ yêu cầu người chơi đặt tên bảng hiệu cho tiệm mì.
-- Bộ lọc thông minh ngăn chặn các từ ngữ thô tục, bậy bạ, phản cảm hoặc ký tự rác.
-- **Cảnh báo đỏ sinh động** với hiệu ứng rung nhẹ (`anime-shake`), **tự động biến mất** hoặc chuyển sang trạng thái xanh hợp lệ ngay khi người chơi gõ tên tử tế và đúng quy định (từ 3 - 25 ký tự).
+### 2. 🧋 Menu Trà Sữa Chuẩn Vị & Đội Ngũ Nhân Sự Toàn Năng (v1.5.0)
+- Mở rộng 6 món trà sữa hot trend và 5 loại topping Boba giòn dai béo ngậy.
+- 5 nhân sự hỗ trợ đắc lực: Vịt Ducky (Pha chế trà sữa), Cú Mèo Owl (Trưởng Marketing kéo bão khách), Nai Fawn (Quản lý kho sỉ), Gấu Kenji (Nấu mì) và Thỏ Usagi (Bưng bê).
 
-### 3. 📦 Class `txaversion` Quản Lý Phiên Bản Game
-- Sử dụng class `txaversion` khai báo phiên bản (hiện tại là `v1.0.0`).
-- Tự động phát hiện phiên bản mới so với dữ liệu đã lưu trong máy.
-- Hiển thị cửa sổ modal **"Có Gì Mới Trong Bản Cập Nhật"** với các **Anime Cartoon Cards** sinh động, nhún nhảy bắt mắt.
+### 3. 🍲 Màn Hình Loading Hoạt Họa Mượt Mà
+- Tiến trình tải từ 0% đến 100% hiển thị từng trạng thái sinh động (ninh nước hầm, dọn bàn ghế gỗ sồi, chuẩn bị ớt hiểm, bật điều hòa Daikin và khởi động Giờ Vàng).
 
-### 4. ⭐ Hệ Thống Đánh Giá & Phản Hồi Thực Khách (Review System)
+### 4. 📦 Class `txaversion` Quản Lý Phiên Bản Độc Quyền
+- Quản lý phiên bản tự động bằng class `txaversion`, lưu trữ lịch sử qua `VERSION_HISTORY`.
+- Tự động phát hiện phiên bản mới và bật cửa sổ thông báo **"Có Gì Mới Trong Bản Cập Nhật"** thiết kế Anime Glassmorphism.
+
+### 5. ⭐ Hệ Thống Đánh Giá & Phản Hồi Thực Khách (Review System 2.0)
 - Khách sau khi dùng bữa sẽ để lại đánh giá (số sao 1-5 ⭐, nhận xét món mì và độ cay).
 - **Chủ quán phản hồi:**
   - Có các nút **Gợi ý trả lời nhanh** siêu ngọt ngào và hiếu khách.
-  - Hoặc **tự gõ phản hồi thủ công** vào ô nhập văn bản theo ý thích.
-- **Khách hàng feedback lại ngay lập tức**: Khi chủ quán nhấn gửi phản hồi, khách hàng sẽ gửi lại tin nhắn cảm ơn / khen ngợi tức thì, kèm tặng thêm tiền Tip 🪙 và cộng điểm Danh tiếng ⭐ cho quán.
+  - Tặng Voucher 20% & đền bù ly trà sữa để hóa giải review 1★ thành 5★ xuất sắc!
+- **Khách hàng feedback lại ngay lập tức**: Khi chủ quán gửi phản hồi, khách sẽ trả lời lại tức thì, tặng thêm tiền Tip 🪙 và tăng điểm Danh tiếng ⭐.
 
-### 5. 🛠️ Nâng Cấp Tiệm & 🐾 Thuê Nhân Viên
+### 6. 🛠️ Nâng Cấp Tiệm, Điều Hòa Daikin & 🐾 Nhân Viên Mới
 - **Nâng cấp cửa hàng**:
-  - *Nồi Niêu Đất Giữ Nhiệt*: Tăng 25% tốc độ nấu mì chín.
-  - *Thêm Bàn Gỗ Ấm Cúng*: Tăng số bàn đón khách (lên đến 6 bàn).
-  - *Đèn Lồng Hoa Anh Đào Decor*: Thu hút khách ghé quán nhanh hơn.
-  - *Bí Truyền Sốt Ớt 7 Cấp Độ*: Tăng giá bán mỗi tô mì.
-  - *Hệ Thống Điều Hòa*: Khách kiên nhẫn chờ món lâu hơn.
-- **Thuê nhân viên anime**:
-  - *Bé Mèo Mochi (Tiếp Tân)*: Chào khách meo meo, tăng 25% tiền tip.
-  - *Gấu Trúc Kenji (Phụ Bếp)*: Tự động chuẩn bị nguyên liệu nhanh x2.
-  - *Cô Thỏ Usagi (Phục Vụ)*: Tự động dọn dẹp bàn ăn sạch bóng siêu tốc.
-  - *Hồ Ly Shiro (Quản Lý)*: Thu hút khách VIP và tăng điểm uy tín.
+  - *Hệ Thống Điều Hòa Daikin Inverter*: Xả gió lạnh Turbo hạ sâu nhiệt độ, hồi phục kiên nhẫn cho toàn bộ khách.
+  - *Bàn Gỗ Sồi Cozy 3 Trạng Thái*: Tương tác húp mì xì xụp và dọn dẹp nhặt tiền tip.
+  - *Sốt Bí Truyền Ớt Hiểm*: Tăng vọt giá bán và tiền thưởng.
+- **Đội ngũ nhân sự toàn năng 5 thành viên**: Mèo Mochi, Gấu Kenji, Thỏ Usagi, Vịt Ducky, Cú Mèo Owl và Nai Fawn.
 
-### 6. ⚙️ Cài Đặt Game Hẳn Hoi
-- Điều chỉnh âm lượng nhạc nền Lo-Fi ấm áp (tạo trực tiếp bằng Web Audio API, không lo thiếu file hay lỗi bản quyền).
-- Tùy chỉnh âm lượng SFX tiếng xèo xèo, chuông cửa, tiền xu ting ting.
-- Tùy chọn tốc độ trò chơi: 1x (Cozy), 1.5x (Nhanh), 2x (Siêu tốc).
-- Bật / tắt hiệu ứng cánh hoa anh đào rơi.
-- Xem lại lịch sử phiên bản `txaversion`.
-- Xóa dữ liệu và chơi lại từ đầu an toàn.
+### 7. ⚙️ Cài Đặt Game Đầy Đủ & Mã QR
+- Mã QR kèm logo quán sắc nét để tải ảnh hoặc chia sẻ bạn bè quét chơi ngay.
+- Điều chỉnh âm lượng Lo-Fi ấm áp và SFX sống động.
+- 5 phong cách giao diện Theme Anime tuyệt sắc (Cozy, Phố Đêm Tokyo, Hoa Anh Đào, Lửa Cay, Trà Xanh Matcha, Boba Pastel).
 
 ---
 

@@ -1,10 +1,11 @@
 {
   "name": "tmc",
-  "version": "1.0.0",
+  "version": "1.5.5",
   "description": "Game Tiệm Mỳ Cay chạy trên Cloudflare Workers (*.workers.dev)",
   "main": "worker.js",
   "type": "module",
   "scripts": {
+    "sync-version": "node scripts/sync-version.js",
     "start": "python -m http.server 8080",
     "dev": "python -m http.server 8080",
     "serve": "npx -y serve . -l 8080",
