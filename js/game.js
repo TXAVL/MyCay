@@ -708,14 +708,30 @@ export class SpicyNoodleGame {
       headerPauseBtn.style.display = isPrep ? "none" : "flex";
     }
 
+    const cockpitClockDigits = document.getElementById("cockpit-clock-digits");
+    const cockpitClockPill = document.getElementById("cockpit-shift-timer-pill");
+    const isUrgent = !isPrep && this.dayRemaining <= 45;
+
     if (timerEl) {
       if (isPrep) {
-        timerEl.textContent = "4 phút";
+        timerEl.className = "header-time-title";
+        timerEl.textContent = "⏱️ 4:00";
       } else {
         const m = Math.floor(this.dayRemaining / 60);
         const s = this.dayRemaining % 60;
-        timerEl.textContent = `${m}:${s < 10 ? "0" : ""}${s}`;
+        const timeStr = `${m}:${s < 10 ? "0" : ""}${s}`;
+        timerEl.className = `header-time-title in-shift ${isUrgent ? "time-warning" : ""}`;
+        timerEl.textContent = `⏱️ ${timeStr}`;
       }
+    }
+
+    if (cockpitClockDigits) {
+      const m = Math.floor(this.dayRemaining / 60);
+      const s = this.dayRemaining % 60;
+      cockpitClockDigits.textContent = `${m}:${s < 10 ? "0" : ""}${s}`;
+    }
+    if (cockpitClockPill) {
+      cockpitClockPill.classList.toggle("time-warning", isUrgent);
     }
 
     // Tiền hiển thị chính xác định dạng VNĐ chuẩn ảnh: 400.000đ, 253.500đ
