@@ -9110,6 +9110,47 @@ body.is-device-locked #loading-screen {
   color: #A88E7D;
 }
 
+/* Huy hiệu Admin Dev Mode hiển thị kín đáo ở góc */
+.sec-admin-dev-badge {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  z-index: 99999999;
+  background: rgba(16, 185, 129, 0.95);
+  color: #FFFFFF;
+  border: 1.5px solid #059669;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-family: inherit;
+  user-select: none;
+}
+
+.sec-admin-dev-badge button {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #FFF;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sec-admin-dev-badge button:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+
 
 
 

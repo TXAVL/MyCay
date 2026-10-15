@@ -1,16 +1,21 @@
 // ==========================================================
 // HỆ THỐNG BẢO MẬT & PHÒNG HỘ AN NINH TIỆM MỲ CAY (SECURITY SHIELD)
 // Chặn F12, DevTools, Debugger Trap, Mã Hóa Nhận Diện Thiết Bị & Khóa Vĩnh Viễn Khi Tái Phạm
+// Hỗ Trợ Chế Độ Admin Developer (Bật F12 Để Soi Lỗi & Gỡ Khóa Khẩn Cấp)
 // ==========================================================
 
 const SUPABASE_SEC_URL = "https://camnragrlqzmcxtgvukj.supabase.co";
 const SUPABASE_SEC_KEY = "sb_publishable_nWBCfr-d5ZSuk5e5ULrpZQ_zVFp_nUh";
+
+// Mã bí mật dành riêng cho Admin để mở F12 & Unban thiết bị
+const ADMIN_MASTER_KEY = "TXA_DEV_ADMIN_2026";
 
 class SecurityShield {
   constructor() {
     this.deviceId = null;
     this.isLocked = false;
     this.isPermanentBan = false;
+    this.isAdminDevMode = false;
     this.lockCount = 0;
     this.remainingSeconds = 0;
     this.lockTimerInterval = null;
@@ -90,8 +95,111 @@ class SecurityShield {
     return "MC-DEV-" + hex.substring(0, 8);
   }
 
-  // 2. Hệ thống lưu trữ nhiều tầng (Evercookie-style): IndexedDB + LocalStorage + SessionStorage
+  // 2. Chế độ Admin Developer (Bật F12, Xem lỗi, Gỡ khóa khẩn cấp)
+  checkAdminDevMode() {
+    // A. Kiểm tra session đã xác thực trước đó
+    try {
+      if (sessionStorage.getItem("mycay_admin_dev_mode") === "true") {
+        this.enableAdminDevMode(false);
+        return true;
+      }
+    } catch (e) {}
+
+    // B. Kiểm tra tham số bí mật trên URL: ?dev_key=TXA_DEV_ADMIN_2026 hoặc #dev_key=...
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, "?"));
+      const token = urlParams.get("dev_key") || hashParams.get("dev_key");
+
+      if (token === ADMIN_MASTER_KEY) {
+        // Tự động xóa token khỏi thanh URL để giữ kín
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        this.enableAdminDevMode(true);
+        return true;
+      }
+    } catch (e) {}
+
+    return false;
+  }
+
+  // Kích hoạt quyền Admin Developer
+  async enableAdminDevMode(showToast = true) {
+    this.isAdminDevMode = true;
+    this.isLocked = false;
+    this.isPermanentBan = false;
+    this.strikeCount = 0;
+
+    try {
+      sessionStorage.setItem("mycay_admin_dev_mode", "true");
+      localStorage.removeItem("mycay_sec_lock");
+      sessionStorage.removeItem("mycay_sec_lock");
+      localStorage.removeItem("mycay_sec_strikes");
+      await this.clearIndexedDB();
+    } catch (e) {}
+
+    // Gọi lệnh giải phóng khóa thiết bị này trên Supabase nếu đang bị khóa
+    if (this.deviceId) {
+      const client = this.getSupabaseClient();
+      if (client) {
+        try {
+          await client.rpc("admin_unlock_device", {
+            p_device_id: this.deviceId,
+            p_admin_key: ADMIN_MASTER_KEY
+          });
+        } catch (e) {}
+      }
+    }
+
+    // Tắt modal khóa nếu đang mở
+    const modal = document.getElementById("modal-security-lockout");
+    if (modal) {
+      modal.style.display = "none";
+    }
+    document.body.classList.remove("is-device-locked");
+
+    // Hiển thị huy hiệu Admin Dev Mode ở góc dưới
+    this.renderAdminDevBadge();
+
+    if (showToast) {
+      this.showTemporaryWarning("🛠️ ADMIN DEV MODE ĐÃ BẬT: F12 & DevTools đã được mở khóa!");
+    }
+  }
+
+  // Hiển thị huy hiệu Admin ở góc màn hình
+  renderAdminDevBadge() {
+    let badge = document.getElementById("sec-admin-dev-badge");
+    if (!badge) {
+      badge = document.createElement("div");
+      badge.id = "sec-admin-dev-badge";
+      badge.className = "sec-admin-dev-badge";
+      badge.innerHTML = `🛠️ ADMIN DEV (F12 ON) <button id="btn-sec-exit-admin" title="Thoát chế độ Admin">✕</button>`;
+      document.body.appendChild(badge);
+
+      const btnExit = document.getElementById("btn-sec-exit-admin");
+      if (btnExit) {
+        btnExit.addEventListener("click", () => {
+          sessionStorage.removeItem("mycay_admin_dev_mode");
+          window.location.reload();
+        });
+      }
+    }
+  }
+
+  // Mở hộp thoại xác thực Admin bằng Master Key
+  promptAdminAuth() {
+    const key = window.prompt("🔑 [XÁC THỰC ADMIN TIỆM MỲ CAY]\nNhập Master Key của Admin để kích hoạt DevTools hoặc mở khóa thiết bị:");
+    if (key === ADMIN_MASTER_KEY) {
+      this.enableAdminDevMode(true);
+    } else if (key !== null) {
+      alert("❌ Sai mã Admin Master Key! Quyền truy cập bị từ chối.");
+    }
+  }
+
+  // 3. Hệ thống lưu trữ nhiều tầng (Evercookie-style): IndexedDB + LocalStorage + SessionStorage
   async getLocalLock() {
+    if (this.isAdminDevMode) return 0;
+
     // Tầng 1: LocalStorage
     try {
       const raw = localStorage.getItem("mycay_sec_lock");
@@ -152,6 +260,8 @@ class SecurityShield {
   }
 
   async saveLocalLock(seconds, isPermanent = false) {
+    if (this.isAdminDevMode) return;
+
     const lockedUntil = isPermanent ? 9999999999999 : Date.now() + seconds * 1000;
     const payload = JSON.stringify({ 
       lockedUntil, 
@@ -166,8 +276,7 @@ class SecurityShield {
   }
 
   clearLocalLock() {
-    // Nếu bị ban vĩnh viễn, không bao giờ được xóa
-    if (this.isPermanentBan) return;
+    if (this.isPermanentBan && !this.isAdminDevMode) return;
 
     try { localStorage.removeItem("mycay_sec_lock"); } catch (e) {}
     try { sessionStorage.removeItem("mycay_sec_lock"); } catch (e) {}
@@ -223,7 +332,7 @@ class SecurityShield {
   }
 
   async clearIndexedDB() {
-    if (this.isPermanentBan) return;
+    if (this.isPermanentBan && !this.isAdminDevMode) return;
     const db = await this.openIDB();
     if (!db) return;
     try {
@@ -233,7 +342,7 @@ class SecurityShield {
     } catch (e) {}
   }
 
-  // 3. Khởi tạo Supabase client phụ trách bảo mật
+  // 4. Khởi tạo Supabase client phụ trách bảo mật
   getSupabaseClient() {
     if (this.supabaseClient) return this.supabaseClient;
     if (typeof window.supabase !== "undefined" && typeof window.supabase.createClient === "function") {
@@ -243,8 +352,10 @@ class SecurityShield {
     return null;
   }
 
-  // 4. Kiểm tra trạng thái khóa từ Supabase (Đính theo mã phần cứng thiết bị)
+  // 5. Kiểm tra trạng thái khóa từ Supabase (Đính theo mã phần cứng thiết bị)
   async checkCloudLock() {
+    if (this.isAdminDevMode) return null;
+
     const client = this.getSupabaseClient();
     if (!client) return null;
 
@@ -260,8 +371,10 @@ class SecurityShield {
     return null;
   }
 
-  // 5. Gửi lệnh khóa thiết bị lên Supabase (15 phút hoặc Vĩnh Viễn)
+  // 6. Gửi lệnh khóa thiết bị lên Supabase (15 phút hoặc Vĩnh Viễn)
   async lockOnCloud(seconds = 900, isPermanent = false) {
+    if (this.isAdminDevMode) return;
+
     const client = this.getSupabaseClient();
     if (!client) return;
 
@@ -274,9 +387,20 @@ class SecurityShield {
     } catch (e) {}
   }
 
-  // 6. Chặn các phím tắt và chuột phải (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, v.v.)
+  // 7. Chặn các phím tắt và chuột phải (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, v.v.)
   setupKeyboardAndMouseBlockers() {
     window.addEventListener("keydown", (e) => {
+      // Phím tắt mở cửa bí mật Admin: Ctrl + Shift + Alt + D
+      if (e.ctrlKey && e.shiftKey && e.altKey && (e.key === "D" || e.key === "d" || e.keyCode === 68)) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.promptAdminAuth();
+        return false;
+      }
+
+      // NẾU LÀ ADMIN DEV MODE THÌ BỎ QUA HOÀN TOÀN VIỆC CHẶN PHÍM TẮT!
+      if (this.isAdminDevMode) return;
+
       // F12
       if (e.key === "F12" || e.keyCode === 123) {
         e.preventDefault();
@@ -326,8 +450,10 @@ class SecurityShield {
       }
     }, true);
 
-    // Chặn chuột phải (Context Menu)
+    // Chặn chuột phải (Context Menu) - Cho phép nếu là Admin
     window.addEventListener("contextmenu", (e) => {
+      if (this.isAdminDevMode) return;
+
       e.preventDefault();
       e.stopPropagation();
       this.showTemporaryWarning("Tiệm Mỳ Cay: Chuột phải đã được vô hiệu hóa để bảo vệ an toàn! 🍜");
@@ -335,16 +461,17 @@ class SecurityShield {
     }, true);
   }
 
-  // 7. Vòng lặp phát hiện DevTools đang mở (Timing & Window Resize & Debugger Trap)
+  // 8. Vòng lặp phát hiện DevTools đang mở (Timing & Window Resize & Debugger Trap)
   setupDevToolsDetector() {
     let strikes = parseInt(localStorage.getItem("mycay_sec_strikes") || "0", 10);
     this.strikeCount = isNaN(strikes) ? 0 : strikes;
 
     // A. Kiểm tra kích thước cửa sổ chênh lệch (Docked DevTools)
     const checkWindowSize = () => {
+      if (this.isAdminDevMode) return; // BYPASS CHO ADMIN
+
       const widthDiff = window.outerWidth - window.innerWidth;
       const heightDiff = window.outerHeight - window.innerHeight;
-      // Nếu chênh lệch quá 165px (trừ khi là thanh cuộn thông thường)
       if (widthDiff > 165 || heightDiff > 165) {
         this.handleViolationAttempt("DevTools Docked Detection");
       }
@@ -352,9 +479,9 @@ class SecurityShield {
 
     // B. Kiểm tra Debugger Timing Trap
     const runDebuggerTrap = () => {
-      if (this.isLocked || this.isPermanentBan) return;
+      if (this.isAdminDevMode || this.isLocked || this.isPermanentBan) return; // BYPASS CHO ADMIN
+
       const start = performance.now();
-      // Nếu DevTools mở, lệnh debugger sẽ dừng hoặc làm chậm đáng kể luồng thực thi
       /* eslint-disable no-debugger */
       debugger;
       /* eslint-enable no-debugger */
@@ -368,8 +495,10 @@ class SecurityShield {
     setInterval(runDebuggerTrap, 2000);
   }
 
-  // 8. Xử lý khi phát hiện hành vi vi phạm (TÁI PHẠM LẦN 2 = BAN VĨNH VIỄN)
+  // 9. Xử lý khi phát hiện hành vi vi phạm (TÁI PHẠM LẦN 2 = BAN VĨNH VIỄN)
   handleViolationAttempt(reason) {
+    if (this.isAdminDevMode) return; // BYPASS CHO ADMIN
+
     if (this.isPermanentBan) {
       this.renderPermanentBanModal();
       return;
@@ -378,12 +507,11 @@ class SecurityShield {
 
     // KIỂM TRA TÁI PHẠM: Nếu thiết bị đã từng bị khóa 15 phút trước đó (lockCount >= 1)
     if (this.lockCount >= 1) {
-      // TÁI PHẠM LẦN 2 -> BAN VĨNH VIỄN NGAY LẬP TỨC!
       this.triggerPermanentBan(reason);
       return;
     }
 
-    // Nếu chưa từng bị khóa (Lần vi phạm chu kỳ đầu tiên)
+    // Nếu chưa từng bị khóa (Chu kỳ vi phạm đầu tiên)
     this.strikeCount++;
     try {
       localStorage.setItem("mycay_sec_strikes", this.strikeCount.toString());
@@ -407,40 +535,36 @@ class SecurityShield {
     }
   }
 
-  // 9. Kích hoạt khóa 15 phút (Lần 1)
+  // 10. Kích hoạt khóa 15 phút (Lần 1)
   async trigger15MinLockout(seconds = 900, reason = "devtools_violation_strike_3") {
+    if (this.isAdminDevMode) return;
+
     this.isLocked = true;
     this.lockCount = 1;
     this.remainingSeconds = seconds;
 
-    // Lưu đa tầng: LocalStorage + SessionStorage + IndexedDB
     await this.saveLocalLock(seconds, false);
-
-    // Gửi khóa lên Supabase theo mã phần cứng
     await this.lockOnCloud(seconds, false);
 
-    // Hiển thị modal khóa chuẩn Cozy Anime
     this.renderLockoutModal();
     this.startLockCountdown();
   }
 
-  // 10. KÍCH HOẠT BAN VĨNH VIỄN KHI TÁI PHẠM LẦN 2
+  // 11. KÍCH HOẠT BAN VĨNH VIỄN KHI TÁI PHẠM LẦN 2
   async triggerPermanentBan(reason = "repeat_violation_perm_ban") {
+    if (this.isAdminDevMode) return;
+
     this.isLocked = true;
     this.isPermanentBan = true;
     this.lockCount = 2;
 
-    // Lưu vĩnh viễn ở mọi tầng lưu trữ cục bộ
     await this.saveLocalLock(999999999, true);
-
-    // Đánh dấu cấm vĩnh viễn trên máy chủ Supabase
     await this.lockOnCloud(0, true);
 
-    // Hiển thị màn hình phong tỏa vĩnh viễn
     this.renderPermanentBanModal();
   }
 
-  // 11. Hiển thị thông báo cảnh báo tạm thời
+  // 12. Hiển thị thông báo cảnh báo tạm thời
   showTemporaryWarning(text) {
     let banner = document.getElementById("sec-warning-toast");
     if (!banner) {
@@ -456,7 +580,28 @@ class SecurityShield {
     }, 2800);
   }
 
-  // 12. Render Modal Khóa 15 Phút (Lần đầu vi phạm)
+  // 13. Cài đặt bẫy gỡ khóa khẩn cấp dành cho Admin (Click 3 lần vào mascot)
+  setupEmergencyUnlockTrigger() {
+    let clickCount = 0;
+    let clickTimer = null;
+    const mascot = document.querySelector(".sec-lockout-mascot");
+    if (mascot) {
+      mascot.style.cursor = "pointer";
+      mascot.title = "Nhấp 3 lần để mở khóa xác thực Admin";
+      mascot.addEventListener("click", () => {
+        clickCount++;
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => { clickCount = 0; }, 700);
+
+        if (clickCount >= 3) {
+          clickCount = 0;
+          this.promptAdminAuth();
+        }
+      });
+    }
+  }
+
+  // 14. Render Modal Khóa 15 Phút (Lần đầu vi phạm)
   renderLockoutModal() {
     let modal = document.getElementById("modal-security-lockout");
     if (!modal) {
@@ -469,7 +614,7 @@ class SecurityShield {
     modal.innerHTML = `
       <div class="sec-lockout-backdrop"></div>
       <div class="sec-lockout-card">
-        <div class="sec-lockout-mascot">🔒😿</div>
+        <div class="sec-lockout-mascot" title="Chạm 3 lần để mở khóa Admin">🔒😿</div>
         <h2 class="sec-lockout-title">Tiệm Mỳ Tạm Phong Tỏa An Ninh!</h2>
         <p class="sec-lockout-desc">
           Hệ thống phát hiện hành vi cố tình mở công cụ lập trình <strong>(F12 / DevTools)</strong> trái phép.
@@ -504,7 +649,8 @@ class SecurityShield {
     modal.style.display = "flex";
     document.body.classList.add("is-device-locked");
 
-    // Dừng âm thanh nền nếu có
+    this.setupEmergencyUnlockTrigger();
+
     try {
       if (window.game && window.game.sound) {
         window.game.sound.stopBgm();
@@ -512,7 +658,7 @@ class SecurityShield {
     } catch (e) {}
   }
 
-  // 13. RENDER MODAL CẤM VĨNH VIỄN (KHI TÁI PHẠM LẦN 2)
+  // 15. RENDER MODAL CẤM VĨNH VIỄN (KHI TÁI PHẠM LẦN 2)
   renderPermanentBanModal() {
     let modal = document.getElementById("modal-security-lockout");
     if (!modal) {
@@ -525,7 +671,7 @@ class SecurityShield {
     modal.innerHTML = `
       <div class="sec-lockout-backdrop" style="background: rgba(10, 4, 2, 0.96);"></div>
       <div class="sec-lockout-card sec-perm-card">
-        <div class="sec-lockout-mascot">⛔☠️</div>
+        <div class="sec-lockout-mascot" title="Chạm 3 lần để mở khóa Admin">⛔☠️</div>
         <h2 class="sec-lockout-title sec-perm-title">THIẾT BỊ ĐÃ BỊ CẤM VĨNH VIỄN!</h2>
         <p class="sec-lockout-desc">
           Hệ thống phát hiện hành vi <strong>TÁI PHẠM NGHIÊM TRỌNG</strong> (Lần thứ 2 cố tình mở công cụ lập trình F12 / DevTools).
@@ -558,7 +704,8 @@ class SecurityShield {
     modal.style.display = "flex";
     document.body.classList.add("is-device-locked");
 
-    // Dừng âm thanh nền
+    this.setupEmergencyUnlockTrigger();
+
     try {
       if (window.game && window.game.sound) {
         window.game.sound.stopBgm();
@@ -566,9 +713,9 @@ class SecurityShield {
     } catch (e) {}
   }
 
-  // 14. Bắt đầu đếm ngược từng giây (Chỉ dành cho khóa 15 phút lần đầu)
+  // 16. Bắt đầu đếm ngược từng giây (Chỉ dành cho khóa 15 phút lần đầu)
   startLockCountdown() {
-    if (this.isPermanentBan) return;
+    if (this.isPermanentBan || this.isAdminDevMode) return;
     if (this.lockTimerInterval) clearInterval(this.lockTimerInterval);
 
     const initialSeconds = this.remainingSeconds || 900;
@@ -600,11 +747,10 @@ class SecurityShield {
     this.lockTimerInterval = setInterval(updateDisplay, 1000);
   }
 
-  // 15. Mở khóa khi đếm ngược xong (Lần 1)
+  // 17. Mở khóa khi đếm ngược xong (Lần 1)
   unlockDevice() {
     this.isLocked = false;
     this.strikeCount = 0;
-    // Giữ nguyên lockCount = 1 để nếu tái phạm sẽ ban vĩnh viễn!
     this.clearLocalLock();
 
     const modal = document.getElementById("modal-security-lockout");
@@ -635,10 +781,17 @@ class SecurityShield {
     }
   }
 
-  // 16. Quy trình khởi động kiểm tra ngay khi mở trang
+  // 18. Quy trình khởi động kiểm tra ngay khi mở trang
   async init() {
     this.deviceId = this.generateHardwareFingerprint();
     window.mycay_device_id = this.deviceId;
+
+    // 0. ƯU TIÊN KIỂM TRA QUYỀN ADMIN TRƯỚC HẾT
+    if (this.checkAdminDevMode()) {
+      // Admin đã bật dev mode: Bỏ qua kiểm tra khóa và không chạy bẫy DevTools
+      this.setupKeyboardAndMouseBlockers();
+      return;
+    }
 
     // A. Kiểm tra ngay tầng lưu trữ cục bộ (Evercookie)
     const localSec = await this.getLocalLock();
@@ -655,7 +808,7 @@ class SecurityShield {
 
     // B. Kiểm tra tầng máy chủ Supabase theo mã phần cứng
     this.checkCloudLock().then(cloudStatus => {
-      if (!cloudStatus) return;
+      if (!cloudStatus || this.isAdminDevMode) return;
 
       if (cloudStatus.is_permanent_ban) {
         this.isLocked = true;
@@ -674,12 +827,11 @@ class SecurityShield {
         this.renderLockoutModal();
         this.startLockCountdown();
       } else {
-        // Cập nhật số lần từng bị khóa để phát hiện tái phạm
         this.lockCount = Math.max(this.lockCount, cloudStatus.lock_count || 0);
       }
     });
 
-    // C. Bật hệ thống phòng hộ phím bấm & DevTools
+    // C. Bật hệ thống phòng hộ phím bấm & DevTools (Dành cho người chơi thông thường)
     this.setupKeyboardAndMouseBlockers();
     this.setupDevToolsDetector();
   }
