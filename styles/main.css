@@ -8972,6 +8972,7 @@ html, body {
   color: #EF4444;
   text-shadow: 0 0 16px rgba(239, 68, 68, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
   font-family: 'Nunito', monospace;
+  font-variant-numeric: tabular-nums;
   letter-spacing: 2px;
   animation: clockPulse 1s infinite alternate;
 }
