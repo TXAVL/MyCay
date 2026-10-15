@@ -2,10 +2,10 @@
 
 [![Phiên Bản](https://img.shields.io/github/package-json/v/TXAVL/MyCay?color=F59E0B&label=Phi%C3%AAn%20B%E1%BA%A3n&logo=github)](https://github.com/TXAVL/MyCay)
 [![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-15%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
-[![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline%20%7C%20Cloudflare-2ECC71)](https://github.com/TXAVL/MyCay)
+[![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
-> Trò chơi mô phỏng quản lý Tiệm Mỳ Cay Cozy Anime, tương thích mượt mà từ điện thoại di động đến máy tính để bàn. Tối ưu sẵn sàng deploy 1-click lên **Cloudflare Workers** (`tmc.*.workers.dev`) và hỗ trợ chơi Offline PWA 100%!
+> Trò chơi mô phỏng quản lý Tiệm Mỳ Cay Cozy Anime, tương thích mượt mà từ điện thoại di động đến máy tính để bàn và hỗ trợ chơi Offline PWA 100%!
 
 ---
 
@@ -43,43 +43,10 @@
 
 ---
 
-## 🚀 Hướng Dẫn Deploy Lên Domain `*.workers.dev` (Cloudflare Workers)
+## 🎮 Hướng Dẫn Trải Nghiệm
 
-Dự án đã được cấu hình sẵn **Cloudflare Workers Static Assets** qua 2 file [`wrangler.toml`](file:///c:/Users/admin/Desktop/MyCay/wrangler.toml) và [`worker.js`](file:///c:/Users/admin/Desktop/MyCay/worker.js). Game sẽ chạy trên domain ngắn gọn dạng:
-```
-https://tmc.<subdomain-cua-ban>.workers.dev
-```
-
-### Cách 1: Deploy bằng dòng lệnh qua Wrangler (Đơn giản nhất - 1 lệnh)
-
-1. Mở PowerShell hoặc Terminal tại thư mục `MyCay`:
-2. Đăng nhập vào tài khoản Cloudflare (chỉ cần làm 1 lần đầu):
-   ```bash
-   npx wrangler login
-   ```
-3. Chạy lệnh deploy:
-   ```bash
-   npx wrangler deploy
-   ```
-4. Wrangler sẽ tự động tải dự án lên mạng lưới Edge của Cloudflare và in ra đường link game của bạn trên màn hình:
-   👉 **`https://tmc.<ten-tai-khoan>.workers.dev`**
-
----
-
-### Cách 2: Tùy chỉnh tên domain theo ý muốn
-Trong file [`wrangler.toml`](file:///c:/Users/admin/Desktop/MyCay/wrangler.toml), bạn có thể đổi dòng:
-```toml
-name = "tmc"
-```
-thành bất kỳ tên nào khác nếu cần. Mỗi khi chạy `npx wrangler deploy`, tên worker sẽ tương ứng với subdomain đầu tiên.
-
----
-
-### Cách 3: Chạy thử trước bằng môi trường Workers local
-Nếu muốn test mô phỏng y hệt môi trường Cloudflare Workers trên máy tính:
-```bash
-npx wrangler dev
-```
+- **Chơi trực tiếp**: Mở trực tiếp trên mọi trình duyệt di động hoặc máy tính để bàn.
+- **Cài đặt như App (PWA Offline)**: Chọn **"Thêm vào Màn hình chính" (Add to Home Screen)** trên trình duyệt để chơi toàn màn hình không viền và tiếp tục quản lý tiệm ngay cả khi không có kết nối mạng!
 
 ---
 
