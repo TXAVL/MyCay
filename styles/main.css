@@ -5012,6 +5012,63 @@ html, body {
   transform: scale(0.95);
 }
 
+.btn-k-turbo.active-blasting {
+  background: linear-gradient(135deg, #0288D1 0%, #0097A7 100%) !important;
+  color: #E0F7FA !important;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.7) !important;
+  animation: turboPulseBtn 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes turboPulseBtn {
+  0% { transform: scale(0.98); }
+  100% { transform: scale(1.04); }
+}
+
+.k-daikin-temp-ctrls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 2px;
+}
+
+.btn-ac-temp-step {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #00E5FF;
+  border-radius: 3px;
+  width: 14px;
+  height: 9px;
+  font-size: 7px;
+  line-height: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-ac-temp-step:hover {
+  background: #00E5FF;
+  color: #0F172A;
+}
+
+.daikin-screen-led.is-turbo-led .daikin-led-num,
+.k-daikin-led.is-turbo-led {
+  color: #00E5FF !important;
+  text-shadow: 0 0 10px #00E5FF, 0 0 20px #00B0FF !important;
+  animation: ledIceGlow 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes ledIceGlow {
+  0% { opacity: 0.85; }
+  100% { opacity: 1; text-shadow: 0 0 14px #00E5FF, 0 0 25px #00B0FF; }
+}
+
+.daikin-led-snowflake.fast-spin {
+  animation: daikinSpin 0.8s linear infinite !important;
+}
+
 /* MINI DAIKIN Ở PHÒNG CHUẨN BỊ */
 .prep-daikin-mini {
   display: flex;

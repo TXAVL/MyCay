@@ -1315,6 +1315,9 @@ export class SpicyNoodleGame {
     if (key === "acCooling") {
       const newLv = this.state.upgrades.acCooling;
       const tempText = newLv >= 3 ? "16°C Turbo Max" : "20°C Inverter";
+      this.state.acTemp = this.getBaseDaikinTemp();
+      this.state.acTurboActive = false;
+      this.state.acTurboSeconds = 0;
       GameUIModal.showToast(`❄️ Đã nâng cấp Điều Hòa Daikin lên Cấp ${newLv} (${tempText})! Cả tiệm mát lạnh sâu, khách kiên nhẫn hơn +${newLv * 25}%!`, "success", "❄️");
       this.renderDaikinAC();
       this.renderDiningStage();
@@ -3476,39 +3479,64 @@ export class SpicyNoodleGame {
   // ==========================================================
   // 14. HỆ THỐNG ĐIỀU HÒA DAIKIN MÁT RƯỢI (LIVING DAIKIN AC SYSTEM)
   // ==========================================================
+  getBaseDaikinTemp() {
+    const acLv = (this.state && this.state.upgrades && this.state.upgrades.acCooling) || 1;
+    return acLv >= 3 ? 16 : (acLv === 2 ? 20 : 24);
+  }
+
+  getCurrentDaikinTemp() {
+    if (!this.state) return 24;
+    if (this.state.acTemp === undefined || this.state.acTemp === null) {
+      this.state.acTemp = this.getBaseDaikinTemp();
+    }
+    return this.state.acTemp;
+  }
+
   renderDaikinAC() {
-    const acLv = this.state.upgrades.acCooling || 1;
-    let temp = "24°C";
+    const acLv = (this.state && this.state.upgrades && this.state.upgrades.acCooling) || 1;
+    const currentTemp = this.getCurrentDaikinTemp();
+    const isTurbo = !!(this.state && this.state.acTurboActive);
+    const turboSecs = (this.state && this.state.acTurboSeconds) || 0;
+
     let modeText = "INVERTER";
     let speedText = "Êm ái dịu mát";
     let bonusPct = 25;
 
     if (acLv === 2) {
-      temp = "20°C";
       modeText = "LÀM LẠNH SÂU";
       speedText = "Gió lạnh băng giá";
       bonusPct = 50;
     } else if (acLv >= 3) {
-      temp = "16°C";
       modeText = "TURBO COOL MAX";
       speedText = "Băng tuyết siêu tốc";
       bonusPct = 75;
     }
 
+    if (isTurbo) {
+      modeText = "TURBO BOOST";
+      speedText = `Xả gió băng tuyết ${currentTemp}°C`;
+    }
+
+    const tempDisplay = `${currentTemp}°C`;
+    const turboLedClass = isTurbo ? "is-turbo-led" : "";
+    const turboSpinClass = isTurbo ? "fast-spin" : "";
+    const turboBtnText = isTurbo ? `❄️ Đang Xả ${tempDisplay} (${turboSecs}s)` : `⚡ Turbo 16°C`;
+    const turboBtnClass = isTurbo ? "btn-k-turbo active-blasting" : "btn-k-turbo";
+
     // 1. Cục lạnh treo tường Daikin tại Sân Khấu Phòng Ăn (Open Mode)
     const stageContainer = document.getElementById("daikin-ac-stage-container");
     if (stageContainer) {
       stageContainer.innerHTML = `
-        <div class="daikin-wall-unit lv-${acLv}" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin ${modeText} - Chạm để xả gió lạnh Turbo!">
+        <div class="daikin-wall-unit lv-${acLv} ${isTurbo ? 'is-turbo-blasting' : ''}" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin ${modeText} - Chạm để xả gió lạnh Turbo!">
           <div class="daikin-front-panel">
             <div class="daikin-brand-badge">
               <span class="daikin-brand-name">DAIKIN</span>
               <span class="daikin-brand-tech">${modeText} · CẤP ${acLv}</span>
             </div>
             <div class="daikin-center-grille"></div>
-            <div class="daikin-screen-led">
-              <span class="daikin-led-num" id="daikin-led-num">${temp}</span>
-              <span class="daikin-led-snowflake">❄️</span>
+            <div class="daikin-screen-led ${turboLedClass}">
+              <span class="daikin-led-num" id="daikin-led-num">${tempDisplay}</span>
+              <span class="daikin-led-snowflake ${turboSpinClass}">❄️</span>
             </div>
             <div class="daikin-led-pills">
               <span class="ac-led-dot led-green" title="Nguồn"></span>
@@ -3528,8 +3556,8 @@ export class SpicyNoodleGame {
             </div>
           </div>
           <div class="daikin-cooling-tip">
-            <span>❄️ Daikin ${temp} · ${speedText} · Giảm sốt ruột cho khách (+${bonusPct}% kiên nhẫn)</span>
-            <span class="btn-tap-turbo-hint">⚡ Chạm để Turbo</span>
+            <span>❄️ Daikin ${tempDisplay} · ${speedText} · Giảm sốt ruột cho khách (+${bonusPct}% kiên nhẫn)</span>
+            <span class="btn-tap-turbo-hint">${isTurbo ? '❄️ Đang Turbo...' : '⚡ Chạm để Turbo'}</span>
           </div>
         </div>
       `;
@@ -3539,16 +3567,20 @@ export class SpicyNoodleGame {
     const kitchenBar = document.getElementById("kitchen-daikin-bar");
     if (kitchenBar) {
       kitchenBar.innerHTML = `
-        <div class="k-daikin-inner lv-${acLv}">
+        <div class="k-daikin-inner lv-${acLv} ${isTurbo ? 'is-turbo-blasting' : ''}">
           <div class="k-daikin-badge">
             <span class="k-daikin-brand">❄️ DAIKIN</span>
-            <span class="k-daikin-led">${temp}</span>
+            <span class="k-daikin-led ${turboLedClass}" id="k-daikin-led">${tempDisplay}</span>
+            <div class="k-daikin-temp-ctrls">
+              <button class="btn-ac-temp-step" onclick="event.stopPropagation(); window.game.adjustDaikinTemp(-1);" title="Giảm 1°C">▼</button>
+              <button class="btn-ac-temp-step" onclick="event.stopPropagation(); window.game.adjustDaikinTemp(1);" title="Tăng 1°C">▲</button>
+            </div>
           </div>
           <div class="k-daikin-flow-wrap">
-            <span class="k-daikin-status">Gió lạnh ${modeText}: Làm dịu cơn cay · Khách kiên nhẫn +${bonusPct}%</span>
+            <span class="k-daikin-status" id="k-daikin-status">Gió lạnh ${modeText}: Làm dịu cơn cay · Khách kiên nhẫn +${bonusPct}%</span>
           </div>
-          <button class="btn-k-turbo" onclick="event.stopPropagation(); window.game.interactDaikinAC();" title="Bật Turbo Boost ngay!">
-            ⚡ Turbo 16°C
+          <button class="${turboBtnClass}" id="btn-k-turbo" onclick="event.stopPropagation(); window.game.interactDaikinAC();" title="Bật Turbo Boost ngay!">
+            ${turboBtnText}
           </button>
         </div>
       `;
@@ -3558,14 +3590,14 @@ export class SpicyNoodleGame {
     const prepAc = document.getElementById("daikin-prep-wall-ac");
     const prepBadge = document.getElementById("prep-daikin-indicator");
     if (prepBadge) {
-      prepBadge.textContent = `❄️ Daikin ${temp} (${modeText})`;
+      prepBadge.textContent = `❄️ Daikin ${tempDisplay} (${modeText})`;
     }
     if (prepAc) {
       prepAc.innerHTML = `
         <div class="prep-daikin-mini lv-${acLv}" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin Inverter sẵn sàng làm mát quán!">
           <div class="prep-daikin-case">
             <span class="prep-daikin-brand">DAIKIN</span>
-            <span class="prep-daikin-temp">${temp}</span>
+            <span class="prep-daikin-temp">${tempDisplay}</span>
             <span class="ac-led-dot led-green"></span>
           </div>
           <div style="font-weight:700; color:#00796B;">Không gian mát lạnh (+${bonusPct}% kiên nhẫn)</div>
@@ -3575,50 +3607,146 @@ export class SpicyNoodleGame {
     }
   }
 
+  // Cập nhật nhanh số liệu LED và nút mà không cần dựng lại toàn bộ DOM
+  updateDaikinLedDisplays() {
+    const currentTemp = this.getCurrentDaikinTemp();
+    const tempDisplay = `${currentTemp}°C`;
+    const isTurbo = !!(this.state && this.state.acTurboActive);
+    const turboSecs = (this.state && this.state.acTurboSeconds) || 0;
+    const acLv = (this.state && this.state.upgrades && this.state.upgrades.acCooling) || 1;
+    const modeText = isTurbo ? "TURBO BOOST" : (acLv >= 3 ? "TURBO COOL MAX" : (acLv === 2 ? "LÀM LẠNH SÂU" : "INVERTER"));
+    const bonusPct = acLv >= 3 ? 75 : (acLv === 2 ? 50 : 25);
+
+    // 1. Stage LED
+    const stageLedNum = document.getElementById("daikin-led-num");
+    if (stageLedNum) {
+      stageLedNum.textContent = tempDisplay;
+    }
+    const stageScreen = document.querySelector(".daikin-screen-led");
+    if (stageScreen) {
+      if (isTurbo) stageScreen.classList.add("is-turbo-led");
+      else stageScreen.classList.remove("is-turbo-led");
+    }
+    const stageFlake = document.querySelector(".daikin-led-snowflake");
+    if (stageFlake) {
+      if (isTurbo) stageFlake.classList.add("fast-spin");
+      else stageFlake.classList.remove("fast-spin");
+    }
+
+    // 2. Kitchen Bar LED & Button
+    const kLed = document.getElementById("k-daikin-led");
+    if (kLed) {
+      kLed.textContent = tempDisplay;
+      if (isTurbo) kLed.classList.add("is-turbo-led");
+      else kLed.classList.remove("is-turbo-led");
+    }
+    const kStatus = document.getElementById("k-daikin-status");
+    if (kStatus) {
+      kStatus.textContent = isTurbo
+        ? `🔥 XẢ GIÓ TURBO ${tempDisplay}! Cả quán mát lạnh cóng, khách cực kỳ kiên nhẫn (${turboSecs}s còn lại)`
+        : `Gió lạnh ${modeText}: Làm dịu cơn cay · Khách kiên nhẫn +${bonusPct}%`;
+    }
+    const turboBtn = document.getElementById("btn-k-turbo");
+    if (turboBtn) {
+      turboBtn.innerHTML = isTurbo ? `❄️ Đang Xả ${tempDisplay} (${turboSecs}s)` : `⚡ Turbo 16°C`;
+      if (isTurbo) turboBtn.classList.add("active-blasting");
+      else turboBtn.classList.remove("active-blasting");
+    }
+
+    // 3. Wall unit classes
+    const wallUnit = document.querySelector(".daikin-wall-unit");
+    if (wallUnit) {
+      if (isTurbo) wallUnit.classList.add("is-turbo-blasting");
+      else wallUnit.classList.remove("is-turbo-blasting");
+    }
+    const kInner = document.querySelector(".k-daikin-inner");
+    if (kInner) {
+      if (isTurbo) kInner.classList.add("is-turbo-blasting");
+      else kInner.classList.remove("is-turbo-blasting");
+    }
+
+    // 4. Prep Mode Mini
+    const prepIndicator = document.getElementById("prep-daikin-indicator");
+    if (prepIndicator) {
+      prepIndicator.textContent = `❄️ Daikin ${tempDisplay} (${modeText})`;
+    }
+    const prepTemp = document.querySelector(".prep-daikin-temp");
+    if (prepTemp) {
+      prepTemp.textContent = tempDisplay;
+    }
+  }
+
+  // Tăng giảm nhiệt độ thủ công trên thanh điều hòa
+  adjustDaikinTemp(delta) {
+    this.sound.playButtonClick();
+    const acLv = (this.state && this.state.upgrades && this.state.upgrades.acCooling) || 1;
+    const minTemp = acLv >= 3 ? 14 : 16;
+    const maxTemp = 28;
+
+    let currentTemp = this.getCurrentDaikinTemp();
+    currentTemp = Math.max(minTemp, Math.min(maxTemp, currentTemp + delta));
+    this.state.acTemp = currentTemp;
+
+    this.updateDaikinLedDisplays();
+    GameUIModal.showToast(`🌡️ Đã chỉnh nhiệt độ Điều Hòa Daikin: ${currentTemp}°C`, "info", "❄️");
+  }
+
   // Tương tác bấm vào Điều hòa Daikin để xả gió Turbo
   interactDaikinAC() {
     this.sound.playCoinChime();
-    const acLv = this.state.upgrades.acCooling || 1;
-    let temp = acLv >= 3 ? "16°C" : (acLv === 2 ? "20°C" : "24°C");
+    const acLv = (this.state && this.state.upgrades && this.state.upgrades.acCooling) || 1;
+    const targetTurboTemp = acLv >= 3 ? 14 : 16;
 
-    // Hồi phục kiên nhẫn ngay cho tất cả khách đang chờ
+    // Hồi phục kiên nhẫn ngay cho tất cả khách đang chờ (+30)
     let boostedCount = 0;
     this.orderSlots.forEach(slot => {
       if (slot) {
-        slot.patience = Math.min(slot.maxPatience, slot.patience + 25);
+        slot.patience = Math.min(slot.maxPatience, slot.patience + 30);
         boostedCount++;
       }
     });
 
-    const wallUnit = document.querySelector(".daikin-wall-unit");
-    if (wallUnit) {
-      wallUnit.classList.add("is-turbo-blasting");
-      setTimeout(() => wallUnit.classList.remove("is-turbo-blasting"), 3000);
-    }
-    const kBar = document.querySelector(".k-daikin-inner");
-    if (kBar) {
-      kBar.classList.add("is-turbo-blasting");
-      setTimeout(() => kBar.classList.remove("is-turbo-blasting"), 3000);
+    // Kích hoạt trạng thái Turbo 12 giây
+    this.state.acTurboActive = true;
+    this.state.acTurboSeconds = 12;
+
+    // Hiệu ứng nhiệt độ tụt dốc thời gian thực (Drop animation)
+    if (this.daikinDropInterval) clearInterval(this.daikinDropInterval);
+    const curr = this.getCurrentDaikinTemp();
+
+    if (curr > targetTurboTemp) {
+      this.daikinDropInterval = setInterval(() => {
+        if (this.state.acTemp > targetTurboTemp) {
+          this.state.acTemp -= 1;
+          this.updateDaikinLedDisplays();
+        } else {
+          clearInterval(this.daikinDropInterval);
+          this.daikinDropInterval = null;
+        }
+      }, 110);
+    } else {
+      this.state.acTemp = targetTurboTemp;
+      this.updateDaikinLedDisplays();
     }
 
     // Hiệu ứng luồng gió lạnh băng giá phà khắp quán
     const openModeLayout = document.getElementById("view-open-mode");
     if (openModeLayout) {
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 9; i++) {
         const flake = document.createElement("div");
         flake.className = "daikin-wind-breeze";
         flake.textContent = ["❄️", "🌬️", "✨", "🧊"][i % 4];
-        flake.style.left = `${12 + Math.random() * 75}%`;
-        flake.style.top = `${25 + Math.random() * 45}%`;
-        flake.style.animationDelay = `${i * 0.1}s`;
+        flake.style.left = `${10 + Math.random() * 80}%`;
+        flake.style.top = `${20 + Math.random() * 55}%`;
+        flake.style.animationDelay = `${i * 0.08}s`;
         openModeLayout.appendChild(flake);
-        setTimeout(() => flake.remove(), 1600);
+        setTimeout(() => flake.remove(), 1800);
       }
     }
 
     this.renderOrderQueue();
     GameUIModal.showToast(
-      `🧊 BẬT TURBO DAIKIN 16°C! Làn gió băng tuyết phà mát rượi cả quán, ${boostedCount > 0 ? `hạ nhiệt cho ${boostedCount} khách (+25 Kiên nhẫn)!` : "không khí mát lạnh sảng khoái!"}`,
+      `🧊 BẬT TURBO DAIKIN ${targetTurboTemp}°C! Nhiệt độ hạ sâu tức thì, gió phà mát lạnh cả quán (+30 Kiên nhẫn cho ${boostedCount} khách)!`,
       "success",
       "❄️"
     );
@@ -3684,6 +3812,20 @@ export class SpicyNoodleGame {
 
       // Kiểm tra định kỳ loại mì hết hàng để từ chối các đơn trùng phía sau
       this.checkAndAutoRejectOutOfStockDuplicates();
+
+      // Cập nhật đếm ngược Turbo Daikin (nếu đang kích hoạt)
+      if (this.state && this.state.acTurboActive) {
+        this.state.acTurboSeconds = (this.state.acTurboSeconds || 12) - 1;
+        if (this.state.acTurboSeconds <= 0) {
+          this.state.acTurboActive = false;
+          this.state.acTurboSeconds = 0;
+          this.state.acTemp = this.getBaseDaikinTemp();
+          this.updateDaikinLedDisplays();
+          GameUIModal.showToast("💨 Chế độ Turbo Daikin đã kết thúc. Điều hòa trở về chế độ Inverter êm dịu!", "info", "❄️");
+        } else {
+          this.updateDaikinLedDisplays();
+        }
+      }
 
       // Nâng cấp Điều Hòa Daikin (acCooling): Không khí mát lành giảm độ bức bối giúp khách kiên nhẫn hơn
       const acLv = this.state.upgrades.acCooling || 1;
@@ -4293,6 +4435,14 @@ export class SpicyNoodleGame {
     if (this.customerInterval) clearInterval(this.customerInterval);
     if (this.onlineOrderInterval) clearInterval(this.onlineOrderInterval);
     if (this.staffAutomationInterval) clearInterval(this.staffAutomationInterval);
+    if (this.daikinDropInterval) clearInterval(this.daikinDropInterval);
+
+    if (this.state) {
+      this.state.acTurboActive = false;
+      this.state.acTurboSeconds = 0;
+      this.state.acTemp = this.getBaseDaikinTemp();
+    }
+    this.updateDaikinLedDisplays();
 
     this.activeLiveShipperOrder = null;
     const shipperCard = document.getElementById("open-mode-shipper-card");
