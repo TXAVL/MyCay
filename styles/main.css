@@ -7328,6 +7328,59 @@ html, body {
   100% { transform: scale(1); }
 }
 
+/* ==========================================================
+   24. PWA OFFLINE STYLES & CÀI ĐẶT ỨNG DỤNG (OFFLINE SUPPORT)
+   ========================================================== */
+.pwa-install-badge-btn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.45) !important;
+  animation: pwaBounce 2s infinite ease-in-out;
+}
+@keyframes pwaBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px) scale(1.05); }
+}
+
+.header-offline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  animation: pulseOffline 1.5s infinite alternate ease-in-out;
+}
+@keyframes pulseOffline {
+  0% { opacity: 0.85; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1.02); }
+}
+
+.pwa-install-highlight {
+  background: linear-gradient(135deg, rgba(37, 138, 109, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%) !important;
+  border: 1.5px solid rgba(37, 138, 109, 0.4) !important;
+  margin-bottom: 12px;
+}
+.pwa-install-highlight:hover {
+  background: linear-gradient(135deg, rgba(37, 138, 109, 0.2) 0%, rgba(16, 185, 129, 0.14) 100%) !important;
+  border-color: #10B981 !important;
+}
+.pwa-install-highlight .action-banner-icon {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: white !important;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35) !important;
+}
+.pwa-install-highlight .action-banner-btn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+}
+
 
 
 

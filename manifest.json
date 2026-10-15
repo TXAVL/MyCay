@@ -1,21 +1,43 @@
 {
-  "name": "Tiệm Mỳ Cay",
+  "id": "tiem-my-cay-v1-5-0",
+  "name": "Tiệm Mỳ Cay & Trà Sữa Boba",
   "short_name": "Tiệm Mỳ Cay",
-  "description": "Trò chơi mô phỏng quản lý Tiệm Mỳ Cay",
+  "description": "Trò chơi mô phỏng quản lý Tiệm Mỳ Cay 7 Cấp Độ & Trà Sữa Boba phong cách Cozy Anime. Hỗ trợ chơi Offline 100% không cần mạng!",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#fff5eb",
-  "theme_color": "#ff7e5f",
+  "orientation": "any",
+  "background_color": "#F6F0E6",
+  "theme_color": "#C44569",
+  "categories": [
+    "games",
+    "simulation",
+    "casual"
+  ],
   "icons": [
     {
       "src": "assets/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "assets/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

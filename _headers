@@ -11,10 +11,18 @@
   Cache-Control: public, max-age=0, must-revalidate
   Content-Type: application/javascript; charset=utf-8
 
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+  Service-Worker-Allowed: /
+  Content-Type: application/javascript; charset=utf-8
+
+/manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
+  Content-Type: application/manifest+json; charset=utf-8
+
 /*.css
   Cache-Control: public, max-age=0, must-revalidate
   Content-Type: text/css; charset=utf-8
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
-

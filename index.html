@@ -98,6 +98,12 @@
           <div class="header-stars-row" id="display-stars">★★★★☆</div>
           <div class="header-reviews-sub" id="display-reviews-count">0 đánh giá</div>
           <div class="header-actions-row">
+            <button id="btn-header-install" class="btn-header-action pwa-install-badge-btn" style="display: none;" title="Cài app chơi Offline không cần mạng">
+              📲
+            </button>
+            <span id="header-offline-badge" class="header-offline-pill" style="display: none;" title="Đang ở chế độ Offline (Không có mạng)">
+              📡 Offline
+            </span>
             <button id="btn-quick-theme" class="btn-header-action" title="Đổi giao diện nhanh (5 Theme Anime)">
               <span id="header-theme-icon">🏮</span>
             </button>
@@ -1045,6 +1051,18 @@
           <div class="settings-section-badge">
             <span>🌟 Tiện Ích & Chia Sẻ</span>
           </div>
+
+          <!-- Nút Cài Đặt Ứng Dụng Chơi Offline (PWA) -->
+          <button id="btn-install-pwa" class="settings-action-banner pwa-install-highlight" title="Cài đặt Tiệm Mỳ Cay vào màn hình chính để chơi Offline">
+            <div class="action-banner-left">
+              <span class="action-banner-icon">📲</span>
+              <div class="action-banner-text">
+                <strong class="action-banner-title">Cài App Chơi Offline (Không Cần Mạng)</strong>
+                <span class="action-banner-desc" id="pwa-install-status-text">Thêm vào màn hình chính để mở chơi tức thì mọi lúc</span>
+              </div>
+            </div>
+            <span class="action-banner-btn" id="btn-install-pwa-badge">Cài Đặt ❯</span>
+          </button>
 
           <!-- Nút Mở QR Code Rủ Bạn Bè Chơi -->
           <button id="btn-open-qr-modal" class="settings-action-banner" title="Mở mã QR chia sẻ cho bạn bè">

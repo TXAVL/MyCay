@@ -7,9 +7,12 @@ export default {
     const response = await env.ASSETS.fetch(request);
 
     // Đối với html, js, css: luôn yêu cầu trình duyệt kiểm tra phiên bản mới
-    if (url.pathname.endsWith(".html") || url.pathname.endsWith(".js") || url.pathname.endsWith(".css") || url.pathname === "/") {
+    if (url.pathname.endsWith(".html") || url.pathname.endsWith(".js") || url.pathname.endsWith(".css") || url.pathname === "/" || url.pathname === "/manifest.json") {
       const newHeaders = new Headers(response.headers);
       newHeaders.set("Cache-Control", "public, max-age=0, must-revalidate");
+      if (url.pathname === "/sw.js" || url.pathname.endsWith("/sw.js")) {
+        newHeaders.set("Service-Worker-Allowed", "/");
+      }
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,

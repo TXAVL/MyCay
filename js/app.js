@@ -610,4 +610,108 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  // ==========================================================
+  // 13. PWA OFFLINE SUPPORT & CÀI ĐẶT ỨNG DỤNG (SERVICE WORKER)
+  // ==========================================================
+  let deferredPrompt = null;
+  const btnHeaderInstall = document.getElementById("btn-header-install");
+  const btnInstallPwa = document.getElementById("btn-install-pwa");
+  const pwaInstallDesc = document.getElementById("pwa-install-status-text");
+  const btnInstallBadge = document.getElementById("btn-install-pwa-badge");
+  const headerOfflineBadge = document.getElementById("header-offline-badge");
+
+  // Kiểm tra trạng thái mạng Online / Offline
+  function updateNetworkStatus() {
+    const isOnline = navigator.onLine;
+    if (headerOfflineBadge) {
+      headerOfflineBadge.style.display = isOnline ? "none" : "inline-flex";
+    }
+  }
+  window.addEventListener("online", () => {
+    updateNetworkStatus();
+    GameUIModal.showToast("🟢 Đã có kết nối Internet trở lại!", "success", "📶");
+  });
+  window.addEventListener("offline", () => {
+    updateNetworkStatus();
+    GameUIModal.showToast("📡 Đang chơi Chế Độ Offline (Không Mạng) - Dữ liệu vẫn lưu an toàn trên máy!", "info", "🍜");
+  });
+  updateNetworkStatus();
+
+  // Kiểm tra xem người dùng đã cài đặt App hay đang chạy Standalone PWA chưa
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if (isStandalone) {
+    if (pwaInstallDesc) pwaInstallDesc.textContent = "Bạn đã cài đặt Tiệm Mỳ Cay vào màn hình chính rồi!";
+    if (btnInstallBadge) btnInstallBadge.textContent = "Đã Cài Đặt ✓";
+    if (btnHeaderInstall) btnHeaderInstall.style.display = "none";
+  }
+
+  // Bắt sự kiện beforeinstallprompt từ trình duyệt (Chrome, Edge, Android...)
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (btnHeaderInstall && !isStandalone) {
+      btnHeaderInstall.style.display = "inline-flex";
+    }
+    if (pwaInstallDesc && !isStandalone) {
+      pwaInstallDesc.textContent = "Nhấn để cài App lên màn hình chính, chơi Offline không cần mạng!";
+    }
+  });
+
+  // Xử lý khi bấm nút Cài đặt App
+  async function triggerPwaInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      if (choiceResult.outcome === "accepted") {
+        GameUIModal.showToast("Đang cài đặt Tiệm Mỳ Cay vào màn hình chính...", "success", "📲");
+      }
+      deferredPrompt = null;
+      if (btnHeaderInstall) btnHeaderInstall.style.display = "none";
+    } else {
+      // Hướng dẫn cài đặt thủ công nếu trình duyệt không hỗ trợ beforeinstallprompt trực tiếp (ví dụ iOS Safari)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        GameUIModal.alert({
+          title: "📲 Cài App Trên iPhone / iPad",
+          message: "Để chơi Offline trên iOS: Bấm nút <strong>Chia sẻ (Share) 📤</strong> ở thanh dưới Safari, sau đó chọn <strong>'Thêm vào Màn hình chính' (Add to Home Screen) ➕</strong>!",
+          icon: "📱"
+        });
+      } else {
+        GameUIModal.alert({
+          title: "📲 Cài App Chơi Offline",
+          message: "Game đã sẵn sàng chơi Offline! Bạn có thể chọn menu 'Cài đặt ứng dụng' (Install App) hoặc 'Thêm vào màn hình chính' trên menu trình duyệt để mở game nhanh không cần mạng.",
+          icon: "✨"
+        });
+      }
+    }
+  }
+
+  if (btnHeaderInstall) {
+    btnHeaderInstall.addEventListener("click", triggerPwaInstall);
+  }
+  if (btnInstallPwa) {
+    btnInstallPwa.addEventListener("click", triggerPwaInstall);
+  }
+
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null;
+    if (btnHeaderInstall) btnHeaderInstall.style.display = "none";
+    if (btnInstallBadge) btnInstallBadge.textContent = "Đã Cài Đặt ✓";
+    if (pwaInstallDesc) pwaInstallDesc.textContent = "Đã cài đặt Tiệm Mỳ Cay thành công!";
+    GameUIModal.showToast("🎉 Đã cài đặt Tiệm Mỳ Cay thành công! Bây giờ bạn có thể mở chơi bất cứ lúc nào kể cả khi tắt mạng!", "success", "🏆");
+  });
+
+  // Đăng ký Service Worker
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js")
+        .then((reg) => {
+          console.log("[PWA] Service Worker đã đăng ký thành công:", reg.scope);
+        })
+        .catch((err) => {
+          console.warn("[PWA] Đăng ký Service Worker thất bại:", err);
+        });
+    });
+  }
 });
