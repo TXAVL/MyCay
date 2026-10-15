@@ -19,10 +19,26 @@ export class GameUIModal {
    * @param {string} icon - Icon biểu tượng (🍜, 🪙, ⭐, 💖, ⚠️...)
    * @param {number} duration - Thời gian hiển thị (ms)
    */
-  static showToast(message, type = "info", icon = "✨", duration = 3200) {
+  static showToast(message, type = "info", icon = "✨", duration = 2400) {
     this.init();
     const container = document.getElementById("game-toast-container");
     if (!container) return;
+
+    // Trên mobile hoặc khi có nhiều thông báo liên tiếp:
+    // Dọn bớt các toast cũ đang hiển thị để tránh xếp chồng che khuất màn hình chơi game
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+    const maxToasts = isMobile ? 1 : 2;
+
+    while (container.children.length >= maxToasts) {
+      const oldest = container.firstElementChild;
+      if (oldest) {
+        oldest.classList.remove("anime-toast-slide-in");
+        oldest.classList.add("anime-toast-slide-out");
+        oldest.remove();
+      } else {
+        break;
+      }
+    }
 
     const toast = document.createElement("div");
     toast.className = `game-toast toast-${type} anime-toast-slide-in`;
@@ -42,7 +58,8 @@ export class GameUIModal {
       }
     }
 
-    // Tự động gỡ bỏ sau thời gian duration
+    // Tự động gỡ bỏ sau thời gian duration (gọn gàng trên mobile: 2.2s)
+    const actualDuration = isMobile ? Math.min(2200, duration) : duration;
     setTimeout(() => {
       toast.classList.remove("anime-toast-slide-in");
       toast.classList.add("anime-toast-slide-out");
@@ -50,8 +67,8 @@ export class GameUIModal {
         if (toast.parentNode) {
           toast.parentNode.removeChild(toast);
         }
-      }, 350);
-    }, duration);
+      }, 300);
+    }, actualDuration);
   }
 
   /**
