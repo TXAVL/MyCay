@@ -61,42 +61,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnNextDay = document.getElementById("btn-next-day");
   const daySummaryModal = document.getElementById("modal-day-summary");
 
-  // Mẹo hoạt hình khi tải trang
-  const loadingTips = [
-    "Đang ninh nước dùng xương hầm cùng thảo mộc thơm lừng...",
-    "Bé Mèo Mochi đang lau dọn bàn ghế gỗ sồi sạch bóng...",
-    "Đang chuẩn bị ớt hiểm 7 cấp độ cay nồng ấm bụng...",
-    "Bật điệu nhạc Lo-Fi anime thư giãn cho tiệm mì cay ấm áp..."
+  // Mẹo hoạt hình và các trạng thái khi tải trang
+  const loadingStages = [
+    { text: "Đang ninh nước dùng xương hầm cùng thảo mộc thơm lừng... 🍲", targetPct: 22 },
+    { text: "Bé Mèo Mochi đang lau dọn bàn ghế gỗ sồi sạch bóng... 🪑", targetPct: 45 },
+    { text: "Đang chuẩn bị ớt hiểm 7 cấp độ cay nồng ấm bụng... 🌶️", targetPct: 68 },
+    { text: "Bật điều hòa Daikin mát rượi và giai điệu Lo-Fi anime thư giãn... ❄️🎵", targetPct: 88 },
+    { text: "Kích hoạt Giờ Vàng FEVER RUSH & sẵn sàng đón khách VIP... 👑✨", targetPct: 100 }
   ];
 
-  // 1. Quản lý Màn hình Loading
+  // 1. Quản lý Màn hình Loading mượt mà hiển thị đủ toàn bộ trạng thái
+  let currentStageIdx = 0;
   let loadProgress = 0;
-  let tipIndex = 0;
-
-  const tipInterval = setInterval(() => {
-    tipIndex = (tipIndex + 1) % loadingTips.length;
-    if (loadingTip) loadingTip.textContent = loadingTips[tipIndex];
-  }, 750);
+  if (loadingTip) loadingTip.textContent = loadingStages[0].text;
 
   const loadInterval = setInterval(() => {
-    loadProgress += Math.floor(Math.random() * 16) + 10;
-    if (loadProgress >= 100) {
-      loadProgress = 100;
-      clearInterval(loadInterval);
-      clearInterval(tipInterval);
+    const currentStage = loadingStages[currentStageIdx];
 
-      if (loadingProgressBar) loadingProgressBar.style.width = "100%";
-      if (loadingPercent) loadingPercent.textContent = "100%";
-      if (loadingTip) loadingTip.textContent = "Nồi trà thơm đã sẵn sàng đón thực khách! ✨";
-
-      if (btnStartPlay) {
-        btnStartPlay.style.display = "inline-flex";
-      }
-    } else {
+    if (loadProgress < currentStage.targetPct) {
+      loadProgress += 1;
       if (loadingProgressBar) loadingProgressBar.style.width = `${loadProgress}%`;
       if (loadingPercent) loadingPercent.textContent = `${loadProgress}%`;
     }
-  }, 100);
+
+    if (loadProgress >= currentStage.targetPct) {
+      if (currentStageIdx < loadingStages.length - 1) {
+        currentStageIdx++;
+        if (loadingTip) loadingTip.textContent = loadingStages[currentStageIdx].text;
+      } else {
+        clearInterval(loadInterval);
+        if (loadingProgressBar) loadingProgressBar.style.width = "100%";
+        if (loadingPercent) loadingPercent.textContent = "100%";
+        if (loadingTip) loadingTip.textContent = "Tiệm mì cay đã sẵn sàng mở cửa đón thực khách! 🍜✨";
+
+        if (btnStartPlay) {
+          btnStartPlay.style.display = "inline-flex";
+        }
+      }
+    }
+  }, 38);
 
   // Kiểm tra quy trình mở tiệm lần đầu & hướng dẫn tân thủ
   function checkFirstTimeFlow() {

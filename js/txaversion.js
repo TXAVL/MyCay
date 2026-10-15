@@ -2,31 +2,38 @@
 // Khai báo class txaversion theo đúng yêu cầu dự án
 
 export class txaversion {
-  constructor(version, versionCode, releaseDate, features = []) {
+  constructor(version, versionCode, releaseDate, features = [], themeName = "") {
     this.version = version; // Ví dụ: "1.4.0"
     this.versionCode = versionCode; // Ví dụ: 140
     this.releaseDate = releaseDate;
     this.features = features; // Danh sách { title, desc, icon, badge }
+    this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
   // Khai báo phiên bản hiện tại của game (Bản 1.5.5 - Giờ Vàng FEVER RUSH & Khách VIP Thần Tài)
   static get CURRENT_VERSION() {
-    return new txaversion("1.5.5", 155, "15/10/2026", [
-      {
-        title: "Chế Độ Giờ Vàng FEVER RUSH & Khách VIP Thần Tài",
-        desc: "Khai mở tính năng FEVER RUSH cực đỉnh: Phục vụ chuỗi khách hoàn hảo để kích hoạt Giờ Vàng bùng nổ, gấp đôi (x2) doanh thu và đóng băng thời gian kiên nhẫn! Đón tiếp những vị khách VIP quý tộc (Mèo Thần Tài Maneki, Đại Gia Shiba, Cửu Vĩ VIP) mang lại tiền tip khổng lồ cho tiệm mì!",
-        icon: "👑",
-        badge: "VIP Mới 🔥",
-        badgeType: "hot"
-      },
-      {
-        title: "Tối ưu hóa & Sửa lỗi",
-        desc: "Sửa một số lỗi tồn đọng và tối ưu hóa hiệu năng, cải thiện trải nghiệm chơi mượt mà hơn cho chủ tiệm.",
-        icon: "🛠️",
-        badge: "Sửa lỗi 🛠️",
-        badgeType: "manage"
-      }
-    ]);
+    return new txaversion(
+      "1.5.5",
+      155,
+      "15/10/2026",
+      [
+        {
+          title: "Chế Độ Giờ Vàng FEVER RUSH & Khách VIP Thần Tài",
+          desc: "Khai mở tính năng FEVER RUSH cực đỉnh: Phục vụ chuỗi khách hoàn hảo để kích hoạt Giờ Vàng bùng nổ, gấp đôi (x2) doanh thu và đóng băng thời gian kiên nhẫn! Đón tiếp những vị khách VIP quý tộc (Mèo Thần Tài Maneki, Đại Gia Shiba, Cửu Vĩ VIP) mang lại tiền tip khổng lồ cho tiệm mì!",
+          icon: "👑",
+          badge: "VIP Mới 🔥",
+          badgeType: "hot"
+        },
+        {
+          title: "Tối ưu hóa & Sửa lỗi",
+          desc: "Sửa một số lỗi tồn đọng và tối ưu hóa hiệu năng, cải thiện trải nghiệm chơi mượt mà hơn cho chủ tiệm.",
+          icon: "🛠️",
+          badge: "Sửa lỗi 🛠️",
+          badgeType: "manage"
+        }
+      ],
+      "Giờ Vàng FEVER RUSH & Khách VIP Thần Tài"
+    );
   }
 
   // Lịch sử các phiên bản
@@ -149,10 +156,10 @@ export class txaversion {
     const current = txaversion.CURRENT_VERSION;
     return `
       <div class="version-banner">
-        <div class="version-banner-icon">🍜</div>
+        <div class="version-banner-icon">${current.features[0]?.icon || '👑'}</div>
         <div class="version-banner-info">
           <div class="version-pill-tag">BẢN NÂNG CẤP MỚI v${current.version}</div>
-          <h3 class="version-heading">Mã QR Bạn Bè & Cân Bằng Kinh Doanh</h3>
+          <h3 class="version-heading">${current.themeName || current.features[0]?.title || 'Giờ Vàng FEVER RUSH & Khách VIP Thần Tài'}</h3>
           <span class="version-date">📅 Phát hành: ${current.releaseDate} · Bản chính thức</span>
         </div>
       </div>
