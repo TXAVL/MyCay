@@ -21,7 +21,7 @@ export class txaversion {
       },
       {
         title: "Tối ưu hóa & Sửa lỗi",
-        desc: "Fix lỗi .......",
+        desc: "Sửa một số lỗi tồn đọng và tối ưu hóa hiệu năng, cải thiện trải nghiệm chơi mượt mà hơn cho chủ tiệm.",
         icon: "🛠️",
         badge: "Sửa lỗi 🛠️",
         badgeType: "manage"
