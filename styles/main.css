@@ -1443,6 +1443,123 @@ html, body {
   transform: scale(0.95);
 }
 
+/* ==========================================================
+   TỐI ƯU HÓA GIAO DIỆN KHO HÀNG TRÊN MOBILE (ISSUE #2 FIX)
+   Thẻ bài gọn gàng, vừa mắt, không bị quá to chiếm hết màn hình
+   ========================================================== */
+@media (max-width: 600px) {
+  .kho-cta-action-deck {
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    gap: 8px;
+  }
+
+  .btn-brew-action,
+  .btn-open-day-prominent {
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    border-radius: 10px;
+  }
+
+  .kho-subtotal-bar {
+    padding: 6px 10px;
+    border-radius: 8px;
+    gap: 4px 10px;
+  }
+
+  .subtotal-item {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .subtotal-item .subtotal-amount {
+    font-size: 11.5px;
+  }
+
+  .kho-cards-grid {
+    gap: 8px;
+  }
+
+  .kho-card {
+    padding: 8px 6px 8px 6px;
+    border-radius: 12px;
+  }
+
+  .kho-card-badge-wrap {
+    margin-bottom: 2px;
+  }
+
+  .kho-badge {
+    font-size: 9px;
+    padding: 1.5px 6px;
+    font-weight: 800;
+  }
+
+  .kho-card-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    margin: 2px 0 3px 0;
+  }
+
+  .kho-card-icon {
+    font-size: 20px;
+  }
+
+  .kho-card-info {
+    margin-bottom: 4px;
+  }
+
+  .kho-card-name {
+    font-size: 11.5px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .kho-card-price {
+    font-size: 10px;
+    margin-top: 1px;
+  }
+
+  .kho-card-price .unit-text {
+    font-size: 9px;
+  }
+
+  .kho-stepper-control {
+    gap: 4px;
+    margin-top: auto;
+  }
+
+  .btn-stepper-action {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    border-radius: 7px;
+    font-size: 16px;
+  }
+
+  .kho-stepper-stock-val {
+    font-size: 13.5px;
+    min-width: 22px;
+  }
+
+  .kho-quick-chips {
+    margin-top: 4px;
+    gap: 4px;
+  }
+
+  .btn-chip-qty {
+    min-height: 22px;
+    padding: 2px 0;
+    font-size: 9.5px;
+    font-weight: 800;
+    border-radius: 6px;
+  }
+}
+
 /* Nút stepper cổ điển dùng trong các tab khác (Giá bán, v.v.) */
 .btn-stepper {
   background-color: var(--bg-card);
