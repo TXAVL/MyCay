@@ -3,13 +3,13 @@
 // Kết nối UI, Sự kiện, Tab Navigation và Logic Game
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.4.0";
-import { NameValidator } from "./filter.js?v=1.4.0";
-import { SpicyNoodleGame } from "./game.js?v=1.4.0";
-import { txatheme } from "./txatheme.js?v=1.4.0";
-import { txacoachmark } from "./txacoachmark.js?v=1.4.0";
-import { txaqr } from "./txaqr.js?v=1.4.0";
-import { GameUIModal } from "./modal.js?v=1.4.0";
+import { txaversion } from "./txaversion.js?v=1.5.0";
+import { NameValidator } from "./filter.js?v=1.5.0";
+import { SpicyNoodleGame } from "./game.js?v=1.5.0";
+import { txatheme } from "./txatheme.js?v=1.5.0";
+import { txacoachmark } from "./txacoachmark.js?v=1.5.0";
+import { txaqr } from "./txaqr.js?v=1.5.0";
+import { GameUIModal } from "./modal.js?v=1.5.0";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Khởi tạo Theme giao diện

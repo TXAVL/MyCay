@@ -9,43 +9,57 @@ export class txaversion {
     this.features = features; // Danh sách { title, desc, icon, badge }
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.4.0 - Mã QR Chơi Cùng Bạn Bè & Cân Bằng Độ Khó)
+  // Khai báo phiên bản hiện tại của game (Bản 1.5.0 - Đại Tiệc Trà Sữa & Đội Ngũ Nhân Sự Toàn Năng)
   static get CURRENT_VERSION() {
-    return new txaversion("1.4.0", 140, "14/10/2026", [
+    return new txaversion("1.5.0", 150, "15/10/2026", [
       {
-        title: "Mã QR Rủ Bạn Bè & Tải Ảnh Sắc Nét",
-        desc: "Mở Cài Đặt để lấy mã QR kèm Logo Tiệm Mỳ Cay ở chính giữa! Bạn bè có thể dùng Camera hoặc Zalo quét mã để chơi ngay. Có sẵn nút tải ảnh PNG sắc nét và báo rõ trạng thái tải!",
-        icon: "📱",
-        badge: "Tính năng mới 🔥",
+        title: "3 Nhân Viên Mới Toàn Năng (Ducky, Owl, Fawn)",
+        desc: "Tuyển dụng Vịt Ducky (Barista pha chế tự động, +25% doanh thu nước), Cú Mèo Owl (Trưởng Marketing kéo bão khách +40%, đơn online 10s, x2 review 5 sao) và Nai Fawn (Quản lý kho chiết khấu sỉ -15%, tự động nhập kho khi cạn & thưởng +50% hoa hồng giao hàng)!",
+        icon: "🧑‍🍳",
+        badge: "Nhân viên mới 🌟",
         badgeType: "hot"
       },
       {
-        title: "Chọn Cấp Độ Cay & Size Ngay Trong Khung Chọn Mì",
-        desc: "Không cần phải chuyển tab hay cuộn xuống cuối! Giờ đây khi bấm vào Mì, thanh chọn Độ Cay (0 - 7) và Size Niêu (M / L) xuất hiện ngay phía trên để bạn thao tác thần tốc!",
-        icon: "🌶️",
-        badge: "Tiện lợi ⚡",
-        badgeType: "manage"
+        title: "Menu Trà Sữa Chuẩn Vị & 5 Topping Boba",
+        desc: "Mở rộng 6 loại trà sữa hot trend: Oolong nướng, Matcha Latte boba, Khoai môn béo, Sữa tươi trân châu đường đen, Cà phê muối boba, Trà trái cây nhiệt đới kèm 5 topping: Trân châu đen dẻo, 3Q trắng giòn, Pudding trứng tươi, Thạch dừa non và Kem cheese Macchiato!",
+        icon: "🧋",
+        badge: "Menu mới 🔥",
+        badgeType: "hot"
       },
       {
-        title: "Cân Bằng Kinh Doanh & Thử Thách Mới",
-        desc: "Nâng cấp và thuê nhân viên giờ đây cần tích lũy vốn và mở khóa theo từng Ngày kinh doanh! Từ Ngày 2, quán bắt đầu tính chi phí mặt bằng & điện nước vận hành thực tế!",
-        icon: "📈",
-        badge: "Thử thách 🪙",
+        title: "2 Theme Độc Quyền: Boba Pastel & Midnight Boba",
+        desc: "Biến hóa diện mạo tiệm với sắc hồng kem sữa Boba Pastel ngọt ngào hoặc không gian bar trà sữa đêm tím neon Midnight Boba thời thượng cùng hiệu ứng Glassmorphism hiện đại!",
+        icon: "🎨",
+        badge: "Theme mới ✨",
+        badgeType: "visual"
+      },
+      {
+        title: "8 Khách Hàng Anime Chibi Mới (Tổng 24 Khách)",
+        desc: "Chào đón thêm 8 thực khách thú cưng sành điệu: Cú Tú Cú Đêm, Vịt Quỳnh Nghiện Boba, Nai Bambi, Sóc Nutty, Rái Cá Otto Chill, Cánh Cụt Pen, Mèo Mun Luna và Gấu Teddy Hảo Ngọt!",
+        icon: "🐾",
+        badge: "Khách mới 💖",
         badgeType: "star"
       },
       {
-        title: "Gọn Gàng Quầy Bếp & Nhân Viên",
-        desc: "Khắc phục triệt để lỗi tràn ngang khi thuê nhiều nhân viên! Các thẻ nhân viên Mèo Mochi, Gấu Kenji, Thỏ Usagi tự động co giãn và xuống dòng thẩm mỹ 100% không còn ô cuộn ngang thừa!",
-        icon: "🐾",
-        badge: "Gọn gàng ✨",
-        badgeType: "visual"
+        title: "Âm Thanh Shaker Trà Sữa & Tự Động Hóa Quán",
+        desc: "Hiệu ứng âm thanh lắc bình shaker rộn rã khi pha chế đồ uống, tích hợp tự động hóa trọn gói quầy nước và kho bãi không lo đứt hàng!",
+        icon: "🎵",
+        badge: "Âm thanh 🎶",
+        badgeType: "manage"
       },
       {
-        title: "Căn Chuẩn Spotlight Tân Thủ txacoachmark",
-        desc: "Sửa hoàn toàn lỗi spotlight hướng dẫn trôi nổi giữa không trung! Khung viền vàng nổi bật giờ đây bám sát chuẩn xác từng nút chức năng và quầy quản lý của quán!",
-        icon: "🧭",
-        badge: "Tối ưu 🌟",
-        badgeType: "visual"
+        title: "Shipper Sống Động & Ép Màng Niêm Phong Thùng",
+        desc: "Đội ngũ tài xế đối tác GrabFood, ShopeeFood, BeFood, Baemin với hồ sơ và câu thoại chân thực. Thêm tính năng ép màng nắp niêu & thùng xốp giữ nhiệt nhận thêm +15k tip!",
+        icon: "🛵",
+        badge: "Shipper 2.0 📦",
+        badgeType: "hot"
+      },
+      {
+        title: "Hệ Thống Đánh Giá 2.0 & Voucher Đền Trà Sữa",
+        desc: "Biểu đồ phân bổ sao 1-5★, thanh bộ lọc danh mục (5★, 1-3★, Chưa trả lời, Đơn online). Tặng voucher 20% & đền bù ly trà sữa để hóa giải review 1★ thành 5★ xuất sắc!",
+        icon: "⭐",
+        badge: "Review 2.0 🌟",
+        badgeType: "hot"
       }
     ]);
   }
@@ -54,6 +68,22 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion("1.4.0", 140, "14/10/2026", [
+        {
+          title: "Mã QR Rủ Bạn Bè & Tải Ảnh Sắc Nét",
+          desc: "Mở Cài Đặt để lấy mã QR kèm Logo Tiệm Mỳ Cay ở chính giữa! Bạn bè có thể dùng Camera hoặc Zalo quét mã để chơi ngay. Có sẵn nút tải ảnh PNG sắc nét và báo rõ trạng thái tải!",
+          icon: "📱",
+          badge: "Tính năng mới 🔥",
+          badgeType: "hot"
+        },
+        {
+          title: "Chọn Cấp Độ Cay & Size Ngay Trong Khung Chọn Mì",
+          desc: "Không cần phải chuyển tab hay cuộn xuống cuối! Giờ đây khi bấm vào Mì, thanh chọn Độ Cay (0 - 7) và Size Niêu (M / L) xuất hiện ngay phía trên để bạn thao tác thần tốc!",
+          icon: "🌶️",
+          badge: "Tiện lợi ⚡",
+          badgeType: "manage"
+        }
+      ]),
       new txaversion("1.3.0", 130, "14/10/2026", [
         {
           title: "Bộ Sưu Tập 5 Giao Diện Theme Tuyệt Sắc",

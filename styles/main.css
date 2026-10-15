@@ -177,6 +177,74 @@
   --shadow-card: 0 3px 10px rgba(40, 70, 45, 0.07);
 }
 
+/* 🧋 THEME 6: TIỆM TRÀ SỮA BOBA PASTEL (SWEET BOBA DESSERT) */
+[data-theme="boba-pastel"] {
+  --bg-app: #FFF5F8;
+  --bg-desktop: #FDE2EC;
+  --bg-tray: #FCD5E3;
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #FFF8FA;
+  --bg-header: rgba(255, 245, 248, 0.96);
+  --border-subtle: #F3BACD;
+  --border-card: #ECA3BD;
+  --border-btn: #E085A7;
+
+  --text-title: #3F1527;
+  --text-main: #502137;
+  --text-muted: #804A66;
+  --text-hint: #6E3953;
+
+  --accent-berry: #E91E63;
+  --accent-berry-hover: #C2185B;
+  --accent-money: #D81B60;
+  --accent-gold: #F59E0B;
+  --accent-caramel: #8D5B4C;
+  --accent-green: #10B981;
+  --accent-red: #F43F5E;
+  --accent-chalk: #2D1420;
+  --wood-frame: #7A3E54;
+  --wood-dark: #4A1E2F;
+  --chalk-teal: #1F2D27;
+  --chalk-teal-border: #3A5B4F;
+  --chalk-teal-text: #FDF2F8;
+  --shadow-soft: 0 8px 24px rgba(220, 80, 130, 0.12);
+  --shadow-card: 0 4px 12px rgba(220, 80, 130, 0.08);
+}
+
+/* 🥤 THEME 7: TRÀ SỮA ĐÊM MIDNIGHT BOBA (CYBER NEON TEA BAR) */
+[data-theme="midnight-boba"] {
+  --bg-app: #120A24;
+  --bg-desktop: #0A0517;
+  --bg-tray: #1A1033;
+  --bg-card: #1F153D;
+  --bg-card-subtle: #291D4E;
+  --bg-header: rgba(18, 10, 36, 0.96);
+  --border-subtle: #3E2973;
+  --border-card: #56399C;
+  --border-btn: #794DDB;
+
+  --text-title: #FFFFFF;
+  --text-main: #F3E8FF;
+  --text-muted: #BCA3E6;
+  --text-hint: #D4C2F5;
+
+  --accent-berry: #D946EF;
+  --accent-berry-hover: #C026D3;
+  --accent-money: #F472B6;
+  --accent-gold: #FBBF24;
+  --accent-caramel: #F59E0B;
+  --accent-green: #34D399;
+  --accent-red: #FB7185;
+  --accent-chalk: #0D071A;
+  --wood-frame: #4C2E85;
+  --wood-dark: #2A174E;
+  --chalk-teal: #0E2929;
+  --chalk-teal-border: #1F5252;
+  --chalk-teal-text: #E0E7FF;
+  --shadow-soft: 0 8px 26px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 4px 16px rgba(168, 85, 247, 0.22);
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6925,6 +6993,282 @@ html, body {
   border-radius: var(--radius-pill, 999px);
   white-space: nowrap;
 }
+
+/* ==========================================================
+   20. HIỆU ỨNG TIỆM TRÀ SỮA, SHAKER WORKSTATION & PARTICLES
+   ========================================================== */
+.boba-bubble-particle {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(216, 27, 96, 0.35));
+  animation: floatBoba 7s infinite ease-in-out;
+  z-index: 1;
+}
+
+@keyframes floatBoba {
+  0% { transform: translateY(0) scale(0.9); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.7; }
+  100% { transform: translateY(-380px) scale(1.15); opacity: 0; }
+}
+
+/* Hiệu ứng bình lắc shaker */
+@keyframes shakeBobaCup {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-8deg) scale(1.04); }
+  50% { transform: rotate(0deg) scale(0.98); }
+  75% { transform: rotate(8deg) scale(1.04); }
+}
+
+.shaker-animated {
+  animation: shakeBobaCup 0.45s infinite ease-in-out;
+}
+
+/* Glassmorphism cho card và modals */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 0 8px 32px 0 rgba(196, 69, 105, 0.12) !important;
+}
+
+[data-theme="tokyo-night"] .glass-panel,
+[data-theme="midnight-boba"] .glass-panel {
+  background: rgba(31, 21, 61, 0.78) !important;
+  border: 1px solid rgba(168, 85, 247, 0.3) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Worker Pill cho nhân viên mới */
+.kitchen-worker-pill.role-barista {
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  border-color: #FFB74D;
+  color: #E65100;
+}
+.kitchen-worker-pill.role-marketing {
+  background: linear-gradient(135deg, #EDE7F6, #D1C4E9);
+  border-color: #B39DDB;
+  color: #4A148C;
+}
+.kitchen-worker-pill.role-logistics {
+  background: linear-gradient(135deg, #E0F2F1, #B2DFDB);
+  border-color: #80CBC4;
+  color: #004D40;
+}
+
+/* ==========================================================
+   21. HỆ THỐNG SHIPPER SỐNG ĐỘNG & ĐÓNG GÓI CHUYÊN NGHIỆP
+   ========================================================== */
+.shipper-driver-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.shipper-driver-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-gold);
+  object-fit: cover;
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.shipper-driver-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.shipper-driver-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-title);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shipper-app-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  color: #FFF;
+  text-transform: uppercase;
+}
+.app-grab { background: #00B14F; }
+.app-shopee { background: #EE4D2D; }
+.app-befood { background: #FDB813; color: #1F1F1F !important; }
+.app-baemin { background: #2AC1C1; }
+
+.shipper-driver-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.shipper-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-pack-seal {
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  color: #FFF;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 8px 10px;
+  font-size: 11.5px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: 0 3px 8px rgba(245, 124, 0, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-pack-seal:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.btn-pack-seal.is-packed {
+  background: linear-gradient(135deg, #4CAF50, #388E3C);
+  box-shadow: 0 3px 8px rgba(56, 142, 60, 0.3);
+  cursor: default;
+}
+
+/* ==========================================================
+   22. BỘ LỌC ĐÁNH GIÁ, BIỂU ĐỒ SAO & FOODIE BADGES (REVIEW 2.0)
+   ========================================================== */
+.review-filters-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px 0 10px 0;
+  margin-bottom: 8px;
+  scrollbar-width: none;
+}
+.review-filters-bar::-webkit-scrollbar { display: none; }
+
+.review-filter-pill {
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-card);
+  color: var(--text-muted);
+  transition: all 0.18s ease;
+}
+
+.review-filter-pill:hover,
+.review-filter-pill.active {
+  background: var(--accent-berry);
+  color: #FFFFFF;
+  border-color: var(--accent-berry);
+  box-shadow: 0 2px 6px rgba(196, 56, 94, 0.25);
+}
+
+/* Biểu đồ phân bổ sao */
+.rating-dist-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 14px;
+  background: var(--bg-card-subtle);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 12px;
+}
+
+.rating-dist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.rating-dist-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rating-dist-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #E11D48);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* Huy hiệu khách hàng & tag món ăn kèm */
+.foodie-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: #FFF3E0;
+  color: #E65100;
+  border: 1px solid #FFE0B2;
+}
+
+.food-attached-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-caramel);
+  background: rgba(212, 136, 22, 0.08);
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+/* Nút Tặng Voucher đền bù giải hòa */
+.btn-voucher-apology {
+  background: linear-gradient(135deg, #8E24AA, #6A1B9A);
+  color: #FFF;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 6px rgba(106, 27, 154, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-voucher-apology:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+
 
 
 

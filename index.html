@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Tiệm Mỳ Cay - Quán Mỳ Cay 7 Cấp Độ & Quầy Trà Giải Cay</title>
-  <meta name="description" content="Trò chơi mô phỏng quản lý Tiệm Mỳ Cay 7 cấp độ phong cách Cozy Anime. Nấu niêu đất nóng hổi, phục vụ khách thú cưng dễ thương, mở rộng quán và quầy nước giải cay!" />
+  <title>Tiệm Mỳ Cay & Trà Sữa Boba - Quán Ăn Anime & Trà Sữa Toàn Năng</title>
+  <meta name="description" content="Trò chơi mô phỏng quản lý Tiệm Mỳ Cay & Trà Sữa Boba phong cách Cozy Anime. Nấu niêu đất nóng hổi, pha chế trà sữa boba thần tốc, phục vụ khách thú cưng dễ thương, tuyển dụng đội ngũ nhân viên toàn năng!" />
   <meta name="theme-color" content="#F6F0E6" />
 
   <!-- Google Fonts: Quicksand & Nunito chuẩn phong cách Cozy Anime -->
@@ -18,7 +18,7 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=1.4.2" />
+  <link rel="stylesheet" href="styles/main.css?v=1.5.0" />
 
   <script>
     // Áp dụng theme lưu trước để chống giật giao diện (Anti-FOUC)
@@ -513,8 +513,11 @@
 
               <!-- ĐƠN HÀNG ONLINE SHIPPER TRỰC TIẾP TRONG CA BÁN (CÓ HẸN GIỜ ĐỢI) -->
               <div class="open-mode-shipper-card" id="open-mode-shipper-card" style="display: none;">
+                <div class="shipper-driver-profile" id="open-shipper-profile">
+                  <!-- Render động qua JS: avatar, tên tài xế, app badge, xe cộ -->
+                </div>
                 <div class="shipper-header">
-                  <span class="shipper-tag">🛵 Shipper Chờ Lấy Mì</span>
+                  <span class="shipper-tag" id="open-shipper-tag">🛵 Đơn Giao Hỏa Tốc</span>
                   <span class="shipper-timer-badge" id="open-shipper-timer">⏱️ 20s</span>
                   <span class="shipper-price" id="open-shipper-price">+65k</span>
                 </div>
@@ -522,7 +525,14 @@
                   <div class="shipper-timer-fill" id="open-shipper-timer-fill" style="width: 100%;"></div>
                 </div>
                 <div class="shipper-desc" id="open-shipper-desc">1 Mì cay bò Mỹ (Cấp 2)</div>
-                <button class="btn-shipper-handover" id="btn-open-handover">📦 Giao Niêu Mì Cho Shipper (Phím Space)</button>
+                <div class="shipper-actions-grid">
+                  <button class="btn-pack-seal" id="btn-open-pack-seal" onclick="window.game.packAndSealOnlineOrder()">
+                    🔒 Ép Màng & Đóng Thùng (+15k)
+                  </button>
+                  <button class="btn-shipper-handover" id="btn-open-handover" onclick="window.game.handoverToShipper()">
+                    🛵 Giao Cho Shipper (Space)
+                  </button>
+                </div>
               </div>
 
               <!-- THANH ĐIỀU HÒA DAIKIN BẾP NẤU & KHU VỰC KHÁCH CHỜ -->
@@ -1131,6 +1141,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=1.4.0"></script>
+  <script type="module" src="js/app.js?v=1.5.0"></script>
 </body>
 </html>

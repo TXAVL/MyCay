@@ -4,11 +4,11 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.4.0";
-import { txaformat } from "./txaformat.js?v=1.4.0";
-import { NameValidator } from "./filter.js?v=1.4.0";
-import { SoundManager } from "./audio.js?v=1.4.0";
-import { GameUIModal } from "./modal.js?v=1.4.0";
+import { txaversion } from "./txaversion.js?v=1.5.0";
+import { txaformat } from "./txaformat.js?v=1.5.0";
+import { NameValidator } from "./filter.js?v=1.5.0";
+import { SoundManager } from "./audio.js?v=1.5.0";
+import { GameUIModal } from "./modal.js?v=1.5.0";
 
 export class SpicyNoodleGame {
   constructor() {
@@ -55,15 +55,26 @@ export class SpicyNoodleGame {
         muc: { id: "muc", name: "Mực Ống", shortName: "Mực ống", icon: "🦑", price: 25, basePrice: 25, unitCost: 8.0, unlockCost: 220, unlocked: false, inMenu: false, stock: 0 },
         trung: { id: "trung", name: "Trứng Lòng Đào", shortName: "Trứng", icon: "🥚", price: 12, basePrice: 12, unitCost: 3.5, unlockCost: 120, unlocked: false, inMenu: false, stock: 0 },
         nam: { id: "nam", name: "Nấm Kim Châm", shortName: "Nấm kim", icon: "🍄", price: 10, basePrice: 10, unitCost: 2.5, unlockCost: 90, unlocked: false, inMenu: false, stock: 0 },
-        phomai: { id: "phomai", name: "Phô Mai Kéo Sợi", shortName: "Phô mai", icon: "🧀", price: 20, basePrice: 20, unitCost: 6.0, unlockCost: 250, unlocked: false, inMenu: false, stock: 0 }
+        phomai: { id: "phomai", name: "Phô Mai Kéo Sợi", shortName: "Phô mai", icon: "🧀", price: 20, basePrice: 20, unitCost: 6.0, unlockCost: 250, unlocked: false, inMenu: false, stock: 0 },
+        top_boba_black: { id: "top_boba_black", name: "Trân Châu Đen Dẻo", shortName: "Boba đen", icon: "🧋", price: 12, basePrice: 12, unitCost: 3.0, unlockCost: 80, unlocked: true, inMenu: true, stock: 15 },
+        top_boba_white: { id: "top_boba_white", name: "Trân Châu Trắng 3Q", shortName: "3Q giòn", icon: "⚪", price: 15, basePrice: 15, unitCost: 4.0, unlockCost: 140, unlocked: false, inMenu: false, stock: 0 },
+        top_pudding: { id: "top_pudding", name: "Pudding Trứng Tươi", shortName: "Pudding", icon: "🍮", price: 15, basePrice: 15, unitCost: 4.5, unlockCost: 160, unlocked: false, inMenu: false, stock: 0 },
+        top_coconut: { id: "top_coconut", name: "Thạch Dừa Giòn Non", shortName: "Thạch dừa", icon: "🥥", price: 12, basePrice: 12, unitCost: 3.5, unlockCost: 110, unlocked: false, inMenu: false, stock: 0 },
+        top_cheese_foam: { id: "top_cheese_foam", name: "Kem Cheese Macchiato", shortName: "Kem cheese", icon: "🧀", price: 18, basePrice: 18, unitCost: 5.5, unlockCost: 230, unlocked: false, inMenu: false, stock: 0 }
       },
 
-      // Quầy đồ uống giải cay
+      // Quầy đồ uống trà sữa & giải khát
       drinks: {
         trasua: { id: "trasua", name: "Trà Sữa Trân Châu", icon: "🧋", price: 25, basePrice: 25, unitCost: 5.0, unlockCost: 0, unlocked: true, inMenu: true, stock: 15 },
         tradao: { id: "tradao", name: "Trà Đào Cam Sả", icon: "🍑", price: 22, basePrice: 22, unitCost: 4.5, unlockCost: 150, unlocked: false, inMenu: false, stock: 0 },
         suatuoi: { id: "suatuoi", name: "Sữa Tươi Lắc Phô Mai", icon: "🥛", price: 28, basePrice: 28, unitCost: 6.0, unlockCost: 220, unlocked: false, inMenu: false, stock: 0 },
-        nuocsam: { id: "nuocsam", name: "Nước Sâm Bí Đao", icon: "🌿", price: 15, basePrice: 15, unitCost: 3.0, unlockCost: 100, unlocked: false, inMenu: false, stock: 0 }
+        nuocsam: { id: "nuocsam", name: "Nước Sâm Bí Đao", icon: "🌿", price: 15, basePrice: 15, unitCost: 3.0, unlockCost: 100, unlocked: false, inMenu: false, stock: 0 },
+        trasua_oolong: { id: "trasua_oolong", name: "Trà Sữa Oolong Nướng", icon: "🧋", price: 32, basePrice: 32, unitCost: 8.0, unlockCost: 180, unlocked: false, inMenu: false, stock: 0 },
+        trasua_matcha: { id: "trasua_matcha", name: "Matcha Latte Boba", icon: "🍵", price: 36, basePrice: 36, unitCost: 10.0, unlockCost: 220, unlocked: false, inMenu: false, stock: 0 },
+        trasua_taro: { id: "trasua_taro", name: "Trà Sữa Khoai Môn Hoàng Kim", icon: "🍠", price: 35, basePrice: 35, unitCost: 9.0, unlockCost: 250, unlocked: false, inMenu: false, stock: 0 },
+        trasua_brownsugar: { id: "trasua_brownsugar", name: "Sữa Tươi Trân Châu Đường Đen", icon: "🥤", price: 40, basePrice: 40, unitCost: 12.0, unlockCost: 320, unlocked: false, inMenu: false, stock: 0 },
+        trasua_saltedcoffee: { id: "trasua_saltedcoffee", name: "Cà Phê Muối Boba Macchiato", icon: "☕", price: 38, basePrice: 38, unitCost: 11.0, unlockCost: 280, unlocked: false, inMenu: false, stock: 0 },
+        tra_traicay: { id: "tra_traicay", name: "Trà Hoa Quả Nhiệt Đới Boba", icon: "🍹", price: 34, basePrice: 34, unitCost: 9.0, unlockCost: 200, unlocked: false, inMenu: false, stock: 0 }
       },
 
       // Nguyên liệu phụ trong kho
@@ -71,7 +82,10 @@ export class SpicyNoodleGame {
         mi_soi: { id: "mi_soi", name: "Mì Sợi Hàn Quốc", icon: "🍜", unitCost: 4.5, stock: 20 },
         nuoc_ham: { id: "nuoc_ham", name: "Nước Hầm Xương", icon: "🍲", unitCost: 5.0, stock: 18 },
         sot_ot: { id: "sot_ot", name: "Sốt Ớt Hiểm 7 Cấp", icon: "🌶️", unitCost: 3.0, stock: 25 },
-        nieu_dat: { id: "nieu_dat", name: "Niêu Đất Nung", icon: "🏺", unitCost: 2.0, stock: 30 }
+        nieu_dat: { id: "nieu_dat", name: "Niêu Đất Nung", icon: "🏺", unitCost: 2.0, stock: 30 },
+        tra_den: { id: "tra_den", name: "Trà Đen & Oolong Thượng Hạng", icon: "🍃", unitCost: 3.5, stock: 25 },
+        sua_tuoi_nguyenkem: { id: "sua_tuoi_nguyenkem", name: "Sữa Tươi Thanh Trùng", icon: "🥛", unitCost: 4.0, stock: 25 },
+        duong_den_dailoan: { id: "duong_den_dailoan", name: "Đường Đen Đài Loan & Boba", icon: "🍯", unitCost: 3.0, stock: 30 }
       },
 
       // Món đặc biệt hôm nay
@@ -95,13 +109,16 @@ export class SpicyNoodleGame {
         acCooling: 1 // Điều hòa Daikin tăng kiên nhẫn
       },
 
-      // Nhân viên
+      // Nhân viên tiệm (8 nhân viên toàn năng)
       staff: {
-        mochi: false, // Mèo tiếp tân đón khách & tăng tip (+25%)
+        mochi: false, // Mèo tiếp tân đón khách & tăng tip (+35%)
         kenji: false, // Gấu Panda đầu bếp ninh mì tự động
         usagi: false, // Thỏ Usagi bưng bê tự động
-        shiba: false, // Cún Shiba tạp vụ dọn bàn tự động
-        shiro: false  // Cáo Shiro thu ngân tự động
+        shiba: false, // Cún Shiba tạp vụ dọn bàn & nhặt tip ngẫu nhiên
+        shiro: false, // Cáo Shiro thu ngân tự động giao Shipper
+        ducky: false, // Vịt Ducky Barista pha chế trà sữa tự động & buff 25% doanh thu nước
+        owl: false,   // Cú Mèo Owl Marketing bão khách +40%, đơn online 10s & x2 review 5 sao
+        fawn: false   // Nai Fawn Logistics sỉ chiết khấu -15% & tự động restock kho thông minh
       },
 
       // Đơn hàng Online
@@ -268,6 +285,78 @@ export class SpicyNoodleGame {
         preferredSpicy: [0, 1],
         tipMultiplier: 1.35,
         patience: 55
+      },
+      {
+        id: "owl_tu",
+        name: "Cú Mèo Tú Cú Đêm",
+        avatar: "assets/staff_owl.png",
+        bio: "Cú đêm mê uống trà sữa đậm vị Oolong lúc 2 giờ sáng, vừa chạy deadline vừa nhâm nhi.",
+        preferredSpicy: [0, 1, 2],
+        tipMultiplier: 1.65,
+        patience: 52
+      },
+      {
+        id: "duck_quynh",
+        name: "Vịt Quỳnh Sành Trà",
+        avatar: "assets/staff_ducky.png",
+        bio: "Tín đồ trà sữa chính hiệu, mỗi ngày đều thẩm 2 ly boba full topping kem cheese béo ngậy.",
+        preferredSpicy: [0, 1],
+        tipMultiplier: 1.5,
+        patience: 46
+      },
+      {
+        id: "fawn_bambi",
+        name: "Nai Con Bambi",
+        avatar: "assets/staff_fawn.png",
+        bio: "Bé nai nhút nhát nhưng say đắm trà hoa quả nhiệt đới tươi mát thanh nhiệt.",
+        preferredSpicy: [0, 1],
+        tipMultiplier: 1.45,
+        patience: 60
+      },
+      {
+        id: "squirrel_nutty",
+        name: "Sóc Hạt Dẻ Nutty",
+        avatar: "assets/cust_hamster.png",
+        bio: "Chú sóc nhanh nhẹn thích nhai trân châu 3Q giòn sần sật và topping béo bùi.",
+        preferredSpicy: [1, 2],
+        tipMultiplier: 1.35,
+        patience: 40
+      },
+      {
+        id: "otter_otto",
+        name: "Rái Cá Otto Chill Chill",
+        avatar: "assets/cust_shiba.png",
+        bio: "Chuyên gia chill bờ sông, cầm ly sữa tươi trân châu đường đen ngắm hoàng hôn cực nghệ.",
+        preferredSpicy: [1, 2, 3],
+        tipMultiplier: 1.6,
+        patience: 48
+      },
+      {
+        id: "penguin_pen",
+        name: "Cánh Cụt Pen Đam Mê Đá",
+        avatar: "assets/cust_panda.png",
+        bio: "Đến từ xứ lạnh Nam Cực, luôn gọi ly trà sữa đá mát lạnh tê đầu lưỡi sảng khoái.",
+        preferredSpicy: [0, 1],
+        tipMultiplier: 1.4,
+        patience: 52
+      },
+      {
+        id: "cat_luna",
+        name: "Mèo Mun Luna Huyền Bí",
+        avatar: "assets/cust_cat.png",
+        bio: "Quý cô mèo bí ẩn, sành điệu chỉ uống Matcha Latte boba đậm vị Nhật Bản.",
+        preferredSpicy: [2, 3],
+        tipMultiplier: 1.75,
+        patience: 44
+      },
+      {
+        id: "bear_teddy",
+        name: "Gấu Bông Teddy Hảo Ngọt",
+        avatar: "assets/cust_bear.png",
+        bio: "Chú gấu bự hảo ngọt số một, gọi ly trà sữa size L 150% đường nhân đôi trân châu đen.",
+        preferredSpicy: [0, 1, 2],
+        tipMultiplier: 2.2,
+        patience: 50
       }
     ];
 
@@ -294,6 +383,35 @@ export class SpicyNoodleGame {
     this.activeLiveShipperOrder = null;
     this.mobileOpenTab = "cockpit"; // "cockpit" (Bếp nấu 0-cuộn) | "dining" (Sảnh ăn 3 bàn)
     this.cookingDockTab = "quick"; // "quick" | "noodle" | "topping" | "spicy" | "drink"
+    this.reviewFilter = "all"; // "all" | "star5" | "bad" | "unreplied" | "online"
+
+    // Đội ngũ Shipper đối tác phong phú & sống động (GrabFood, ShopeeFood, BeFood, Baemin)
+    this.shipperTemplates = [
+      {
+        name: "Bác Tài Shiba",
+        avatar: "assets/cust_shiba.png",
+        vehicle: "Honda Wave • 59-X1 888.88",
+        quote: "Quán đóng gói niêu kỹ ghê, khách khen nước hầm nóng hổi suốt!"
+      },
+      {
+        name: "Shipper Mèo Miu",
+        avatar: "assets/cust_cat.png",
+        vehicle: "Yamaha Grande • 29-B1 666.99",
+        quote: "Đơn này khách dặn ép màng chống tràn cẩn thận nha chủ tiệm ơi!"
+      },
+      {
+        name: "Tài Xế Gấu Bự",
+        avatar: "assets/cust_bear.png",
+        vehicle: "SH Mode 150 • 43-C1 999.77",
+        quote: "Thùng giữ nhiệt của tui bao ấm nóng 100%, bảo đảm mì còn bốc khói!"
+      },
+      {
+        name: "Shipper Cáo Kaito",
+        avatar: "assets/cust_fox.png",
+        vehicle: "Vespa Sprint • 60-F2 777.66",
+        quote: "Giao hỏa tốc 15 phút, khách nhận niêu mì khen nức nở tiệm chu đáo!"
+      }
+    ];
   }
 
   init() {
@@ -442,6 +560,57 @@ export class SpicyNoodleGame {
       } catch (e) {
         console.error("Lỗi nạp game:", e);
       }
+    }
+
+    // Nếu chưa có đánh giá nào, khởi tạo 3 đánh giá mẫu cực kỳ sống động
+    if (!this.state.reviews || this.state.reviews.length === 0) {
+      this.state.reviews = [
+        {
+          id: "seed_1",
+          customerName: "Bé Mèo Linh",
+          customerAvatar: "assets/cust_cat.png",
+          stars: 5,
+          comment: "Mì cay nước hầm xương đậm đà thơm nức mũi, phô mai kéo sợi siêu béo! Không gian quán decor cưng xỉu, sẽ ghé ủng hộ dài dài! 💖",
+          date: "Hôm nay",
+          foodieBadge: "Foodie Triệu View",
+          foodAttached: "Mì Cay Bò Mỹ (Cấp 2) + Trà Sữa",
+          isOnline: false,
+          replied: false,
+          ownerReply: null,
+          customerFeedback: null
+        },
+        {
+          id: "seed_2",
+          customerName: "Cún Shiba Duy IT",
+          customerAvatar: "assets/cust_shiba.png",
+          stars: 4,
+          comment: "Đang chạy deadline đói bụng gọi mì giao tận nơi. Shipper giao nhanh 15 phút, niêu mì đóng thùng giữ nhiệt còn bốc khói. Điểm trừ xíu là ớt hơi gắt với mình, nhưng mì rất ngon!",
+          date: "Hôm nay",
+          foodieBadge: "Thánh Ăn Đêm",
+          foodAttached: "Mì Cay Hải Sản (Cấp 3)",
+          isOnline: true,
+          app: "GrabFood",
+          shipperName: "Bác Tài Shiba",
+          isPacked: true,
+          replied: false,
+          ownerReply: null,
+          customerFeedback: null
+        },
+        {
+          id: "seed_3",
+          customerName: "Gấu Nâu Đại Gia",
+          customerAvatar: "assets/cust_bear.png",
+          stars: 5,
+          comment: "Tô mì cấp 7 đỉnh chóp! Nước dùng bốc khói nghi ngút cay toát mồ hôi hột, topping bò mỹ ngập ngụa, đúng chuẩn mì cay niêu đất truyền thống! 🔥👑",
+          date: "Hôm nay",
+          foodieBadge: "Vua Ăn Cay Cấp 7",
+          foodAttached: "Mì Cay Cấp 7 Bốc Hỏa",
+          isOnline: false,
+          replied: false,
+          ownerReply: null,
+          customerFeedback: null
+        }
+      ];
     }
 
     // Đảm bảo luôn có basePrice thị trường chuẩn cho toàn bộ món ăn & đồ uống
@@ -759,7 +928,8 @@ export class SpicyNoodleGame {
     if (!item) return;
 
     if (amount > 0) {
-      const cost = item.unitCost * amount;
+      const discount = this.state.staff.fawn ? 0.85 : 1.0;
+      const cost = Math.round((item.unitCost * amount) * discount * 10) / 10;
       if (this.state.money < cost) {
         GameUIModal.showToast("Không đủ tiền trong ngân quỹ để mua thêm!", "warning", "🪙");
         return;
@@ -768,7 +938,8 @@ export class SpicyNoodleGame {
       item.stock += amount;
       this.state.todaySupplySpent = (this.state.todaySupplySpent || 0) + cost;
       this.sound.playCoinChime();
-      GameUIModal.showToast(`Đã mua +${amount} ${item.name} (-${txaformat.formatVND(cost)})`, "success", item.icon);
+      const fawnTag = this.state.staff.fawn ? " (🦌 Chiết khấu sỉ -15%)" : "";
+      GameUIModal.showToast(`Đã mua +${amount} ${item.name} (-${txaformat.formatVND(cost)}${fawnTag})`, "success", item.icon);
 
       if (itemId === "mi_soi" && !this.state.tutorialDismissed) {
         this.state.tutorialDismissed = true;
@@ -1141,11 +1312,14 @@ export class SpicyNoodleGame {
     if (!listEl) return;
 
     const staffConfig = [
-      { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Tự động chào đón khách & tăng 25% tiền tip", cost: 350, minDay: 2, icon: "🐱" },
+      { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Tự động chào đón khách & tăng 35% tiền tip", cost: 350, minDay: 2, icon: "🐱" },
       { key: "usagi", name: "Thỏ Usagi (Bưng bê niêu đất)", desc: "Tự động bưng mì nóng hổi ra bàn cho khách", cost: 480, minDay: 2, icon: "🐰" },
       { key: "shiba", name: "Cún Shiba (Tạp vụ dọn bàn)", desc: "Tự động lau dọn bàn sạch bóng & nhặt tiền tip", cost: 520, minDay: 3, icon: "🐶" },
       { key: "kenji", name: "Gấu Kenji (Đầu bếp ninh mì)", desc: "Tự động nấu niêu đất khi khách gọi món", cost: 680, minDay: 4, icon: "🐼" },
-      { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và phát phiếu giảm giá", cost: 750, minDay: 5, icon: "🦊" }
+      { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và giao đơn online cho Shipper", cost: 750, minDay: 5, icon: "🦊" },
+      { key: "ducky", name: "Vịt Ducky (Barista Pha Chế)", desc: "Tự động pha chế & phục vụ trà sữa, tăng +25% doanh thu nước", cost: 850, minDay: 6, icon: "🦆" },
+      { key: "owl", name: "Cú Mèo Owl (Trưởng Marketing)", desc: "Bão khách ghé tiệm +40%, nổ đơn Online 10s & x2 review 5 sao", cost: 980, minDay: 7, icon: "🦉" },
+      { key: "fawn", name: "Nai Fawn (Logistics & Quản Lý Kho)", desc: "Nhập sỉ chiết khấu -15%, tự động restock & thưởng +50% đơn giao", cost: 1200, minDay: 8, icon: "🦌" }
     ];
 
     listEl.innerHTML = staffConfig.map(st => {
@@ -1185,10 +1359,18 @@ export class SpicyNoodleGame {
     this.state.money -= cost;
     this.state.staff[key] = true;
     this.sound.playCoinChime();
-    GameUIModal.showToast(`Đã đón chào nhân viên mới về tiệm mì cay!`, "success", "🐾");
+
+    let welcomeMsg = `Đã đón chào nhân viên mới về tiệm!`;
+    if (key === "ducky") welcomeMsg = `🦆 Vịt Ducky đã đứng quầy Barista! Sẵn sàng lắc trà sữa & tăng 25% doanh thu nước!`;
+    else if (key === "owl") welcomeMsg = `🦉 Cú Mèo Owl đã lên sóng Marketing! Lượng khách & đơn online sắp bùng nổ!`;
+    else if (key === "fawn") welcomeMsg = `🦌 Nai Fawn đã tiếp quản kho hàng! Toàn bộ nguyên liệu được chiết khấu sỉ 15%!`;
+    else welcomeMsg = `Đã đón chào nhân viên mới về tiệm mì cay & trà sữa!`;
+
+    GameUIModal.showToast(welcomeMsg, "success", "🐾");
     this.saveGame();
     this.renderHeader();
     this.renderStaffTab();
+    this.renderStaffKitchenBar();
   }
 
   // 9. Tab 6: Online
@@ -1234,6 +1416,10 @@ export class SpicyNoodleGame {
     this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + order.price;
     this.state.stats.bowlsServed += order.bowlsCount || 1;
     this.state.onlineOrders.splice(index, 1);
+
+    if (Math.random() < 0.6) {
+      this.generateOnlineReview(order);
+    }
 
     this.sound.playCoinChime();
     GameUIModal.showToast(`Shipper đã lấy mỳ cay! Nhận +${order.price}k!`, "coin", "🛵");
@@ -1341,12 +1527,98 @@ export class SpicyNoodleGame {
           </div>
         `;
 
-        const listHtml = this.state.reviews.slice(0, 15).map((r, idx) => {
+        // Thống kê phân bổ sao chi tiết (Star Distribution 1-5 sao)
+        const count5 = this.state.reviews.filter(r => (r.stars || 5) === 5).length;
+        const count4 = this.state.reviews.filter(r => (r.stars || 5) === 4).length;
+        const count3 = this.state.reviews.filter(r => (r.stars || 5) === 3).length;
+        const count2 = this.state.reviews.filter(r => (r.stars || 5) === 2).length;
+        const count1 = this.state.reviews.filter(r => (r.stars || 5) === 1).length;
+
+        const pct5 = totalReviews ? Math.round((count5 / totalReviews) * 100) : 0;
+        const pct4 = totalReviews ? Math.round((count4 / totalReviews) * 100) : 0;
+        const pct3 = totalReviews ? Math.round((count3 / totalReviews) * 100) : 0;
+        const pct2 = totalReviews ? Math.round((count2 / totalReviews) * 100) : 0;
+        const pct1 = totalReviews ? Math.round((count1 / totalReviews) * 100) : 0;
+
+        const countBad = count3 + count2 + count1;
+        const countUnreplied = this.state.reviews.filter(r => !r.replied).length;
+        const countOnline = this.state.reviews.filter(r => r.isOnline).length;
+
+        const distributionHtml = `
+          <div class="rating-dist-panel">
+            <div class="rating-dist-row">
+              <span style="width: 32px;">5 ★</span>
+              <div class="rating-dist-track"><div class="rating-dist-fill" style="width: ${pct5}%;"></div></div>
+              <span style="width: 55px; text-align: right;">${pct5}% (${count5})</span>
+            </div>
+            <div class="rating-dist-row">
+              <span style="width: 32px;">4 ★</span>
+              <div class="rating-dist-track"><div class="rating-dist-fill" style="width: ${pct4}%;"></div></div>
+              <span style="width: 55px; text-align: right;">${pct4}% (${count4})</span>
+            </div>
+            <div class="rating-dist-row">
+              <span style="width: 32px;">3 ★</span>
+              <div class="rating-dist-track"><div class="rating-dist-fill" style="width: ${pct3}%;"></div></div>
+              <span style="width: 55px; text-align: right;">${pct3}% (${count3})</span>
+            </div>
+            <div class="rating-dist-row">
+              <span style="width: 32px;">2 ★</span>
+              <div class="rating-dist-track"><div class="rating-dist-fill" style="width: ${pct2}%;"></div></div>
+              <span style="width: 55px; text-align: right;">${pct2}% (${count2})</span>
+            </div>
+            <div class="rating-dist-row">
+              <span style="width: 32px;">1 ★</span>
+              <div class="rating-dist-track"><div class="rating-dist-fill" style="width: ${pct1}%;"></div></div>
+              <span style="width: 55px; text-align: right;">${pct1}% (${count1})</span>
+            </div>
+          </div>
+        `;
+
+        const curFilter = this.reviewFilter || "all";
+        const filtersHtml = `
+          <div class="review-filters-bar">
+            <button class="review-filter-pill ${curFilter === 'all' ? 'active' : ''}" onclick="window.game.setReviewFilter('all')">
+              Tất cả (${totalReviews})
+            </button>
+            <button class="review-filter-pill ${curFilter === 'star5' ? 'active' : ''}" onclick="window.game.setReviewFilter('star5')">
+              5★ Xuất sắc (${count5})
+            </button>
+            <button class="review-filter-pill ${curFilter === 'bad' ? 'active' : ''}" onclick="window.game.setReviewFilter('bad')">
+              1-3★ Cần cứu (${countBad})
+            </button>
+            <button class="review-filter-pill ${curFilter === 'unreplied' ? 'active' : ''}" onclick="window.game.setReviewFilter('unreplied')">
+              Chưa trả lời 💌 (${countUnreplied})
+            </button>
+            <button class="review-filter-pill ${curFilter === 'online' ? 'active' : ''}" onclick="window.game.setReviewFilter('online')">
+              Đơn Online 🛵 (${countOnline})
+            </button>
+          </div>
+        `;
+
+        // Lọc danh sách đánh giá theo filter đang chọn
+        let indexedReviews = this.state.reviews.map((r, originalIdx) => ({ r, originalIdx }));
+        if (curFilter === "star5") {
+          indexedReviews = indexedReviews.filter(item => (item.r.stars || 5) === 5);
+        } else if (curFilter === "bad") {
+          indexedReviews = indexedReviews.filter(item => (item.r.stars || 5) <= 3);
+        } else if (curFilter === "unreplied") {
+          indexedReviews = indexedReviews.filter(item => !item.r.replied);
+        } else if (curFilter === "online") {
+          indexedReviews = indexedReviews.filter(item => item.r.isOnline);
+        }
+
+        const listHtml = indexedReviews.length === 0 ? `
+          <div style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 13px;">
+            Không có đánh giá nào phù hợp với bộ lọc "${curFilter}".
+          </div>
+        ` : indexedReviews.slice(0, 20).map(({ r, originalIdx }) => {
           const starCount = Math.max(1, Math.min(5, r.stars || 5));
           const starStr = "★".repeat(starCount) + "☆".repeat(5 - starCount);
           const tagClass = `star-${starCount}`;
           const starTagText = starCount === 5 ? "5★ Xuất sắc" : (starCount === 4 ? "4★ Hài lòng" : (starCount === 3 ? "3★ Tạm ổn" : (starCount === 2 ? "2★ Thất vọng" : "1★ Rất tệ")));
           const custAvatar = r.customerAvatar || "assets/cust_cat.png";
+
+          const appClass = r.app === 'ShopeeFood' ? 'app-shopee' : (r.app === 'BeFood' ? 'app-befood' : (r.app === 'Baemin' ? 'app-baemin' : 'app-grab'));
 
           return `
             <div class="review-item-card">
@@ -1354,8 +1626,12 @@ export class SpicyNoodleGame {
                 <div class="review-customer-identity">
                   <img src="${custAvatar}" alt="${r.customerName}" class="review-cust-avatar" onerror="this.src='assets/cust_cat.png'" />
                   <div>
-                    <div class="review-customer-name">${r.customerName}</div>
-                    <div class="review-date-badge">${r.date || 'Hôm nay'}</div>
+                    <div class="review-customer-name">
+                      ${r.customerName}
+                      ${r.foodieBadge ? `<span class="foodie-badge">🏅 ${r.foodieBadge}</span>` : ''}
+                      ${r.isOnline ? `<span class="shipper-app-badge ${appClass}">🛵 ${r.app || 'Online'}</span>` : ''}
+                    </div>
+                    <div class="review-date-badge">${r.date || 'Hôm nay'}${r.shipperName ? ` • Tài xế: ${r.shipperName}` : ''}</div>
                   </div>
                 </div>
                 <div class="review-stars-wrap">
@@ -1363,6 +1639,9 @@ export class SpicyNoodleGame {
                   <span class="review-star-tag ${tagClass}">${starTagText}</span>
                 </div>
               </div>
+
+              ${r.foodAttached ? `<div class="food-attached-tag">🍜 ${r.foodAttached}</div>` : ''}
+              ${r.isPacked ? `<div class="food-attached-tag">📦 Đã ép màng nắp & niêm phong thùng giữ nhiệt</div>` : ''}
 
               <div class="review-comment">"${r.comment}"</div>
 
@@ -1386,15 +1665,20 @@ export class SpicyNoodleGame {
               ` : `
                 <div class="review-reply-form">
                   <div class="reply-input-row">
-                    <input type="text" id="reply-input-${idx}" class="review-reply-input" placeholder="Gõ lời phản hồi của chủ tiệm gửi đến ${r.customerName}..." />
-                    <button class="btn-send-reply" onclick="window.game.submitCustomReply(${idx})">Gửi 💌</button>
+                    <input type="text" id="reply-input-${originalIdx}" class="review-reply-input" placeholder="Gõ lời phản hồi của chủ tiệm gửi đến ${r.customerName}..." />
+                    <button class="btn-send-reply" onclick="window.game.submitCustomReply(${originalIdx})">Gửi 💌</button>
+                    ${starCount <= 3 ? `
+                      <button class="btn-voucher-apology" onclick="window.game.sendVoucherApology(${originalIdx})" title="Gửi tặng voucher 20% và ly trà sữa bù đắp để gỡ điểm đánh giá lên 5 sao!">
+                        🎁 Đền Trà Sữa & Voucher (-15k)
+                      </button>
+                    ` : ''}
                   </div>
                   <div class="reply-quick-chips">
                     <div style="font-size: 10px; font-weight: 800; color: #7F8C8D; width: 100%; margin-bottom: 3px;">
                       💡 Chọn mục phản hồi (Bấm vào nút để tự động random câu ngẫu nhiên 🎲):
                     </div>
                     ${this.getReviewReplyCategories(starCount, r.customerName).map(tpl => `
-                      <span class="reply-chip" onclick="window.game.fillQuickReplyCategory(${idx}, '${tpl.key}')" title="Bấm để random câu ngẫu nhiên thuộc mục: ${tpl.label}">
+                      <span class="reply-chip" onclick="window.game.fillQuickReplyCategory(${originalIdx}, '${tpl.key}')" title="Bấm để random câu ngẫu nhiên thuộc mục: ${tpl.label}">
                         ${tpl.label} 🎲
                       </span>
                     `).join("")}
@@ -1405,9 +1689,43 @@ export class SpicyNoodleGame {
           `;
         }).join("");
 
-        reviewsList.innerHTML = headerHtml + listHtml;
+        reviewsList.innerHTML = headerHtml + distributionHtml + filtersHtml + listHtml;
       }
     }
+  }
+
+  setReviewFilter(filterKey) {
+    this.reviewFilter = filterKey;
+    this.renderSummaryTab();
+  }
+
+  sendVoucherApology(idx) {
+    const rev = this.state.reviews[idx];
+    if (!rev) return;
+
+    if (this.state.money < 15) {
+      GameUIModal.showToast("Bạn không đủ 15k trong ví để tặng voucher và đền bù cho khách!", "warning", "💸");
+      return;
+    }
+
+    this.state.money -= 15;
+    rev.stars = 5;
+    rev.replied = true;
+    rev.rescuedWithVoucher = true;
+    rev.ownerReply = "Dạ Bếp Trưởng chân thành xin lỗi bạn nhiều! Tiệm xin phép gửi tặng bạn Voucher giảm giá 20% và đền bù 1 ly Trà Sữa Trân Châu full topping mát lạnh vào lần sau nhé! Mong bạn luôn vui vẻ và thứ lỗi cho quán ạ! 🧋💖";
+    rev.customerFeedback = "Khách cảm động: Ôi chủ tiệm chu đáo và xử lý khiếu nại quá chuyên nghiệp! Em xóa tan mọi ấm ức liền, đổi ngay lên 5 sao cho quán! Sẽ rủ hội bạn ghé ủng hộ tiệm hoài hoài luôn ạ! 🥰✨🍜";
+
+    this.state.reputation = Math.min(100, (this.state.reputation || 30) + 3);
+
+    if (this.sound) {
+      this.sound.playCoinChime();
+      this.sound.playReviewChime();
+    }
+
+    GameUIModal.showToast(`🎁 Đã tặng Voucher 20% & đền ly trà sữa (-15k)! Khách đổi đánh giá thành 5★ (+3 ⭐ Uy tín)!`, "success", "✨");
+    this.saveGame();
+    this.renderHeader();
+    this.renderSummaryTab();
   }
 
   // Danh mục phân loại các nút gợi ý phản hồi
@@ -1767,13 +2085,34 @@ export class SpicyNoodleGame {
         role: "Thu ngân",
         avatar: "assets/cust_fox.png",
         active: !!staff.shiro
+      },
+      {
+        name: "Ducky",
+        role: "Barista Trà Sữa",
+        avatar: "assets/staff_ducky.png",
+        active: !!staff.ducky,
+        className: "role-barista"
+      },
+      {
+        name: "Owl",
+        role: "Marketing Cú Đêm",
+        avatar: "assets/staff_owl.png",
+        active: !!staff.owl,
+        className: "role-marketing"
+      },
+      {
+        name: "Fawn",
+        role: "Logistics Kho",
+        avatar: "assets/staff_fawn.png",
+        active: !!staff.fawn,
+        className: "role-logistics"
       }
     ];
 
     const activeWorkers = workers.filter(w => w.active);
 
     staffBar.innerHTML = activeWorkers.map(w => `
-      <div class="kitchen-worker-pill" title="${w.name}: ${w.role}">
+      <div class="kitchen-worker-pill ${w.className || ''}" title="${w.name}: ${w.role}">
         <img src="${w.avatar}" alt="${w.name}" class="worker-avatar" onerror="this.src='assets/cust_cat.png'" />
         <span class="worker-name">${w.name}</span>
         <span class="worker-role">${w.role}</span>
@@ -2038,6 +2377,7 @@ export class SpicyNoodleGame {
     const presets = [
       { noodleId: "my_bo", name: "Mì Bò Mỹ", icon: "🥩", size: "M", spicy: 2, toppingId: "bo", sub: "M · Cay 2 · Bò" },
       { noodleId: "my_haisan", name: "Mì Hải Sản", icon: "🦐", size: "M", spicy: 3, toppingId: "tom", sub: "M · Cay 3 · Tôm" },
+      { noodleId: "my_bo", name: "Combo Mì Bò & Boba", icon: "🧋", size: "M", spicy: 2, toppingId: "top_boba_black", sub: "M · Cay 2 · Trân châu" },
       { noodleId: "my_thapcam", name: "Mì Thập Cẩm", icon: "🍲", size: "M", spicy: 3, toppingId: "xucxich", sub: "M · Cay 3 · Xúc xích" },
       { noodleId: "my_kimchi", name: "Mì Kim Chi", icon: "🥬", size: "M", spicy: 1, toppingId: "kimchi", sub: "M · Cay 1 · Kim chi" },
       { noodleId: "my_tomyum", name: "Mì Tomyum", icon: "🌶️", size: "M", spicy: 4, toppingId: "muc", sub: "M · Cay 4 · Mực" },
@@ -2259,11 +2599,19 @@ export class SpicyNoodleGame {
   toggleDrink(drinkId) {
     if (this.currentPot.drinkId === drinkId) {
       this.currentPot.drinkId = null;
+      this.sound.playButtonClick();
     } else {
       const drink = this.state.drinks[drinkId];
       if (drink && drink.stock > 0) {
         this.currentPot.drinkId = drinkId;
-        this.sound.playCoinChime();
+        if (this.sound.playShakerSound) {
+          this.sound.playShakerSound();
+        } else {
+          this.sound.playCoinChime();
+        }
+        GameUIModal.showToast(`🧋 Đã lắc xong 1 ly ${drink.name}!`, "info", drink.icon);
+      } else if (drink && drink.stock <= 0) {
+        GameUIModal.showToast(`Trong kho đã hết ${drink.name} rồi! Vào Kho để bổ sung nhé!`, "warning", "⚠️");
       }
     }
     this.renderCookingSteps();
@@ -2375,8 +2723,14 @@ export class SpicyNoodleGame {
       if (this.state.toppings[topId]) bowlPrice += this.state.toppings[topId].price;
     });
 
+    let duckyBonus = 0;
     if (pot.drinkId && this.state.drinks[pot.drinkId]) {
-      bowlPrice += this.state.drinks[pot.drinkId].price;
+      let drinkPrice = this.state.drinks[pot.drinkId].price;
+      if (this.state.staff.ducky) {
+        duckyBonus = Math.round(drinkPrice * 0.25);
+        drinkPrice += duckyBonus;
+      }
+      bowlPrice += drinkPrice;
       this.state.stats.drinksServed++;
       this.state.todayDrinksSold++;
     }
@@ -2455,12 +2809,13 @@ export class SpicyNoodleGame {
     }
 
     this.sound.playCoinChime();
+    const duckyText = duckyBonus > 0 ? " (🦆 Ducky Barista +25% nước)" : "";
     if (isSpecialCombo) {
-      GameUIModal.showToast(`🌟 KHÁCH MÊ MẨN ĐƠN ĐẶC BIỆT! Nhận +${totalEarned}k (Mì + Tip x2 & 🎁 BONUS COMBO +${specialBonus}k)!`, "success", "🔥");
+      GameUIModal.showToast(`🌟 KHÁCH MÊ MẨN ĐƠN ĐẶC BIỆT! Nhận +${totalEarned}k (Mì + Tip x2 & 🎁 BONUS COMBO +${specialBonus}k)${duckyText}!`, "success", "🔥");
     } else if (isAutoUsagi) {
-      GameUIModal.showToast(`🐰 Thỏ Usagi nhanh tay bưng mì cho ${slot.customer.name}! +${totalEarned}k (tip +${tip}k)`, "success", "✨");
+      GameUIModal.showToast(`🐰 Thỏ Usagi nhanh tay bưng mì cho ${slot.customer.name}! +${totalEarned}k (tip +${tip}k)${duckyText}`, "success", "✨");
     } else {
-      GameUIModal.showToast(`Bưng mỳ thành công! Khách gửi +${totalEarned}k (tip +${tip}k)!`, "success", "✨");
+      GameUIModal.showToast(`Bưng mỳ thành công! Khách gửi +${totalEarned}k (tip +${tip}k)${duckyText}!`, "success", "✨");
     }
 
     // Tạo đánh giá sao động (1 -> 5 sao) dựa trên thời gian phục vụ, chất lượng món ăn và mức giá bán
@@ -2509,6 +2864,19 @@ export class SpicyNoodleGame {
       comment = comments2[Math.floor(Math.random() * comments2.length)];
     }
 
+    // Tác động Marketing Cú Mèo Owl: Đẩy viral mạng xã hội và buff đánh giá 5 sao
+    if (this.state.staff.owl && Math.random() < 0.65) {
+      stars = Math.min(5, stars + 1);
+      if (stars === 5) {
+        const viralComments = [
+          `Xem TikTok thấy quán viral rần rần nên ghé thử, quả thực mì cay & trà sữa boba ngon đỉnh nóc kịch trần! 🦉💖 5 sao!`,
+          `Check-in tiệm theo review của Cú Mèo Owl, không gian cực chill, mì ngon trà sữa béo ngậy, bão like liền! ⭐⭐⭐⭐⭐`,
+          `Món ăn chất lượng, trà sữa chuẩn vị tiệm boba anime! Đúng là quán hot trend nhất khu phố! 🌟🧋`
+        ];
+        comment = viralComments[Math.floor(Math.random() * viralComments.length)];
+      }
+    }
+
     // Tác động trực tiếp từ Giá Bán (Price Ratio):
     if (orderPriceRatio > 1.35) {
       // Bị chê chặt chém, trừ 1 sao và bình luận bức xúc về giá
@@ -2539,6 +2907,9 @@ export class SpicyNoodleGame {
     else if (stars === 4) this.state.reputation = Math.min(100, this.state.reputation + 1);
     else if (stars <= 2) this.state.reputation = Math.max(5, this.state.reputation - 2);
 
+    const foodieBadges = ["Foodie Sành Ăn", "Mê Ăn Cay Cấp 7", "Khách Quen Ruột", "Tín Đồ Mì Cay", "Chuyên Gia Đánh Giá"];
+    const randomBadge = foodieBadges[Math.floor(Math.random() * foodieBadges.length)];
+
     this.state.reviews.unshift({
       id: Date.now() + Math.random().toString(36).substr(2, 4),
       customerName: slot.customer.name,
@@ -2546,6 +2917,9 @@ export class SpicyNoodleGame {
       stars: stars,
       comment: comment,
       date: `Ngày ${this.state.day}`,
+      foodieBadge: randomBadge,
+      foodAttached: `${noodle.name} (Cấp ${pot.spicyLevel})`,
+      isOnline: false,
       replied: false,
       ownerReply: null,
       customerFeedback: null
@@ -3368,8 +3742,9 @@ export class SpicyNoodleGame {
       priceTrafficMultiplier = 1.18; // Hơi đắt -> khách thưa hơn một chút
     }
 
-    // Nhịp độ khách vào quán hợp lý (5.0s - 9.5s), cân bằng hài hòa giữa sao & giá bán
-    const custIntervalMs = Math.max(5000, Math.round((9500 - (decorLv - 1) * 750) * starMultiplier * priceTrafficMultiplier));
+    // Nhịp độ khách vào quán hợp lý (3.5s - 9.5s), Owl tăng +40% tần suất khách ghé quán
+    const owlTraffic = this.state.staff.owl ? 0.65 : 1.0;
+    const custIntervalMs = Math.max(3500, Math.round((9500 - (decorLv - 1) * 750) * starMultiplier * priceTrafficMultiplier * owlTraffic));
 
     // Khách mới ghé các slot trống
     this.customerInterval = setInterval(() => {
@@ -3377,13 +3752,14 @@ export class SpicyNoodleGame {
       this.spawnCustomerToSlot();
     }, custIntervalMs / this.gameSpeed);
 
-    // 3. Đơn hàng Shipper online định kỳ (mỗi 18s)
+    // 3. Đơn hàng Shipper online định kỳ (Owl rút ngắn từ 18s xuống 10s bão đơn)
+    const onlineTimerMs = (this.state.staff.owl ? 10000 : 18000) / this.gameSpeed;
     this.onlineOrderInterval = setInterval(() => {
       if (this.isPaused) return;
       this.spawnOnlineOrder();
-    }, 18000 / this.gameSpeed);
+    }, onlineTimerMs);
 
-    // 4. Vòng lặp làm việc thực tế của nhân viên (Kenji nấu, Usagi bưng, Shiba dọn dẹp)
+    // 4. Vòng lặp làm việc thực tế của nhân viên (Kenji nấu, Usagi bưng, Shiba dọn, Ducky pha nước, Fawn nhập kho)
     // Nâng cấp Bếp Gas Cao Cấp (stoveSpeed) giúp Kenji và nhà bếp thao tác nhanh hơn
     const stoveLv = this.state.upgrades.stoveSpeed || 1;
     const autoIntervalMs = Math.max(1200, 2200 - (stoveLv - 1) * 350);
@@ -3455,13 +3831,167 @@ export class SpicyNoodleGame {
       GameUIModal.showToast(`🐶 Cún Shiba chăm chỉ lau dọn quán, nhặt được +${extraTip}k tiền tip!`, "success", "🪙");
       this.renderHeader();
     }
+
+    // 4. Vịt Ducky (Barista): Tự động lắc shaker trà sữa & trang bị ly đồ uống vào niêu/khay
+    if (staff.ducky && this.currentPot.noodleId && !this.currentPot.drinkId) {
+      const activeDrinks = Object.values(this.state.drinks).filter(d => d.unlocked && d.stock > 0);
+      if (activeDrinks.length > 0) {
+        const chosenDrink = activeDrinks[Math.floor(Math.random() * activeDrinks.length)];
+        this.currentPot.drinkId = chosenDrink.id;
+        chosenDrink.stock = Math.max(0, chosenDrink.stock - 1);
+        GameUIModal.showToast(`🦆 Vịt Ducky đã pha 1 ly ${chosenDrink.name} thơm lừng đặt kèm (+25% giá nước)!`, "info", "🧋");
+        this.renderPotWorkstation();
+        this.renderCookingSteps();
+      }
+    }
+
+    // 5. Nai Fawn (Logistics & Quản lý Kho): Tự động đặt sỉ khi nguyên liệu cạn đáy (còn <= 1 phần)
+    if (staff.fawn) {
+      const allWarehouseItems = [
+        ...Object.values(this.state.supplies),
+        ...Object.values(this.state.noodles).filter(n => n.unlocked),
+        ...Object.values(this.state.toppings).filter(t => t.unlocked),
+        ...Object.values(this.state.drinks).filter(d => d.unlocked)
+      ];
+      for (const item of allWarehouseItems) {
+        if ((item.stock || 0) <= 1) {
+          const wholesaleCost = Math.round((item.unitCost * 5) * 0.85 * 10) / 10;
+          if (this.state.money >= wholesaleCost) {
+            this.state.money -= wholesaleCost;
+            item.stock = (item.stock || 0) + 5;
+            this.state.todaySupplySpent = (this.state.todaySupplySpent || 0) + wholesaleCost;
+            this.sound.playCoinChime();
+            GameUIModal.showToast(`🦌 Nai Fawn đã tự động nhập sỉ +5 ${item.name} (-${txaformat.formatVND(wholesaleCost)}, giảm sỉ 15%)!`, "success", "📦");
+            this.renderHeader();
+            this.renderKhoTab();
+            break;
+          }
+        }
+      }
+    }
   }
 
-  // Đơn hàng Online phát sinh từ Grab / Shopee
+  // Ép màng nắp niêu mì & đóng thùng xốp giữ nhiệt cho đơn Online
+  packAndSealOnlineOrder() {
+    if (!this.activeLiveShipperOrder) {
+      GameUIModal.showToast("Hiện tại không có đơn shipper nào đang đợi đóng gói!", "info", "📦");
+      return;
+    }
+    const order = this.activeLiveShipperOrder;
+    if (order.isPacked) {
+      GameUIModal.showToast("Đơn hàng này đã được ép màng và niêm phong thùng giữ nhiệt rồi!", "info", "✅");
+      return;
+    }
+
+    order.isPacked = true;
+    order.price += 15; // Khách hàng tip thêm tiền đóng gói chuyên nghiệp
+
+    if (this.sound && typeof this.sound.playPackagingSound === "function") {
+      this.sound.playPackagingSound();
+    } else if (this.sound) {
+      this.sound.playCoinChime();
+    }
+
+    const packBtn = document.getElementById("btn-open-pack-seal");
+    if (packBtn) {
+      packBtn.classList.add("is-packed");
+      packBtn.innerHTML = `✨ Đã Ép Màng & Thùng Giữ Nhiệt (+15k)`;
+    }
+
+    const priceEl = document.getElementById("open-shipper-price");
+    if (priceEl) {
+      priceEl.textContent = `+${order.price}k`;
+    }
+
+    GameUIModal.showToast(`📦 Đã ép màng nắp niêu & cho vào thùng giữ nhiệt! Khách tip thêm +15k!`, "success", "✨");
+  }
+
+  // Tự động sinh đánh giá thực khách online sau khi Shipper giao hàng thành công
+  generateOnlineReview(order) {
+    if (!order) return;
+    const isPacked = !!order.isPacked;
+    const shipperName = order.shipper ? order.shipper.name : "Bác Tài Shipper";
+    const app = order.app || "GrabFood";
+
+    const highCommentsPacked = [
+      `Giao siêu nhanh bằng ${app}! Quán ép màng nắp niêu cực kỳ kỹ không đổ một giọt nước dùng, mở ra mì vẫn còn bốc khói nghi ngút! Đỉnh chóp 5 sao! 🍲✨`,
+      `Shipper ${shipperName} giao tận cửa còn nóng hôi hổi. Trà sữa boba dẻo thơm, đóng gói thùng giữ nhiệt cẩn thận 10/10! Sẽ ủng hộ tiệm dài dài! 🧋🛵`,
+      `Mì cay đặt online mà giòn dai ngon y chang ăn tại quán. Thích nhất cách quán niêm phong màng nắp niêu chống tràn. Rất chu đáo! 💖`,
+      `Nước mì đậm đà cay xé lưỡi, trân châu mềm dẻo. ${shipperName} giao nhanh 15 phút là tới, shipper rất lịch sự! Cho quán 5 sao! ⭐⭐⭐⭐⭐`
+    ];
+
+    const standardComments = [
+      `Đồ ăn giao nhanh, nước mì vừa vị, shipper nhiệt tình. Lần sau sẽ thử cấp độ cay cao hơn! 🍜`,
+      `Giao qua ${app} kịp giờ cơm trưa. Mì cay ngon vừa miệng, trà sữa thanh mát. 🧋`,
+      `Đóng gói tạm ổn, mì vẫn còn ấm. Nước dùng chua cay đậm đà đúng gu mình. 🌶️`
+    ];
+
+    const stars = isPacked ? 5 : (Math.random() < 0.8 ? 5 : 4);
+    const commentPool = isPacked ? highCommentsPacked : standardComments;
+    const comment = commentPool[Math.floor(Math.random() * commentPool.length)];
+
+    const customerNames = [
+      "Quỳnh Anh Foodie", "Hoàng Long Review", "Thảo Vy Mê Trà Sữa", "Minh Trí Coder",
+      "Bảo Ngọc Sống Ảo", "Tuấn Kiệt Ăn Cay", "Khánh Linh Sinh Viên", "Đức Huy Văn Phòng"
+    ];
+    const custName = customerNames[Math.floor(Math.random() * customerNames.length)];
+
+    const badges = ["Gourmet VIP", "Mê Ăn Cay Cấp 7", "Nghiện Trà Sữa", "Thánh Ăn Đêm", "Top Food Reviewer"];
+    const badge = badges[Math.floor(Math.random() * badges.length)];
+
+    const newReview = {
+      id: Date.now() + Math.random().toString(36).substr(2, 4),
+      customerName: custName,
+      customerAvatar: order.shipper ? order.shipper.avatar : "assets/cust_cat.png",
+      stars: stars,
+      comment: comment,
+      date: `Ngày ${this.state.day}`,
+      isOnline: true,
+      app: app,
+      shipperName: shipperName,
+      isPacked: isPacked,
+      foodieBadge: badge,
+      foodAttached: order.itemsText || "Mì Cay & Trà Sữa",
+      replied: false,
+      ownerReply: null,
+      customerFeedback: null
+    };
+
+    this.state.reviews.unshift(newReview);
+    if (this.state.reviews.length > 35) this.state.reviews.pop();
+  }
+
+  // Sinh ngẫu nhiên phương tiện và biển số xe Việt Nam chân thực cho Shipper mỗi chuyến giao
+  generateRandomShipperVehicle() {
+    const vehicles = [
+      "Honda Wave Alpha", "Honda Wave RSX", "Yamaha Sirius", "Honda Future 125",
+      "Honda Vision 110", "Honda Air Blade 125", "Honda Air Blade 160", "Yamaha Grande Hybrid",
+      "Honda Lead 125", "Honda Vario 160", "Honda SH Mode", "Yamaha NVX 155",
+      "VinFast Evo 200 (Xe điện)", "VinFast Feliz S (Xe điện)", "VinFast Klara S (Xe điện)"
+    ];
+
+    const provinces = ["29", "30", "50", "51", "59", "43", "60", "61", "65", "72", "14", "15", "79", "36", "37", "47", "68", "77", "81"];
+    const seriesLetters = ["B", "C", "D", "E", "F", "G", "K", "L", "M", "N", "P", "S", "T", "U", "V", "X", "Y"];
+    const seriesNums = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+
+    const chosenVehicle = vehicles[Math.floor(Math.random() * vehicles.length)];
+    const chosenProv = provinces[Math.floor(Math.random() * provinces.length)];
+    const chosenLetter = seriesLetters[Math.floor(Math.random() * seriesLetters.length)];
+    const chosenSeriNum = seriesNums[Math.floor(Math.random() * seriesNums.length)];
+
+    // Tạo 5 chữ số biển xe: 3 số đầu . 2 số sau (vd: 59-X1 682.55)
+    const part1 = String(Math.floor(Math.random() * 900) + 100);
+    const part2 = String(Math.floor(Math.random() * 90) + 10);
+    const plate = `${chosenProv}-${chosenLetter}${chosenSeriNum} ${part1}.${part2}`;
+
+    return `${chosenVehicle} • ${plate}`;
+  }
+
+  // Đơn hàng Online phát sinh từ Grab / Shopee / Be / Baemin
   spawnOnlineOrder() {
     if (this.state.onlineOrders.length >= 4) return;
 
-    const apps = ["GrabFood", "ShopeeFood"];
+    const apps = ["GrabFood", "ShopeeFood", "BeFood", "Baemin"];
     const app = apps[Math.floor(Math.random() * apps.length)];
     const id = Math.floor(Math.random() * 800) + 100;
 
@@ -3478,13 +4008,29 @@ export class SpicyNoodleGame {
     const spicyLevel = Math.floor(Math.random() * 4) + 1;
     const itemsText = `1 ${noodleName} (Cấp ${spicyLevel}) + 1 Trà sữa trân châu`;
 
+    const baseShipper = (this.shipperTemplates && this.shipperTemplates.length > 0)
+      ? this.shipperTemplates[Math.floor(Math.random() * this.shipperTemplates.length)]
+      : { name: "Bác Tài Shiba", avatar: "assets/cust_shiba.png", quote: "Giao hỏa tốc!" };
+
+    // Random phương tiện và biển số xe mỗi chuyến giao hàng
+    const randomVehicle = this.generateRandomShipperVehicle();
+
+    const shipper = {
+      name: baseShipper.name,
+      avatar: baseShipper.avatar,
+      vehicle: randomVehicle,
+      quote: baseShipper.quote
+    };
+
     const order = {
       id: id,
       app: app,
       price: price,
       bowlsCount: 1,
       itemsText: itemsText,
-      remainingSeconds: 20
+      remainingSeconds: 20,
+      isPacked: false,
+      shipper: shipper
     };
 
     this.state.onlineOrders.push(order);
@@ -3494,20 +4040,50 @@ export class SpicyNoodleGame {
     if (this.state.dayPhase === "open") {
       this.activeLiveShipperOrder = order;
       const shipperCard = document.getElementById("open-mode-shipper-card");
+      const profileEl = document.getElementById("open-shipper-profile");
+      const tagEl = document.getElementById("open-shipper-tag");
       const priceEl = document.getElementById("open-shipper-price");
       const descEl = document.getElementById("open-shipper-desc");
+      const packBtn = document.getElementById("btn-open-pack-seal");
 
-      if (shipperCard && priceEl && descEl) {
-        priceEl.textContent = `+${price}k`;
-        descEl.textContent = `[${app}] #${id}: ${itemsText}`;
-        const timerBadge = document.getElementById("open-shipper-timer");
-        const timerFill = document.getElementById("open-shipper-timer-fill");
-        if (timerBadge) {
-          timerBadge.textContent = "⏱️ 20s";
-          timerBadge.style.background = "#FFEDD5";
-          timerBadge.style.color = "#C2410C";
-        }
-        if (timerFill) timerFill.style.width = "100%";
+      const appClass = app === 'ShopeeFood' ? 'app-shopee' : (app === 'BeFood' ? 'app-befood' : (app === 'Baemin' ? 'app-baemin' : 'app-grab'));
+
+      if (profileEl) {
+        profileEl.innerHTML = `
+          <img src="${shipper.avatar}" class="shipper-driver-avatar" alt="${shipper.name}" onerror="this.src='assets/cust_shiba.png'" />
+          <div class="shipper-driver-meta">
+            <div class="shipper-driver-name">
+              ${shipper.name}
+              <span class="shipper-app-badge ${appClass}">${app}</span>
+            </div>
+            <div class="shipper-driver-sub">${shipper.vehicle} • "${shipper.quote}"</div>
+          </div>
+        `;
+      }
+
+      if (tagEl) {
+        tagEl.innerHTML = `🛵 Đơn ${app} #${id}`;
+      }
+
+      if (packBtn) {
+        packBtn.classList.remove("is-packed");
+        packBtn.disabled = false;
+        packBtn.innerHTML = `🔒 Ép Màng & Đóng Thùng (+15k)`;
+      }
+
+      if (priceEl) priceEl.textContent = `+${price}k`;
+      if (descEl) descEl.textContent = itemsText;
+
+      const timerBadge = document.getElementById("open-shipper-timer");
+      const timerFill = document.getElementById("open-shipper-timer-fill");
+      if (timerBadge) {
+        timerBadge.textContent = "⏱️ 20s";
+        timerBadge.style.background = "#FFEDD5";
+        timerBadge.style.color = "#C2410C";
+      }
+      if (timerFill) timerFill.style.width = "100%";
+
+      if (shipperCard) {
         shipperCard.style.display = "block";
         this.sound.playDoorBell();
       }
@@ -3523,7 +4099,7 @@ export class SpicyNoodleGame {
     }
   }
 
-  // Giao đơn niêu mì trực tiếp cho Shipper Grab / Shopee
+  // Giao đơn niêu mì trực tiếp cho Shipper Grab / Shopee / Be / Baemin
   handoverToShipper(isAutoShiro = false) {
     if (!this.activeLiveShipperOrder && this.state.onlineOrders.length === 0) {
       GameUIModal.showToast("Chưa có shipper nào đến lấy hàng!", "info", "🛵");
@@ -3533,11 +4109,27 @@ export class SpicyNoodleGame {
     const order = this.activeLiveShipperOrder || this.state.onlineOrders[0];
     if (!order) return;
 
+    let fawnDeliveryBonus = 0;
+    if (this.state.staff.fawn) {
+      fawnDeliveryBonus = Math.round(order.price * 0.5);
+      this.state.money += fawnDeliveryBonus;
+      this.state.todayEarnings += fawnDeliveryBonus;
+      this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + fawnDeliveryBonus;
+    }
+
     this.state.money += order.price;
     this.state.deliveredOnlineCount++;
     this.state.todayEarnings += order.price;
     this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + order.price;
     this.state.stats.bowlsServed += order.bowlsCount || 1;
+
+    const isPacked = !!order.isPacked;
+    const packBonusText = isPacked ? " (📦 Đã ép màng & giữ nhiệt!)" : "";
+
+    // Sinh review thực khách online
+    if (isPacked || Math.random() < 0.6) {
+      this.generateOnlineReview(order);
+    }
 
     // Loại khỏi danh sách online
     const idx = this.state.onlineOrders.indexOf(order);
@@ -3551,10 +4143,11 @@ export class SpicyNoodleGame {
     if (shipperCard) shipperCard.style.display = "none";
 
     this.sound.playCoinChime();
+    const fawnTxt = fawnDeliveryBonus > 0 ? ` + 🦌 Nai Fawn thưởng sỉ +${fawnDeliveryBonus}k!` : "";
     if (isAutoShiro) {
-      GameUIModal.showToast(`🦊 Cáo Shiro đã đóng gói giao đơn cho Shipper ${order.app}! (+${order.price}k)`, "success", "🛵");
+      GameUIModal.showToast(`🦊 Cáo Shiro đã đóng gói giao đơn cho Shipper ${order.app}! (+${order.price}k)${packBonusText}${fawnTxt}`, "success", "🛵");
     } else {
-      GameUIModal.showToast(`🛵 Đã giao niêu mì cho Shipper ${order.app}! Nhận +${order.price}k`, "success", "✨");
+      GameUIModal.showToast(`🛵 Đã giao niêu mì cho Shipper ${order.app}! Nhận +${order.price}k${packBonusText}${fawnTxt}`, "success", "✨");
     }
 
     this.saveGame();

@@ -49,6 +49,22 @@ export class txatheme {
       desc: "Sắc xanh matcha thanh khiết, thư thái cùng tre trúc thanh tao",
       themeColor: "#F4F7F2",
       previewColors: ["#F4F7F2", "#B5C8AB", "#2E7D32"]
+    },
+    {
+      id: "boba-pastel",
+      name: "Boba Pastel",
+      icon: "🧋",
+      desc: "Hồng dâu & kem sữa pastel ngọt ngào, đậm chất tiệm trà sữa boba",
+      themeColor: "#FFF0F5",
+      previewColors: ["#FFF0F5", "#F8B4D9", "#D81B60"]
+    },
+    {
+      id: "midnight-boba",
+      name: "Midnight Boba",
+      icon: "🥤",
+      desc: "Quán trà sữa đêm tím Cyber neon, boba phát sáng huyền ảo",
+      themeColor: "#140D26",
+      previewColors: ["#140D26", "#2D1B69", "#E040FB"]
     }
   ];
 
