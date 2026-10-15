@@ -7381,6 +7381,63 @@ html, body {
   font-weight: 800 !important;
 }
 
+/* ==========================================================
+   25. HỆ THỐNG TOOLTIP TÙY CHỈNH COZY (COZY CUSTOM TOOLTIP)
+   ========================================================== */
+.cozy-custom-tooltip {
+  position: fixed;
+  z-index: 99999999;
+  pointer-events: none;
+  background: rgba(43, 24, 16, 0.94);
+  color: #FFFDF8;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(246, 185, 59, 0.42);
+  border-radius: 8px;
+  padding: 6px 11px;
+  font-size: 11.5px;
+  font-family: "Nunito", "Quicksand", system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+  box-shadow: 0 6px 20px rgba(30, 15, 10, 0.45), 0 2px 6px rgba(0, 0, 0, 0.25);
+  max-width: 250px;
+  text-align: center;
+  word-wrap: break-word;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px) scale(0.96);
+  transition: opacity 0.15s cubic-bezier(0.2, 0.8, 0.3, 1), transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1), visibility 0.15s;
+}
+
+.cozy-custom-tooltip.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.cozy-custom-tooltip .cozy-tooltip-arrow {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: rgba(43, 24, 16, 0.94);
+  transform: rotate(45deg);
+}
+
+.cozy-custom-tooltip.placement-top .cozy-tooltip-arrow {
+  bottom: -4px;
+  left: calc(50% - 3.5px);
+  border-bottom: 1px solid rgba(246, 185, 59, 0.42);
+  border-right: 1px solid rgba(246, 185, 59, 0.42);
+}
+
+.cozy-custom-tooltip.placement-bottom .cozy-tooltip-arrow {
+  top: -4px;
+  left: calc(50% - 3.5px);
+  border-top: 1px solid rgba(246, 185, 59, 0.42);
+  border-left: 1px solid rgba(246, 185, 59, 0.42);
+}
+
 
 
 

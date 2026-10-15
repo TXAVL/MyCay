@@ -714,4 +714,115 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
   }
+
+  // ==========================================================
+  // 14. HỆ THỐNG TOOLTIP TÙY CHỈNH COZY (GLOBAL COZY TOOLTIP)
+  // Tự động chuyển đổi toàn bộ thẻ có title="..." thành tooltip Anime xịn sò
+  // ==========================================================
+  function initCozyCustomTooltip() {
+    let tooltipEl = document.getElementById("cozy-custom-tooltip");
+    if (!tooltipEl) {
+      tooltipEl = document.createElement("div");
+      tooltipEl.id = "cozy-custom-tooltip";
+      tooltipEl.className = "cozy-custom-tooltip";
+      tooltipEl.setAttribute("role", "tooltip");
+      tooltipEl.setAttribute("aria-hidden", "true");
+      tooltipEl.innerHTML = `<span class="cozy-tooltip-text"></span><div class="cozy-tooltip-arrow"></div>`;
+      document.body.appendChild(tooltipEl);
+    }
+
+    const textEl = tooltipEl.querySelector(".cozy-tooltip-text");
+    const arrowEl = tooltipEl.querySelector(".cozy-tooltip-arrow");
+    let activeTarget = null;
+    let hideTimer = null;
+
+    function showTooltip(target) {
+      if (!target) return;
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+
+      // Nếu phần tử có title, chuyển sang data-cozy-tooltip và xóa title để chặn tooltip mặc định của trình duyệt
+      if (target.hasAttribute("title")) {
+        const titleStr = target.getAttribute("title").trim();
+        if (titleStr) {
+          target.setAttribute("data-cozy-tooltip", titleStr);
+        }
+        target.removeAttribute("title");
+      }
+
+      const content = target.getAttribute("data-cozy-tooltip");
+      if (!content || !content.trim()) {
+        hideTooltip();
+        return;
+      }
+
+      activeTarget = target;
+      textEl.textContent = content.trim();
+
+      // Đặt tạm để đo kích thước
+      tooltipEl.style.left = "-9999px";
+      tooltipEl.style.top = "-9999px";
+      tooltipEl.classList.add("is-visible");
+
+      requestAnimationFrame(() => {
+        if (activeTarget !== target) return;
+        const rect = target.getBoundingClientRect();
+        const tipRect = tooltipEl.getBoundingClientRect();
+
+        // Tính vị trí X (ngang)
+        let left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+        left = Math.max(8, Math.min(window.innerWidth - tipRect.width - 8, left));
+
+        // Tính vị trí Y (dọc)
+        let top = rect.top - tipRect.height - 8;
+        let placement = "placement-top";
+
+        // Nếu sát mép trên màn hình quá thì đẩy xuống phía dưới phần tử
+        if (top < 6) {
+          top = rect.bottom + 8;
+          placement = "placement-bottom";
+        }
+
+        tooltipEl.className = `cozy-custom-tooltip is-visible ${placement}`;
+        tooltipEl.style.left = `${Math.round(left)}px`;
+        tooltipEl.style.top = `${Math.round(top)}px`;
+
+        // Định vị mũi tên trỏ chuẩn vào tâm phần tử
+        if (arrowEl) {
+          const arrowOffset = Math.max(6, Math.min(tipRect.width - 13, rect.left + (rect.width / 2) - left - 3.5));
+          arrowEl.style.left = `${Math.round(arrowOffset)}px`;
+        }
+      });
+    }
+
+    function hideTooltip() {
+      activeTarget = null;
+      if (tooltipEl) {
+        tooltipEl.classList.remove("is-visible");
+      }
+    }
+
+    // Lắng nghe sự kiện rê chuột qua Event Delegation trên document
+    document.addEventListener("mouseover", (e) => {
+      const target = e.target.closest("[title], [data-cozy-tooltip]");
+      if (target) {
+        showTooltip(target);
+      }
+    }, true);
+
+    document.addEventListener("mouseout", (e) => {
+      const target = e.target.closest("[title], [data-cozy-tooltip]");
+      if (target && target === activeTarget) {
+        hideTooltip();
+      }
+    }, true);
+
+    // Khi click hoặc cuộn chuột thì ẩn tooltip đi
+    document.addEventListener("click", () => hideTooltip(), true);
+    window.addEventListener("scroll", () => hideTooltip(), { passive: true });
+  }
+
+  initCozyCustomTooltip();
 });
