@@ -292,25 +292,37 @@ class RealtimeStats {
       }
     } catch (e) {}
 
-    // Truy vấn API IP geolocation nhẹ với timeout ngắn (1.5s) để không làm chậm trải nghiệm
+    // Truy vấn API IP geolocation nhẹ với timeout ngắn (1.8s) để lấy chính xác cả Quốc gia & Tỉnh/Thành phố
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1500);
-      const res = await fetch("https://api.country.is", { signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 1800);
+      const res = await fetch("https://ipwho.is/", { signal: controller.signal });
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
-        if (data && data.country) {
-          country = data.country.toUpperCase();
-          if (country === "VN") countryName = "Việt Nam";
-          else if (country === "US") countryName = "Hoa Kỳ";
-          else if (country === "JP") countryName = "Nhật Bản";
-          else if (country === "KR") countryName = "Hàn Quốc";
-          else countryName = country;
+        if (data && data.success !== false) {
+          if (data.country_code) country = data.country_code.toUpperCase();
+          if (data.country) {
+            countryName = country === "VN" ? "Việt Nam" : data.country;
+          }
+          if (data.city) city = data.city;
         }
       }
     } catch (e) {
-      // Giữ giá trị từ Timezone heuristic nếu offline hoặc timeout
+      // Fallback API nhẹ hơn nếu ipwho.is gặp sự cố
+      try {
+        const controller2 = new AbortController();
+        const timeoutId2 = setTimeout(() => controller2.abort(), 1200);
+        const res2 = await fetch("https://api.country.is", { signal: controller2.signal });
+        clearTimeout(timeoutId2);
+        if (res2.ok) {
+          const d2 = await res2.json();
+          if (d2 && d2.country) {
+            country = d2.country.toUpperCase();
+            countryName = country === "VN" ? "Việt Nam" : country;
+          }
+        }
+      } catch (errFallback) {}
     }
 
     // 6. Device ID: Tận dụng ID từ Security Shield nếu có
