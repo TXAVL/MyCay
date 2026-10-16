@@ -24,6 +24,16 @@ class SecurityShield {
     this.supabaseClient = null;
   }
 
+  // Nhận diện thiết bị di động (Mobile / Tablet) để tránh false-positive
+  isMobileOrTablet() {
+    if (typeof navigator === "undefined") return false;
+    const ua = navigator.userAgent || "";
+    const isMobileUa = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    const isMacTouch = navigator.platform === "MacIntel" && (navigator.maxTouchPoints || 0) > 1;
+    const isSmallTouchScreen = typeof window !== "undefined" && window.innerWidth <= 820 && (navigator.maxTouchPoints || 0) > 0;
+    return isMobileUa || isMacTouch || isSmallTouchScreen;
+  }
+
   // 1. Tạo dấu vân tay phần cứng duy nhất (Hardware Fingerprint)
   // Không phụ thuộc vào cookie/localStorage hay trình duyệt cụ thể
   // Đổi từ Chrome sang Firefox, Edge, Brave trên cùng một máy vẫn cho ra cùng 1 ID phần cứng!
@@ -467,38 +477,40 @@ class SecurityShield {
     let strikes = parseInt(localStorage.getItem("mycay_sec_strikes") || "0", 10);
     this.strikeCount = isNaN(strikes) ? 0 : strikes;
 
-    // A. Kiểm tra kích thước cửa sổ chênh lệch (Docked DevTools)
+    // A. Kiểm tra kích thước cửa sổ chênh lệch (Docked DevTools - CHỈ ÁP DỤNG TRÊN DESKTOP)
     const checkWindowSize = () => {
       if (this.isAdminDevMode) return; // BYPASS CHO ADMIN
+      if (this.isMobileOrTablet()) return; // BỎ QUA MOBILE/TABLET (Thanh địa chỉ URL tự nhiên gây chênh lệch kích thước)
 
       const widthDiff = window.outerWidth - window.innerWidth;
       const heightDiff = window.outerHeight - window.innerHeight;
-      if (widthDiff > 165 || heightDiff > 165) {
+      if (widthDiff > 180 || heightDiff > 180) {
         this.handleViolationAttempt("DevTools Docked Detection");
       }
     };
 
-    // B. Kiểm tra Debugger Timing Trap
+    // B. Kiểm tra Debugger Timing Trap (CHỈ ÁP DỤNG TRÊN DESKTOP)
     const runDebuggerTrap = () => {
       if (this.isAdminDevMode || this.isLocked || this.isPermanentBan) return; // BYPASS CHO ADMIN
+      if (this.isMobileOrTablet()) return; // Bỏ qua mobile (tránh giật lag CPU hoặc ngắt luồng tải trang)
 
       const start = performance.now();
       /* eslint-disable no-debugger */
       debugger;
       /* eslint-enable no-debugger */
       const duration = performance.now() - start;
-      if (duration > 120) {
+      if (duration > 150) {
         this.handleViolationAttempt("Debugger Halt Detected");
       }
     };
 
-    setInterval(checkWindowSize, 1200);
-    setInterval(runDebuggerTrap, 2000);
+    setInterval(checkWindowSize, 1500);
+    setInterval(runDebuggerTrap, 2500);
   }
 
   // 9. Xử lý khi phát hiện hành vi vi phạm (TÁI PHẠM LẦN 2 = BAN VĨNH VIỄN)
   handleViolationAttempt(reason) {
-    if (this.isAdminDevMode) return; // BYPASS CHO ADMIN
+    if (this.isAdminDevMode || this.isMobileOrTablet()) return; // BYPASS CHO ADMIN & MOBILE
 
     if (this.isPermanentBan) {
       this.renderPermanentBanModal();
@@ -794,7 +806,21 @@ class SecurityShield {
       return;
     }
 
-    // A. Kiểm tra ngay tầng lưu trữ cục bộ (Evercookie)
+    // MIỄN TRỪ HOÀN TOÀN CHO MOBILE & TABLET:
+    // Trình duyệt di động không có phím F12 hay Docked DevTools, tự động giải phóng bất kỳ cờ khóa nhầm nào
+    if (this.isMobileOrTablet()) {
+      try {
+        this.isLocked = false;
+        this.isPermanentBan = false;
+        localStorage.removeItem("mycay_sec_lock");
+        sessionStorage.removeItem("mycay_sec_lock");
+        localStorage.removeItem("mycay_sec_strikes");
+        await this.clearIndexedDB();
+      } catch (e) {}
+      return;
+    }
+
+    // A. Kiểm tra ngay tầng lưu trữ cục bộ (Evercookie) - Dành riêng cho Desktop
     const localSec = await this.getLocalLock();
     if (this.isPermanentBan) {
       this.isLocked = true;
