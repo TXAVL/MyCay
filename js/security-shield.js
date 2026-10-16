@@ -355,6 +355,7 @@ class SecurityShield {
   // 5. Kiểm tra trạng thái khóa từ Supabase (Đính theo mã phần cứng thiết bị)
   async checkCloudLock() {
     if (this.isAdminDevMode) return null;
+    if (typeof navigator !== "undefined" && !navigator.onLine) return null;
 
     const client = this.getSupabaseClient();
     if (!client) return null;

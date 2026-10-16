@@ -36,14 +36,18 @@ class RealtimeStats {
     if (this.isInitialized) return;
     this.isInitialized = true;
 
+    // Nếu đang ngoại tuyến, kích hoạt ngay chế độ offline không cần chờ mạng
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      this.updateOnlineUI(1);
+      return;
+    }
+
     // Đảm bảo thư viện Supabase đã sẵn sàng
     if (typeof window.supabase === "undefined") {
-      console.warn("[RealtimeStats] Đang chờ Supabase SDK nạp...");
-      await this.waitForSupabaseSdk();
+      await this.waitForSupabaseSdk(1200);
     }
 
     if (typeof window.supabase === "undefined" || typeof window.supabase.createClient !== "function") {
-      console.error("[RealtimeStats] Không thể nạp Supabase SDK. Sử dụng chế độ ngoại tuyến.");
       this.updateOnlineUI(1);
       return;
     }

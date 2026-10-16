@@ -10,13 +10,37 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.5.5 - Giờ Vàng FEVER RUSH & Khách VIP Thần Tài)
+  // Khai báo phiên bản hiện tại của game (Bản 1.5.6 - Hỗ Trợ Chơi Offline 100% & Fix Safari iOS)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.5.5",
-      155,
-      "15/10/2026",
+      "1.5.6",
+      156,
+      "16/10/2026",
       [
+        {
+          title: "Chơi Game Ngoại Tuyến 100% (Offline PWA)",
+          desc: "Tối ưu hóa Service Worker v1.5.6: Toàn bộ dữ liệu, âm thanh, hình ảnh và mã nguồn được tự động lưu vào bộ nhớ đệm sạch. Giờ đây bạn có thể tắt toàn bộ mạng Wifi/4G và mở game chơi bình thường mà không cần kết nối Internet!",
+          icon: "📶",
+          badge: "Offline 100% ⚡",
+          badgeType: "hot"
+        },
+        {
+          title: "Khắc phục triệt để lỗi Safari iOS",
+          desc: "Xử lý triệt để lỗi 'Response served by service worker has redirections' trên trình duyệt Safari iPhone/iPad. Chuẩn hóa luồng phản hồi trực tiếp không chuyển hướng.",
+          icon: "🍏",
+          badge: "Safari Fix 🛠️",
+          badgeType: "manage"
+        }
+      ],
+      "Chơi Game Ngoại Tuyến 100% & Fix Safari iOS"
+    );
+  }
+
+  // Lịch sử các phiên bản
+  static get VERSION_HISTORY() {
+    return [
+      txaversion.CURRENT_VERSION,
+      new txaversion("1.5.5", 155, "15/10/2026", [
         {
           title: "Chế Độ Giờ Vàng FEVER RUSH & Khách VIP Thần Tài",
           desc: "Khai mở tính năng FEVER RUSH cực đỉnh: Phục vụ chuỗi khách hoàn hảo để kích hoạt Giờ Vàng bùng nổ, gấp đôi (x2) doanh thu và đóng băng thời gian kiên nhẫn! Đón tiếp những vị khách VIP quý tộc (Mèo Thần Tài Maneki, Đại Gia Shiba, Cửu Vĩ VIP) mang lại tiền tip khổng lồ cho tiệm mì!",
@@ -31,15 +55,7 @@ export class txaversion {
           badge: "Sửa lỗi 🛠️",
           badgeType: "manage"
         }
-      ],
-      "Giờ Vàng FEVER RUSH & Khách VIP Thần Tài"
-    );
-  }
-
-  // Lịch sử các phiên bản
-  static get VERSION_HISTORY() {
-    return [
-      txaversion.CURRENT_VERSION,
+      ], "Giờ Vàng FEVER RUSH & Khách VIP Thần Tài"),
       new txaversion("1.5.0", 150, "15/10/2026", [
         {
           title: "3 Nhân Viên Mới Toàn Năng (Ducky, Owl, Fawn)",
