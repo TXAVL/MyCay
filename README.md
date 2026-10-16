@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
 [![Phiên Bản](https://img.shields.io/github/package-json/v/TXAVL/MyCay?color=F59E0B&label=Phi%C3%AAn%20B%E1%BA%A3n&logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-15%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-16%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 

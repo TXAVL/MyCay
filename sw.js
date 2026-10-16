@@ -9,13 +9,10 @@ const PRECACHE_ASSETS = [
   "./index.html",
   "./manifest.json",
   "./styles/main.css",
-  "./styles/main.css?v=1.5.5",
   "./styles/main.css?v=1.5.6",
   "./js/app.js",
-  "./js/app.js?v=1.5.5",
   "./js/app.js?v=1.5.6",
   "./js/game.js",
-  "./js/game.js?v=1.5.5",
   "./js/game.js?v=1.5.6",
   "./js/audio.js",
   "./js/modal.js",
@@ -27,11 +24,11 @@ const PRECACHE_ASSETS = [
   "./js/txaversion.js",
   "./js/txaversion.js?v=1.5.6",
   "./js/filter.js",
-  "./js/filter.js?v=1.5.5",
+  "./js/filter.js?v=1.5.6",
   "./js/realtime-stats.js",
-  "./js/realtime-stats.js?v=1.5.5",
+  "./js/realtime-stats.js?v=1.5.6",
   "./js/security-shield.js",
-  "./js/security-shield.js?v=1.5.5",
+  "./js/security-shield.js?v=1.5.6",
   "./assets/favicon.png",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
@@ -198,7 +195,7 @@ self.addEventListener("fetch", (event) => {
   // 2. CÁC TÀI NGUYÊN TĨNH KHÁC (CSS, JS, ẢNH, FONTS):
   event.respondWith(
     (async () => {
-      // Tìm trong cache trước (kèm ignoreSearch: true để bắt trúng query ?v=1.5.5)
+      // Tìm trong cache trước (kèm ignoreSearch: true để bắt trúng query ?v=1.5.6)
       const cached = await caches.match(req, { ignoreSearch: true });
       if (cached) {
         // Cập nhật ngầm nếu có mạng

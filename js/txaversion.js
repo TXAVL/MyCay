@@ -10,7 +10,7 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.5.6 - Hỗ Trợ Chơi Offline 100% & Fix Safari iOS)
+  // Khai báo phiên bản hiện tại của game (Bản 1.5.6 - Phòng Hộ An Ninh, Fix Safari & Chơi Offline 100%)
   static get CURRENT_VERSION() {
     return new txaversion(
       "1.5.6",
@@ -18,21 +18,49 @@ export class txaversion {
       "16/10/2026",
       [
         {
-          title: "Chơi Game Ngoại Tuyến 100% (Offline PWA)",
-          desc: "Tối ưu hóa Service Worker v1.5.6: Toàn bộ dữ liệu, âm thanh, hình ảnh và mã nguồn được tự động lưu vào bộ nhớ đệm sạch. Giờ đây bạn có thể tắt toàn bộ mạng Wifi/4G và mở game chơi bình thường mà không cần kết nối Internet!",
+          title: "Hỗ Trợ Chơi Ngoại Tuyến 100% (Offline PWA)",
+          desc: "Nâng cấp Service Worker v1.5.6: Toàn bộ mã nguồn, dữ liệu, âm thanh và hình ảnh được lưu trữ sạch trong bộ nhớ đệm. Chơi mượt mà không cần mạng Internet sau lần tải đầu tiên!",
           icon: "📶",
           badge: "Offline 100% ⚡",
           badgeType: "hot"
         },
         {
-          title: "Khắc phục triệt để lỗi Safari iOS",
-          desc: "Xử lý triệt để lỗi 'Response served by service worker has redirections' trên trình duyệt Safari iPhone/iPad. Chuẩn hóa luồng phản hồi trực tiếp không chuyển hướng.",
+          title: "Khắc Phục Triệt Để Lỗi Safari iOS",
+          desc: "Khử hoàn toàn lỗi 'Response served by service worker has redirections' trên Safari iPhone/iPad. Chuẩn hóa luồng phản hồi trực tiếp không chuyển hướng.",
           icon: "🍏",
           badge: "Safari Fix 🛠️",
           badgeType: "manage"
+        },
+        {
+          title: "Hệ Thống Phòng Hộ An Ninh (Security Shield)",
+          desc: "Chặn phím F12, DevTools, chống gian lận. Cảnh báo tự động reload và khóa 15 phút, tái phạm lần 2 sẽ Ban vĩnh viễn theo mã phần cứng máy tính!",
+          icon: "🛡️",
+          badge: "Bảo Mật Mới 🔒",
+          badgeType: "hot"
+        },
+        {
+          title: "Đồng Hồ Đếm Ngược 2 Chữ Số (MM:SS) Chuẩn Anime",
+          desc: "Đồng hồ khóa an ninh hiển thị số điện tử phát sáng chuẩn 2 chữ số (15:00 đếm ngược tới 00:00), định dạng Monospace chống rung lắc số.",
+          icon: "⏱️",
+          badge: "Đồng Hồ 2 Số 🕒",
+          badgeType: "star"
+        },
+        {
+          title: "Thống Kê Người Chơi Online & Lượt Xem Thực Tế",
+          desc: "Tích hợp Supabase Realtime Presence: Cập nhật trực tiếp số người đang mở quán mì tại thời điểm hiện tại và tổng lượt xem thực tế chống spam.",
+          icon: "👥",
+          badge: "Realtime 🟢",
+          badgeType: "star"
+        },
+        {
+          title: "Cảnh Báo Đổi Tên Quán Rung Anime & Màn Loading Mới",
+          desc: "Hộp cảnh báo đỏ rung lắc sinh động khi tên không hợp lệ, tự biến mất sau 3.5s hoặc chuyển sang xanh hợp lệ. Dòng trạng thái màn hình loading đổi theo từng tiến trình.",
+          icon: "🍜",
+          badge: "Giao Diện ✨",
+          badgeType: "manage"
         }
       ],
-      "Chơi Game Ngoại Tuyến 100% & Fix Safari iOS"
+      "Phòng Hộ An Ninh, Fix Safari & Chơi Offline 100%"
     );
   }
 
@@ -175,7 +203,7 @@ export class txaversion {
         <div class="version-banner-icon">${current.features[0]?.icon || '👑'}</div>
         <div class="version-banner-info">
           <div class="version-pill-tag">BẢN NÂNG CẤP MỚI v${current.version}</div>
-          <h3 class="version-heading">${current.themeName || current.features[0]?.title || 'Giờ Vàng FEVER RUSH & Khách VIP Thần Tài'}</h3>
+          <h3 class="version-heading">${current.themeName || current.features[0]?.title || 'Bản Cập Nhật Mới'}</h3>
           <span class="version-date">📅 Phát hành: ${current.releaseDate} · Bản chính thức</span>
         </div>
       </div>
