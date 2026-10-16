@@ -137,7 +137,9 @@ class RealtimeStats {
   }
 
   // ==========================================================
+  // ==========================================================
   // 2. TỔNG SỐ LƯỢT TRUY CẬP THỰC TẾ & CƠ CHẾ CHỐNG SPAM (ANTI-SPAM)
+  // Ghi nhận chi tiết Thiết Bị, Trình Duyệt, Quốc Gia phục vụ Biểu Đồ Admin
   // ==========================================================
   async setupTotalViewsTracking() {
     if (!this.client) return;
@@ -147,16 +149,37 @@ class RealtimeStats {
 
     if (shouldCount) {
       try {
-        // Tăng bộ đếm an toàn qua Stored Procedure PostgreSQL trên server
-        const { data, error } = await this.client.rpc("increment_mycay_views");
+        // Thu thập thông số telemetry không xâm nhập riêng tư
+        const telemetry = await this.gatherClientTelemetry();
+
+        // Ghi nhận vào bảng mycay_visit_logs & tăng bộ đếm an toàn qua Stored Procedure
+        const { data, error } = await this.client.rpc("record_mycay_visit", {
+          p_device_id: telemetry.deviceId,
+          p_country: telemetry.country,
+          p_country_name: telemetry.countryName,
+          p_city: telemetry.city,
+          p_browser: telemetry.browser,
+          p_device_type: telemetry.deviceType,
+          p_os: telemetry.os,
+          p_screen_resolution: telemetry.screenRes,
+          p_language: telemetry.language
+        });
+
         if (!error && typeof data === "number") {
           this.markVisitCounted();
           this.updateViewsUI(data);
         } else {
-          await this.fetchCurrentTotalViews();
+          // Fallback: nếu lỗi rpc record_mycay_visit thì thử increment_mycay_views cũ
+          const { data: fallbackData } = await this.client.rpc("increment_mycay_views");
+          if (typeof fallbackData === "number") {
+            this.markVisitCounted();
+            this.updateViewsUI(fallbackData);
+          } else {
+            await this.fetchCurrentTotalViews();
+          }
         }
       } catch (e) {
-        console.error("[RealtimeStats] Lỗi tăng lượt xem:", e);
+        console.error("[RealtimeStats] Lỗi ghi nhận lượt xem:", e);
         await this.fetchCurrentTotalViews();
       }
     } else {
@@ -182,6 +205,131 @@ class RealtimeStats {
     } catch (e) {
       console.warn("[RealtimeStats] Lỗi đăng ký kênh postgres changes:", e);
     }
+  }
+
+  // Thu thập thông số thiết bị, trình duyệt, hệ điều hành & vị trí phục vụ biểu đồ Admin
+  async gatherClientTelemetry() {
+    const ua = typeof navigator !== "undefined" ? (navigator.userAgent || "") : "";
+
+    // 1. Phân loại thiết bị (Device Type: Mobile / Tablet / Desktop)
+    let deviceType = "Desktop";
+    const isMobileUa = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    const isTabletUa = /iPad|Android(?!.*Mobile)|Tablet/i.test(ua) || 
+      (typeof navigator !== "undefined" && navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isTabletUa) {
+      deviceType = "Tablet";
+    } else if (isMobileUa || (typeof window !== "undefined" && window.innerWidth <= 640 && (navigator.maxTouchPoints || 0) > 0)) {
+      deviceType = "Mobile";
+    }
+
+    // 2. Nhận diện Trình duyệt (Browser)
+    let browser = "Khác";
+    if (/CocCoc/i.test(ua)) {
+      browser = "Cốc Cốc";
+    } else if (/Edg|Edge/i.test(ua)) {
+      browser = "Microsoft Edge";
+    } else if (/OPR|Opera/i.test(ua)) {
+      browser = "Opera";
+    } else if (/SamsungBrowser/i.test(ua)) {
+      browser = "Samsung Internet";
+    } else if (/Chrome|CriOS/i.test(ua)) {
+      browser = "Google Chrome";
+    } else if (/Firefox|FxiOS/i.test(ua)) {
+      browser = "Mozilla Firefox";
+    } else if (/Safari/i.test(ua) && !/Chrome|CriOS/i.test(ua)) {
+      browser = "Apple Safari";
+    } else if (/Zalo/i.test(ua)) {
+      browser = "Zalo In-App";
+    } else if (/FBAN|FBAV/i.test(ua)) {
+      browser = "Facebook In-App";
+    }
+
+    // 3. Hệ điều hành (OS)
+    let os = "Khác";
+    if (/iPhone|iPad|iPod/i.test(ua) || (typeof navigator !== "undefined" && navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+      os = "iOS";
+    } else if (/Android/i.test(ua)) {
+      os = "Android";
+    } else if (/Windows/i.test(ua)) {
+      os = "Windows";
+    } else if (/Macintosh|Mac OS X/i.test(ua)) {
+      os = "macOS";
+    } else if (/CrOS/i.test(ua)) {
+      os = "ChromeOS";
+    } else if (/Linux/i.test(ua)) {
+      os = "Linux";
+    }
+
+    // 4. Độ phân giải màn hình & Ngôn ngữ
+    const screenRes = typeof window !== "undefined" 
+      ? `${window.screen?.width || window.innerWidth}x${window.screen?.height || window.innerHeight}` 
+      : "unknown";
+    const language = typeof navigator !== "undefined" ? (navigator.language || "vi") : "vi";
+
+    // 5. Quốc gia (Country detection: Timezone heuristic + Lightweight API)
+    let country = "VN";
+    let countryName = "Việt Nam";
+    let city = null;
+
+    try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      if (timeZone.includes("Asia/Ho_Chi_Minh") || timeZone.includes("Saigon") || language.startsWith("vi")) {
+        country = "VN";
+        countryName = "Việt Nam";
+      } else if (timeZone.includes("Tokyo")) {
+        country = "JP";
+        countryName = "Nhật Bản";
+      } else if (timeZone.includes("Seoul")) {
+        country = "KR";
+        countryName = "Hàn Quốc";
+      } else if (timeZone.startsWith("America/")) {
+        country = "US";
+        countryName = "Hoa Kỳ";
+      } else if (timeZone.startsWith("Europe/")) {
+        country = "EU";
+        countryName = "Châu Âu";
+      }
+    } catch (e) {}
+
+    // Truy vấn API IP geolocation nhẹ với timeout ngắn (1.5s) để không làm chậm trải nghiệm
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      const res = await fetch("https://api.country.is", { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.country) {
+          country = data.country.toUpperCase();
+          if (country === "VN") countryName = "Việt Nam";
+          else if (country === "US") countryName = "Hoa Kỳ";
+          else if (country === "JP") countryName = "Nhật Bản";
+          else if (country === "KR") countryName = "Hàn Quốc";
+          else countryName = country;
+        }
+      }
+    } catch (e) {
+      // Giữ giá trị từ Timezone heuristic nếu offline hoặc timeout
+    }
+
+    // 6. Device ID: Tận dụng ID từ Security Shield nếu có
+    let deviceId = this.deviceId;
+    if (typeof window !== "undefined" && window.securityShield && window.securityShield.deviceId) {
+      deviceId = window.securityShield.deviceId;
+    }
+
+    return {
+      deviceId,
+      country,
+      countryName,
+      city,
+      browser,
+      deviceType,
+      os,
+      screenRes,
+      language
+    };
   }
 
   // Kiểm tra chống spam: 1 phiên (session) chỉ tính 1 lần, và cách nhau tối thiểu 30 phút giữa các lần mở
@@ -233,6 +381,20 @@ class RealtimeStats {
     }
   }
 
+  // Lấy dữ liệu tổng hợp cho biểu đồ Trang Admin (Device, Browser, Country, Daily Trend)
+  async getAdminStats() {
+    if (!this.client) return null;
+    try {
+      const { data, error } = await this.client.rpc("get_mycay_admin_stats");
+      if (!error && data) {
+        return data;
+      }
+    } catch (e) {
+      console.error("[RealtimeStats] Lỗi lấy admin stats:", e);
+    }
+    return null;
+  }
+
   // ==========================================================
   // CẬP NHẬT GIAO DIỆN (UI BINDINGS)
   // ==========================================================
@@ -276,6 +438,11 @@ class RealtimeStats {
 
 // Khởi tạo Singleton Instance
 export const realtimeStats = new RealtimeStats();
+
+// Gắn vào window để hỗ trợ trang Admin và dev console
+if (typeof window !== "undefined") {
+  window.mycayStats = realtimeStats;
+}
 
 // Tự động kích hoạt khi DOM tải xong
 if (typeof document !== "undefined") {
