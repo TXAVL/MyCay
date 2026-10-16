@@ -406,6 +406,9 @@ class RealtimeStats {
     [desktopEl, mobileEl].forEach((el) => {
       if (!el) return;
       el.textContent = this.formatNumber(count);
+      if (typeof count === "number") {
+        el.setAttribute("title", `${count.toLocaleString("vi-VN")} người đang chơi`);
+      }
       this.triggerPulseFx(el);
     });
   }
@@ -418,12 +421,37 @@ class RealtimeStats {
     [desktopEl, mobileEl].forEach((el) => {
       if (!el) return;
       el.textContent = this.formatNumber(views);
+      if (typeof views === "number") {
+        el.setAttribute("title", `${views.toLocaleString("vi-VN")} lượt truy cập`);
+      }
       this.triggerPulseFx(el);
     });
   }
 
+  // Tự động định dạng số: 1K, 1.1K, 1M, 1.1M, 1B, 1T...
   formatNumber(num) {
-    if (typeof num !== "number") return num;
+    if (typeof num !== "number" || isNaN(num)) return num;
+    const abs = Math.abs(num);
+    const sign = num < 0 ? "-" : "";
+
+    const tiers = [
+      { threshold: 1e12, suffix: "T" },
+      { threshold: 1e9,  suffix: "B" },
+      { threshold: 1e6,  suffix: "M" },
+      { threshold: 1e3,  suffix: "K" }
+    ];
+
+    for (const tier of tiers) {
+      if (abs >= tier.threshold) {
+        const scaled = abs / tier.threshold;
+        let formatted = scaled.toFixed(1);
+        if (formatted.endsWith(".0")) {
+          formatted = formatted.slice(0, -2);
+        }
+        return `${sign}${formatted}${tier.suffix}`;
+      }
+    }
+
     return num.toLocaleString("vi-VN");
   }
 

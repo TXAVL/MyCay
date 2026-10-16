@@ -2,7 +2,7 @@
 // Hỗ trợ chơi game 100% Offline không cần mạng sau lần tải đầu tiên
 // Khắc phục triệt để lỗi "Response served by service worker has redirections" trên Safari iOS
 
-const CACHE_NAME = "mycay-pwa-v1.5.6.1";
+const CACHE_NAME = "mycay-pwa-v1.5.6.2";
 
 const PRECACHE_ASSETS = [
   "./",
