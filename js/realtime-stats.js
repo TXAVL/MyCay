@@ -383,16 +383,26 @@ class RealtimeStats {
 
   // Lấy dữ liệu tổng hợp cho biểu đồ Trang Admin (Device, Browser, Country, Daily Trend)
   async getAdminStats() {
-    if (!this.client) return null;
+    const emptyStats = { total_views: 0, devices: [], browsers: [], countries: [], daily_trend: [] };
+    if (!this.client) {
+      if (typeof window !== "undefined" && window.supabase && typeof window.supabase.createClient === "function") {
+        this.client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    }
+    if (!this.client) return emptyStats;
+
     try {
       const { data, error } = await this.client.rpc("get_mycay_admin_stats");
       if (!error && data) {
         return data;
       }
+      if (error) {
+        console.warn("[RealtimeStats] get_mycay_admin_stats RPC error:", error);
+      }
     } catch (e) {
       console.error("[RealtimeStats] Lỗi lấy admin stats:", e);
     }
-    return null;
+    return emptyStats;
   }
 
   // ==========================================================

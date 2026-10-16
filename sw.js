@@ -142,6 +142,19 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Bỏ qua toàn bộ request không phải GET (POST/PUT/DELETE/RPC gửi thẳng qua mạng)
+  if (req.method !== "GET") {
+    return;
+  }
+
+  // Bỏ qua các API của bên thứ ba & Supabase (để trình duyệt gọi trực tiếp, không bị nuốt bởi SW)
+  try {
+    const url = new URL(req.url);
+    if (url.hostname.includes("supabase.co") || url.hostname.includes("country.is")) {
+      return;
+    }
+  } catch (e) {}
+
   // 1. ĐIỀU HƯỚNG TRANG (HTML NAVIGATION):
   // Xử lý đặc thù cho Safari iOS: Loại bỏ triệt để cờ redirected
   if (req.mode === "navigate") {
