@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "sync-version": "node scripts/sync-version.js",
-    "start": "python -m http.server 8080",
-    "dev": "python -m http.server 8080",
-    "serve": "npx -y serve . -l 8080",
+    "start": "node scripts/server.js",
+    "dev": "node scripts/server.js",
+    "serve": "node scripts/server.js",
     "deploy": "npx -y wrangler deploy"
   },
   "devDependencies": {

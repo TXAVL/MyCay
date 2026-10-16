@@ -12,12 +12,20 @@ import { txaqr } from "./txaqr.js?v=1.5.6";
 import { GameUIModal } from "./modal.js?v=1.5.6";
 import { realtimeStats } from "./realtime-stats.js?v=1.5.6";
 
+// Gắn biến toàn cục phục vụ Console Admin và Dashboard phân tích số liệu
+if (typeof window !== "undefined") {
+  window.mycayStats = realtimeStats;
+  window.realtimeStats = realtimeStats;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Khởi tạo Theme giao diện
   txatheme.init();
 
   // Khởi tạo Thống Kê Realtime Online & Lượt Truy Cập Thực Tế (Chống spam)
   realtimeStats.init();
+  window.mycayStats = realtimeStats;
+  window.realtimeStats = realtimeStats;
 
   // Khởi tạo Game Engine
   const game = new SpicyNoodleGame();

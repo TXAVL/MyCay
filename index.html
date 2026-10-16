@@ -27,6 +27,25 @@
   <script src="js/security-shield.js?v=1.5.6"></script>
 
   <script>
+    // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
+    window.mycayStats = window.mycayStats || {
+      getAdminStats: async function() {
+        try {
+          const client = window.supabase?.createClient(
+            "https://camnragrlqzmcxtgvukj.supabase.co",
+            "sb_publishable_nWBCfr-d5ZSuk5e5ULrpZQ_zVFp_nUh"
+          );
+          if (client) {
+            const { data, error } = await client.rpc("get_mycay_admin_stats");
+            if (!error && data) return data;
+          }
+        } catch (e) {
+          console.error("Lỗi lấy admin stats:", e);
+        }
+        return { total_views: 0, devices: [], browsers: [], countries: [], daily_trend: [] };
+      }
+    };
+
     // Áp dụng theme lưu trước để chống giật giao diện (Anti-FOUC)
     try {
       const savedTheme = localStorage.getItem('mycay_theme') || 'cozy';
