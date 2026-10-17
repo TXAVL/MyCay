@@ -10,57 +10,78 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.5.7 - 3 Siêu Nhân Viên, 5 Nâng Cấp Mới & Fix Offline Safari iOS)
+  // Khai báo phiên bản hiện tại của game (Bản 1.6.0 - Đại Tu Giao Diện Chuẩn Game Tiệm Nhỏ & Khu Bếp Mới)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.5.7",
-      157,
+      "1.6.0",
+      160,
       "17/10/2026",
       [
         {
-          title: "Khắc Phục 100% Offline Trên iOS Safari",
-          desc: "Tối ưu bộ điều hướng Cache-First cho Service Worker: Đã cài app vào màn hình chính iPhone/iPad, kể cả tắt mạng hoặc bật chế độ máy bay vẫn mở và chơi mượt mà 100% không còn bị Safari bắt kết nối Internet!",
-          icon: "🍏",
-          badge: "iOS Offline Fix ⚡",
+          title: "Khung Cảnh Tiệm Sống Động",
+          desc: "Tiệm mì giờ là một thế giới thật sự: khách chibi bước vào từ cửa, xếp hàng ở quầy gọi món, cầm tô đi về bàn ngồi ăn xì xụp rồi mới ra về. Đầu bếp và nhân viên đứng quầy nói chuyện rôm rả, nồi niêu bốc khói, ánh sáng đổi từ sáng sớm sang hoàng hôn rồi đêm theo giờ ca bán!",
+          icon: "🏮",
+          badge: "Đại Tu Giao Diện 🎮",
           badgeType: "hot"
         },
         {
-          title: "3 Siêu Nhân Viên Mới (Cụ Rùa, Bạch Hổ & Thần Long)",
-          desc: "Đội ngũ nhân sự cao cấp: Cụ Rùa Torto (giảm 50% tiền nhà & sinh lãi két sắt), Bạch Hổ Tora (85% hóa giải khách giận dữ) và Thần Long Ryu (gọi bão FEVER & mưa vàng)!",
-          icon: "🐾",
-          badge: "Nhân Sự Mới 👥",
+          title: "Chạm Khách Để Nấu & Bưng Món",
+          desc: "Chạm vào khách trong khung cảnh để nấu đúng món (bong bóng chuyển xanh ✓), chạm lần nữa để bưng ra. Chạm bàn bẩn 🧹 để dọn nhận tip, chạm khách đang ăn để nghe khen ngon!",
+          icon: "👆",
+          badge: "Lối Chơi Mới ✨",
           badgeType: "hot"
         },
         {
-          title: "5 Nâng Cấp Trang Thiết Bị Chiều Sâu",
-          desc: "Mở rộng 5 trang bị cấp cao: Máy Ép Màng Tự Động (+20k/đơn online), Bếp Niêu Đôi Song Song (+40% tốc độ), Quạt Hút Mùi Ion Khói Cay (+35% ăn nhanh), Hồ Cá Koi Zen (+50% khách VIP) và Gia Vị 7 Vị Shichimi (+25% giá mì cay).",
-          icon: "🛠️",
-          badge: "Trang Bị Mới ✨",
+          title: "HUD Game, Cấp Độ Tiệm & Xu Vàng Bay",
+          desc: "Thanh trạng thái kiểu game với ví xu vàng, sao đánh giá, đồng hồ ca bán. Tiệm có Cấp độ (Lv) và thanh XP, mỗi tô bán ra đều cộng kinh nghiệm, lên cấp có pháo giấy ăn mừng. Tiền vào là xu vàng bay thẳng về ví!",
+          icon: "🪙",
+          badge: "Cấp Độ Tiệm ⭐",
           badgeType: "star"
         },
         {
-          title: "Hệ Thống Ngân Hàng Tiết Kiệm (Boba Savings Bank)",
-          desc: "Khai trương Ngân Hàng Tiết Kiệm Quán Mì: Gửi tiền an toàn không lo thâm hụt, rút linh hoạt bất kỳ lúc nào. Sinh lãi mỗi đêm từ 2.5%/ngày đến 12%/ngày với các gói kỳ hạn 3 ngày & 7 ngày VIP siêu lợi nhuận, kết hợp đặc quyền buff lãi suất từ Cụ Rùa Torto!",
-          icon: "🏦",
-          badge: "Ngân Hàng Mới 💳",
+          title: "Dock Nút Tròn & Nút Bấm 3D",
+          desc: "Thanh điều hướng mới dạng dock gỗ cố định đáy màn hình, nút bấm 3D lún xuống khi chạm, bảng nội dung có ruy băng tiêu đề, màn hình chờ mới với mặt tiền quán vẽ tay.",
+          icon: "🕹️",
+          badge: "Giao Diện Mới 🎨",
+          badgeType: "visual"
+        },
+        {
+          title: "Đại Tu Khu Bếp Nấu",
+          desc: "Bếp mới khung gỗ ấm cúng: phiếu order giấy treo trên thanh ray inox (đung đưa khi khách mới tới), bếp niêu đặt trên quầy gỗ với tường gạch men và kệ gia vị, dock nguyên liệu dạng thùng 3D bấm lún. Nấu đúng món là phiếu đóng dấu ✓ ĐÚNG MÓN và chuông 🛎️ Bưng rung lên!",
+          icon: "🍳",
+          badge: "Bếp Mới 🔥",
           badgeType: "hot"
         },
         {
-          title: "Cân Bằng Kinh Tế & Chiều Sâu Chơi Càng Lâu Càng Cuốn",
-          desc: "Chuẩn hóa bảng chi phí vận hành, giá bán người chơi thiết lập, phân bổ kiên nhẫn và chuỗi ngày dài hạn đến Ngày 55+ đầy thử thách và cuốn hút!",
-          icon: "📈",
-          badge: "Cân Bằng Game 🍲",
+          title: "Chuỗi Phục Vụ, Doanh Thu Hôm Nay & Món Đặc Biệt Ngay Trong Bếp",
+          desc: "Thanh tiêu đề bếp đếm Chuỗi phục vụ liên tiếp (mốc x5, x10... có thông báo ăn mừng, về 0 khi khách bỏ về hoặc bị từ chối), số tô · ly · tiền bán được hôm nay, kèm lời nhắc Món đặc biệt hôm nay để nấu đúng nhận Bonus.",
+          icon: "🔥",
+          badge: "Tính Năng Mới ✨",
+          badgeType: "hot"
+        },
+        {
+          title: "Phụ Bếp, Cảnh Báo Sắp Hết Hàng & Phím Tắt",
+          desc: "Nhân viên đã thuê (Kenji, Ducky, Usagi, Shiba) hiện cạnh bếp. Thùng nguyên liệu báo cam khi còn ≤3 phần và xám khi đã hết. Trên máy tính có bảng gợi ý phím tắt 1·2·3 Bưng khách, C Làm lại, P Tạm dừng, Space Giao shipper.",
+          icon: "🧑‍🍳",
+          badge: "Tiện Ích 🛠️",
+          badgeType: "star"
+        },
+        {
+          title: "Gọn Gàng Trên Điện Thoại & Mượt Hơn",
+          desc: "Khu bếp trên điện thoại gọn hơn khoảng 1/3 (phiếu order từ ~650px còn ~220px, bỏ đồng hồ trùng với HUD). Phiếu order không còn bị dựng lại mỗi giây nên không còn mất cú chạm khi đang bấm Nấu/Bưng.",
+          icon: "📱",
+          badge: "Tối Ưu ⚡",
           badgeType: "manage"
         },
         {
-          title: "Tối Ưu Nhập Kho & Cam Kết Bảo Quản Vô Hạn",
-          desc: "Khóa thông minh nguyên liệu của những món chưa mở khóa trong Menu (kèm nút chuyển nhanh sang Menu mở khóa, không lo mua nhầm phí tiền). Toàn bộ nguyên liệu & topping nhập kho được bảo quản tươi ngon VÔ HẠN thời gian, vĩnh viễn không hư hỏng qua các ngày!",
-          icon: "❄️",
-          badge: "Lắng Nghe Góp Ý 💬",
-          badgeType: "star"
+          title: "Sửa Lỗi Phím P Tiếp Tục Bán",
+          desc: "Bấm phím P lần thứ hai để tiếp tục ca bán không còn bị lỗi và kẹt hộp thoại Tạm dừng.",
+          icon: "🐞",
+          badge: "Sửa Lỗi 🛠️",
+          badgeType: "manage"
         }
       ],
-      "Đại Tiệc Nâng Cấp & Ngân Hàng Tiết Kiệm"
+      "Đại Tu Giao Diện Chuẩn Game Tiệm Nhỏ"
     );
   }
 
@@ -68,6 +89,56 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "1.5.7",
+        157,
+        "17/10/2026",
+        [
+          {
+            title: "Khắc Phục 100% Offline Trên iOS Safari",
+            desc: "Tối ưu bộ điều hướng Cache-First cho Service Worker: Đã cài app vào màn hình chính iPhone/iPad, kể cả tắt mạng hoặc bật chế độ máy bay vẫn mở và chơi mượt mà 100% không còn bị Safari bắt kết nối Internet!",
+            icon: "🍏",
+            badge: "iOS Offline Fix ⚡",
+            badgeType: "hot"
+          },
+          {
+            title: "3 Siêu Nhân Viên Mới (Cụ Rùa, Bạch Hổ & Thần Long)",
+            desc: "Đội ngũ nhân sự cao cấp: Cụ Rùa Torto (giảm 50% tiền nhà & sinh lãi két sắt), Bạch Hổ Tora (85% hóa giải khách giận dữ) và Thần Long Ryu (gọi bão FEVER & mưa vàng)!",
+            icon: "🐾",
+            badge: "Nhân Sự Mới 👥",
+            badgeType: "hot"
+          },
+          {
+            title: "5 Nâng Cấp Trang Thiết Bị Chiều Sâu",
+            desc: "Mở rộng 5 trang bị cấp cao: Máy Ép Màng Tự Động (+20k/đơn online), Bếp Niêu Đôi Song Song (+40% tốc độ), Quạt Hút Mùi Ion Khói Cay (+35% ăn nhanh), Hồ Cá Koi Zen (+50% khách VIP) và Gia Vị 7 Vị Shichimi (+25% giá mì cay).",
+            icon: "🛠️",
+            badge: "Trang Bị Mới ✨",
+            badgeType: "star"
+          },
+          {
+            title: "Hệ Thống Ngân Hàng Tiết Kiệm (Boba Savings Bank)",
+            desc: "Khai trương Ngân Hàng Tiết Kiệm Quán Mì: Gửi tiền an toàn không lo thâm hụt, rút linh hoạt bất kỳ lúc nào. Sinh lãi mỗi đêm từ 2.5%/ngày đến 12%/ngày với các gói kỳ hạn 3 ngày & 7 ngày VIP siêu lợi nhuận, kết hợp đặc quyền buff lãi suất từ Cụ Rùa Torto!",
+            icon: "🏦",
+            badge: "Ngân Hàng Mới 💳",
+            badgeType: "hot"
+          },
+          {
+            title: "Cân Bằng Kinh Tế & Chiều Sâu Chơi Càng Lâu Càng Cuốn",
+            desc: "Chuẩn hóa bảng chi phí vận hành, giá bán người chơi thiết lập, phân bổ kiên nhẫn và chuỗi ngày dài hạn đến Ngày 55+ đầy thử thách và cuốn hút!",
+            icon: "📈",
+            badge: "Cân Bằng Game 🍲",
+            badgeType: "manage"
+          },
+          {
+            title: "Tối Ưu Nhập Kho & Cam Kết Bảo Quản Vô Hạn",
+            desc: "Khóa thông minh nguyên liệu của những món chưa mở khóa trong Menu (kèm nút chuyển nhanh sang Menu mở khóa, không lo mua nhầm phí tiền). Toàn bộ nguyên liệu & topping nhập kho được bảo quản tươi ngon VÔ HẠN thời gian, vĩnh viễn không hư hỏng qua các ngày!",
+            icon: "❄️",
+            badge: "Lắng Nghe Góp Ý 💬",
+            badgeType: "star"
+          }
+        ],
+        "Đại Tiệc Nâng Cấp & Ngân Hàng Tiết Kiệm"
+      ),
       new txaversion("1.5.5", 155, "15/10/2026", [
         {
           title: "Chế Độ Giờ Vàng FEVER RUSH & Khách VIP Thần Tài",

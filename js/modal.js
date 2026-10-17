@@ -187,12 +187,29 @@ export class GameUIModal {
     });
   }
 
+  // Đóng các hộp thoại alert/confirm đang mở (VD: bấm phím P lần nữa để tiếp tục ca bán)
+  static closeDialogs() {
+    ["custom-confirm-dialog", "custom-alert-dialog"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    });
+  }
+
   /**
    * Hiệu ứng tiền xu / tim bay lên từ vị trí phần tử (Floating Number FX)
    */
   static spawnFloatingFx(element, text, isPositive = true) {
     if (!element) return;
-    const rect = element.getBoundingClientRect();
+    // Khi người chơi chạm vào nhân vật trong khung cảnh tiệm, hiệu ứng bật ra ngay tại nhân vật đó
+    const rect = window.__mycayFxAnchor || element.getBoundingClientRect();
+    // Phần tử đang bị ẩn (VD: tab Sảnh bàn ăn trên mobile) -> không vẽ hiệu ứng lạc ở góc màn hình
+    if (rect.width === 0 && rect.height === 0) return;
+
+    // Xu vàng bay thẳng về ví khi có tiền vào
+    if (isPositive && /^\+\d/.test(String(text)) && window.shopScene && typeof window.shopScene.flyCoins === "function") {
+      window.shopScene.flyCoins(rect, text);
+    }
+
     const fx = document.createElement("div");
     fx.className = `floating-score-fx ${isPositive ? "fx-green" : "fx-red"}`;
     fx.textContent = text;

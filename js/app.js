@@ -3,14 +3,15 @@
 // Kết nối UI, Sự kiện, Tab Navigation và Logic Game
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.5.7";
-import { NameValidator } from "./filter.js?v=1.5.7";
-import { SpicyNoodleGame } from "./game.js?v=1.5.7";
-import { txatheme } from "./txatheme.js?v=1.5.7";
-import { txacoachmark } from "./txacoachmark.js?v=1.5.7";
-import { txaqr } from "./txaqr.js?v=1.5.7";
-import { GameUIModal } from "./modal.js?v=1.5.7";
-import { realtimeStats } from "./realtime-stats.js?v=1.5.7";
+import { txaversion } from "./txaversion.js?v=1.6.0";
+import { NameValidator } from "./filter.js?v=1.6.0";
+import { SpicyNoodleGame } from "./game.js?v=1.6.0";
+import { txatheme } from "./txatheme.js?v=1.6.0";
+import { txacoachmark } from "./txacoachmark.js?v=1.6.0";
+import { txaqr } from "./txaqr.js?v=1.6.0";
+import { GameUIModal } from "./modal.js?v=1.6.0";
+import { realtimeStats } from "./realtime-stats.js?v=1.6.0";
+import { ShopScene } from "./shop-scene.js?v=1.6.0";
 
 // Gắn biến toàn cục phục vụ Console Admin và Dashboard phân tích số liệu
 if (typeof window !== "undefined") {
@@ -160,6 +161,13 @@ document.addEventListener("DOMContentLoaded", () => {
         loadingScreen.style.display = "none";
         game.init();
 
+        // Dựng khung cảnh tiệm sống động (khách chibi, nhân viên, xu vàng bay về ví)
+        if (!game.scene) {
+          game.scene = new ShopScene(game);
+          window.shopScene = game.scene;
+          game.scene.mount(document.getElementById("shop-scene-root"));
+        }
+
         const verCheck = txaversion.checkNewVersion();
         if (verCheck.isNew) {
           setTimeout(showVersionModal, 500);
@@ -175,6 +183,16 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       const tabId = btn.getAttribute("data-tab");
       game.switchTab(tabId);
+
+      // Dock nằm cố định ở đáy: cuộn tới bảng nội dung nếu nó đang khuất khỏi màn hình
+      btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      const tabArea = document.querySelector(".tab-content-area");
+      if (tabArea) {
+        const top = tabArea.getBoundingClientRect().top;
+        if (top > window.innerHeight * 0.55 || top < 0) {
+          tabArea.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
     });
   });
 
@@ -656,11 +674,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Chờ xem người chơi còn bấm tiếp không rồi mới mở hồ sơ,
+      // nếu mở ngay thì hộp thoại che mất avatar và không bấm đủ 5 lần được
       ownerAvatarClickTimer = setTimeout(() => {
         ownerAvatarClickCount = 0;
-      }, 1500);
-
-      game.showOwnerProfileModal();
+        game.showOwnerProfileModal();
+      }, 400);
     });
   }
 

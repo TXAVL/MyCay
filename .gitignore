@@ -15,6 +15,7 @@ Thumbs.db
 # IDE & Editor files
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 
@@ -22,3 +23,4 @@ Thumbs.db
 tmp/
 temp/
 .wrangler/
+

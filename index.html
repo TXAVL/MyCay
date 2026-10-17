@@ -10,7 +10,7 @@
   <!-- Google Fonts: Quicksand & Nunito chuẩn phong cách Cozy Anime -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Favicon & PWA Icons -->
   <link rel="icon" type="image/png" href="assets/favicon.png" />
@@ -18,13 +18,15 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=1.5.7" />
+  <link rel="stylesheet" href="styles/main.css?v=1.6.0" />
+  <!-- Lớp giao diện game (HUD, khung cảnh tiệm, dock nút tròn, nút 3D) -->
+  <link rel="stylesheet" href="styles/game-skin.css?v=1.6.0" />
 
   <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
-  <script src="js/security-shield.js?v=1.5.7"></script>
+  <script src="js/security-shield.js?v=1.6.0"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -63,9 +65,10 @@
        1. MÀN HÌNH LOADING COZY
        ========================================================== -->
   <div id="loading-screen">
+    <div class="loading-backdrop" aria-hidden="true"></div>
     <div class="loading-container">
       <div class="loading-anime-pot">
-        <span class="loading-teapot-emoji">🍜</span>
+        <img class="loading-logo-img" src="assets/icon-512.png" alt="" draggable="false" />
       </div>
       <h2 class="loading-title">Tiệm Mỳ Cay</h2>
       <p class="loading-subtitle">Hương vị cay nồng ấm bụng sưởi ấm những ngày mưa 🌧️✨</p>
@@ -95,33 +98,31 @@
   <div class="game-viewport-wrapper">
     <div class="game-phone-frame">
 
-      <!-- HEADER TOP (3 CỘT CHUẨN ẢNH THỰC TẾ) -->
-      <header class="game-top-header">
-        <div class="header-col-left">
+      <!-- HUD GAME (AVATAR + LEVEL/XP · VÍ TIỀN · SAO ĐÁNH GIÁ · ĐỒNG HỒ CA BÁN) -->
+      <header class="game-top-header game-hud">
+        <div class="hud-row hud-row-top">
           <div class="header-left-wrap">
             <button class="header-pause-btn" id="btn-header-pause" style="display: none;" title="Tạm dừng ca bán">⏸️</button>
-            <div class="shop-owner-avatar-box" id="btn-owner-profile" title="Hồ sơ chủ quán mì">
+            <div class="shop-owner-avatar-box hud-avatar-ring" id="btn-owner-profile" title="Hồ sơ chủ quán mì">
               <img src="assets/cust_cat.png" alt="Chủ tiệm" class="owner-avatar-img" id="header-owner-avatar" onerror="this.src='assets/cust_cat.png'" />
-              <span class="owner-crown-badge">🧑‍🍳</span>
+              <span class="hud-level-badge">Lv <b id="hud-level-num">1</b></span>
             </div>
             <div class="shop-name-block">
               <div class="shop-name-row" id="btn-trigger-rename" title="Bấm để đổi tên tiệm">
                 <h1 id="display-shop-name">Tiệm Mỳ Cay</h1>
                 <span class="shop-pencil-icon">✏️</span>
               </div>
-              <div class="shop-day-sub" id="display-day-status">Ngày 1 · Chuẩn bị</div>
+              <div class="hud-sub-row">
+                <span class="shop-day-sub" id="display-day-status">Ngày 1 · Chuẩn bị</span>
+                <span class="hud-level-title" id="hud-level-title">Xe Đẩy Vỉa Hè</span>
+              </div>
+              <div class="hud-xp-bar" title="Kinh nghiệm tiệm: phục vụ khách để lên cấp">
+                <i id="hud-xp-fill"></i>
+                <span id="hud-xp-text">0/60 XP</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="header-col-center">
-          <div class="header-time-title" id="display-day-timer">4 phút</div>
-          <div class="header-money-val" id="display-money">400.000đ</div>
-        </div>
-
-        <div class="header-col-right">
-          <div class="header-stars-row" id="display-stars">★★★★☆</div>
-          <div class="header-reviews-sub" id="display-reviews-count">0 đánh giá</div>
           <div class="header-actions-row">
             <button id="btn-header-install" class="btn-header-action pwa-install-badge-btn" style="display: none;" title="Cài app chơi Offline không cần mạng">
               📲
@@ -140,10 +141,27 @@
             </button>
           </div>
         </div>
+
+        <div class="hud-row hud-row-stats">
+          <div class="hud-pill hud-coin" id="hud-coin-pill" title="Ví tiền của tiệm">
+            <span class="hud-coin-icon" aria-hidden="true"></span>
+            <span class="header-money-val" id="display-money">400.000đ</span>
+          </div>
+          <div class="hud-pill hud-star" title="Đánh giá trung bình của thực khách">
+            <span class="header-stars-row" id="display-stars">★★★★☆</span>
+            <span class="header-reviews-sub" id="display-reviews-count">0 đánh giá</span>
+          </div>
+          <div class="hud-pill hud-time" title="Thời gian ca bán">
+            <span class="header-time-title" id="display-day-timer">⏱️ 4:00</span>
+          </div>
+        </div>
       </header>
 
       <!-- SCROLLABLE CONTENT BODY -->
       <div class="game-scroll-body" id="game-scroll-body">
+
+        <!-- KHUNG CẢNH TIỆM SỐNG ĐỘNG: khách vào quán, xếp hàng, ngồi ăn, nhân viên đứng quầy (render bởi js/shop-scene.js) -->
+        <section class="shop-scene is-prep" id="shop-scene-root" aria-label="Khung cảnh tiệm mì"></section>
 
         <!-- ==========================================================
              VIEW 1: CHẾ ĐỘ CHUẨN BỊ (PREP MODE - 8 TAB QUẢN LÝ TIỆM)
@@ -280,7 +298,7 @@
         </nav>
 
         <!-- 6. NỘI DUNG CHI TIẾT TỪNG TAB -->
-        <div class="tab-content-area">
+        <div class="tab-content-area" data-title="📦 Kho">
 
           <!-- ================= TAB 1: KHO (NGUYÊN LIỆU & NẤU NHẬN) ================= -->
           <section id="tab-kho" class="tab-pane active">
@@ -611,7 +629,7 @@
           <!-- THANH CHUYỂN ĐỔI CHẾ ĐỘ DÀNH RIÊNG CHO MOBILE: BẾP NẤU 0-CUỘN HOẶC SẢNH BÀN ĂN -->
           <div class="mobile-open-view-tabs" id="mobile-open-view-tabs">
             <button class="btn-open-view-tab active" id="btn-tab-cockpit" onclick="window.game.switchMobileOpenTab('cockpit')">
-              🍳 Bếp Nấu Siêu Tốc (0-Cuộn)
+              🍳 Bếp Nấu
             </button>
             <button class="btn-open-view-tab" id="btn-tab-dining" onclick="window.game.switchMobileOpenTab('dining')">
               🪑 Sảnh Bàn Ăn <span class="tab-dining-badge" id="open-dining-count" style="font-size: 11px; font-weight: 700; color: #8C431A; margin-left: 2px;"></span> <span class="tab-badge-dirty" id="tab-badge-dirty" style="display:none;">🧹</span>
@@ -661,7 +679,16 @@
             </div>
 
             <!-- CỘT PHẢI (RIGHT): KHÔNG GIAN BẾP NẤU SIÊU TỐC - ĐƠN HÀNG, NIÊU ĐẤT & DOCK NGUYÊN LIỆU (ZERO-SCROLL) -->
-            <div class="open-col-right" id="open-col-kitchen-side">
+            <div class="open-col-right kitchen-station" id="open-col-kitchen-side">
+
+              <!-- THANH TIÊU ĐỀ BẾP: CHUỖI PHỤC VỤ LIÊN TIẾP & DOANH THU HÔM NAY -->
+              <div class="kt-header" id="kt-header">
+                <span class="kt-title">🍳 Bếp Nấu</span>
+                <span class="kt-streak is-zero" id="kt-streak" title="Chuỗi phục vụ liên tiếp (về 0 khi khách bỏ về hoặc bị từ chối)">🔥 Chuỗi x0</span>
+                <span class="kt-today" id="kt-today" title="Đã bán hôm nay">🍜 0 · 🧋 0 · 💰 +0đ</span>
+              </div>
+              <!-- Nhắc món đặc biệt hôm nay ngay trong bếp (nấu đúng để nhận Bonus) -->
+              <div class="kt-special-chip" id="kt-special-chip"></div>
 
               <!-- ĐƠN HÀNG ONLINE SHIPPER TRỰC TIẾP TRONG CA BÁN (CÓ HẸN GIỜ ĐỢI) -->
               <div class="open-mode-shipper-card" id="open-mode-shipper-card" style="display: none;">
@@ -687,54 +714,51 @@
                 </div>
               </div>
 
-              <!-- THANH ĐIỀU HÒA DAIKIN BẾP NẤU & KHU VỰC KHÁCH CHỜ -->
-              <div class="kitchen-daikin-bar" id="kitchen-daikin-bar" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin Inverter đang làm mát - Chạm để xả gió lạnh Turbo!">
-                <!-- Render động qua renderDaikinAC() -->
-              </div>
-
-              <!-- ĐỒNG HỒ ĐẾM NGƯỢC CA BÁN SIÊU NỔI BẬT KHÔNG BỊ CHE (SHIFT TIMER HUD) -->
-              <div class="cockpit-shift-clock-bar" id="cockpit-shift-clock-bar">
-                <div class="shift-clock-pill" id="cockpit-shift-timer-pill">
-                  <span class="shift-clock-icon">⏱️</span>
-                  <span class="shift-clock-label">Thời gian ca bán:</span>
-                  <span class="shift-clock-digits" id="cockpit-clock-digits">4:00</span>
+              <!-- HÀNG TRẠNG THÁI BẾP: ĐIỀU HÒA · ĐỒNG HỒ CA · GIỜ VÀNG FEVER -->
+              <div class="kt-status-row">
+                <!-- THANH ĐIỀU HÒA DAIKIN BẾP NẤU & KHU VỰC KHÁCH CHỜ -->
+                <div class="kitchen-daikin-bar" id="kitchen-daikin-bar" onclick="window.game.interactDaikinAC()" title="Điều hòa Daikin Inverter đang làm mát - Chạm để xả gió lạnh Turbo!">
+                  <!-- Render động qua renderDaikinAC() -->
                 </div>
-                <div class="shift-clock-sub" id="cockpit-shift-sub">⚡ Phục vụ & giao đơn trước khi hết giờ!</div>
-              </div>
 
-              <!-- THANH BÙNG NỔ GIỜ VÀNG FEVER RUSH (VIP FEATURE v1.5.5) -->
-              <div class="cockpit-fever-bar" id="cockpit-fever-bar" onclick="window.game.handleFeverBarClick()" title="Giờ Vàng FEVER RUSH: Phục vụ khách chuẩn để tích đầy Giờ Vàng bùng nổ x2 Doanh Thu!">
-                <div class="fever-bar-inner">
-                  <div class="fever-title-row">
-                    <span class="fever-fire-icon" id="fever-fire-icon">🔥</span>
-                    <span class="fever-label" id="fever-label">GIỜ VÀNG FEVER RUSH:</span>
-                    <span class="fever-status-text" id="fever-status-text">0 / 100 Điểm</span>
-                    <span class="fever-mult-badge" id="fever-mult-badge">x1 THƯỜNG</span>
+                <!-- ĐỒNG HỒ ĐẾM NGƯỢC CA BÁN SIÊU NỔI BẬT KHÔNG BỊ CHE (SHIFT TIMER HUD) -->
+                <div class="cockpit-shift-clock-bar" id="cockpit-shift-clock-bar">
+                  <div class="shift-clock-pill" id="cockpit-shift-timer-pill">
+                    <span class="shift-clock-icon">⏱️</span>
+                    <span class="shift-clock-label">Thời gian ca bán:</span>
+                    <span class="shift-clock-digits" id="cockpit-clock-digits">4:00</span>
                   </div>
-                  <div class="fever-track">
-                    <div class="fever-fill" id="fever-fill" style="width: 0%;"></div>
+                  <div class="shift-clock-sub" id="cockpit-shift-sub">⚡ Phục vụ & giao đơn trước khi hết giờ!</div>
+                </div>
+
+                <!-- THANH BÙNG NỔ GIỜ VÀNG FEVER RUSH (VIP FEATURE v1.5.5) -->
+                <div class="cockpit-fever-bar" id="cockpit-fever-bar" onclick="window.game.handleFeverBarClick()" title="Giờ Vàng FEVER RUSH: Phục vụ khách chuẩn để tích đầy Giờ Vàng bùng nổ x2 Doanh Thu!">
+                  <div class="fever-bar-inner">
+                    <div class="fever-title-row">
+                      <span class="fever-fire-icon" id="fever-fire-icon">🔥</span>
+                      <span class="fever-label" id="fever-label">GIỜ VÀNG FEVER RUSH:</span>
+                      <span class="fever-status-text" id="fever-status-text">0 / 100 Điểm</span>
+                      <span class="fever-mult-badge" id="fever-mult-badge">x1 THƯỜNG</span>
+                    </div>
+                    <div class="fever-track">
+                      <div class="fever-fill" id="fever-fill" style="width: 0%;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- 1. HÀNG 3 KHAY ĐƠN HÀNG CỦA THỰC KHÁCH (ORDER QUEUE SLOTS) -->
-              <div class="order-queue-grid" id="order-queue-grid">
-                <!-- Slot 1 -->
-                <div class="order-slot-card" id="order-slot-1">
-                  <!-- Render động bằng JS -->
-                </div>
-                <!-- Slot 2 -->
-                <div class="order-slot-card slot-empty" id="order-slot-2">
-                  <span class="empty-slot-text">Trống</span>
-                </div>
-                <!-- Slot 3 -->
-                <div class="order-slot-card slot-empty" id="order-slot-3">
-                  <span class="empty-slot-text">Trống</span>
-                </div>
+              <div class="order-queue-grid kt-rail" id="order-queue-grid">
+                <!-- Render động 3 phiếu order bằng JS (renderOrderQueue) -->
               </div>
 
               <!-- 2. KHU VỰC NIÊU ĐẤT NẤU MÌ (WORKSTATION TRUNG TÂM NẰM NGAY DƯỚI ĐƠN HÀNG) -->
               <div class="pot-workstation-card">
+                <!-- Tường gạch men + kệ gia vị & dụng cụ treo (trang trí) -->
+                <div class="kt-backsplash" aria-hidden="true">
+                  <span class="kt-shelf">🫙 🧂 🌶️ 🍶 🧄</span>
+                  <span class="kt-utensils">🥄 🍳 🥢</span>
+                </div>
                 <div class="pot-visual-wrap">
                   <!-- Hơi nước bốc lên xì xèo -->
                   <div class="pot-steam-particles" id="pot-steam-particles">
@@ -799,12 +823,15 @@
                   <div class="pot-summary-pills" id="pot-summary-pills"></div>
 
                   <div class="pot-actions-row">
-                    <button class="btn-clear-pot" id="btn-clear-pot">🗑️ Làm lại (C)</button>
+                    <button class="btn-clear-pot" id="btn-clear-pot">🗑️ Làm lại<span class="kt-key-hint"> (C)</span></button>
                     <button class="btn-direct-serve" id="btn-direct-serve" onclick="window.game.serveToMatchingSlot()">
-                      ✨ Bưng Khớp Đơn
+                      <span class="kt-bell">🛎️</span> Bưng<span class="kt-hide-xs"> Khớp Đơn</span>
                     </button>
                     <div class="pot-drink-preview" id="pot-drink-preview"></div>
                   </div>
+
+                  <!-- Phụ bếp đã thuê đứng cạnh bếp -->
+                  <div class="kt-helpers" id="kt-helpers"></div>
                 </div>
               </div>
 
@@ -898,6 +925,10 @@
                   </div>
                 </div>
 
+                <!-- Gợi ý phím tắt (chỉ hiện trên máy có chuột/bàn phím) -->
+                <div class="kt-hotkeys">
+                  ⌨️ <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Bưng khách · <kbd>C</kbd> Làm lại · <kbd>P</kbd> Tạm dừng · <kbd>Space</kbd> Giao shipper
+                </div>
               </div> <!-- /cooking-steps-container -->
 
             </div> <!-- /open-col-right -->
@@ -1473,6 +1504,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=1.5.7"></script>
+  <script type="module" src="js/app.js?v=1.6.0"></script>
 </body>
 </html>

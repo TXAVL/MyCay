@@ -4,11 +4,11 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.5.6";
-import { txaformat } from "./txaformat.js?v=1.5.6";
-import { NameValidator } from "./filter.js?v=1.5.6";
-import { SoundManager } from "./audio.js?v=1.5.6";
-import { GameUIModal } from "./modal.js?v=1.5.6";
+import { txaversion } from "./txaversion.js?v=1.6.0";
+import { txaformat } from "./txaformat.js?v=1.6.0";
+import { NameValidator } from "./filter.js?v=1.6.0";
+import { SoundManager } from "./audio.js?v=1.6.0";
+import { GameUIModal } from "./modal.js?v=1.6.0";
 
 export class SpicyNoodleGame {
   constructor() {
@@ -806,6 +806,11 @@ export class SpicyNoodleGame {
     if (openDiningCount) {
       openDiningCount.textContent = eatingCount > 0 ? `(${eatingCount} đang ăn)` : "";
     }
+
+    if (!isPrep) this.renderKitchenPanel();
+
+    // Đồng bộ khung cảnh tiệm sống động (ánh sáng theo giờ, cấp độ tiệm)
+    if (this.scene) this.scene.requestSync();
   }
 
   // 2. Bảng đen Chalkboard "📋 Menu hôm nay"
@@ -2663,6 +2668,7 @@ export class SpicyNoodleGame {
   // CHUẨN 100% SCREENSHOT MỚI
   // ==========================================================
   renderOpenMode() {
+    this.renderKitchenPanel();
     this.renderStaffKitchenBar();
     this.renderActiveBuffsIndicator();
     this.updateFeverUI();
@@ -2908,90 +2914,200 @@ export class SpicyNoodleGame {
     }
   }
 
-  // Render 3 Khay Đơn Hàng Slot (Với tính năng nhận diện món khớp đơn thông minh)
+  // Niêu đang nấu có khớp đúng đơn khách gọi không (mì, size, cấp cay, topping)
+  isPotMatchingOrder(order) {
+    const pot = this.currentPot;
+    return Boolean(order && pot && pot.noodleId &&
+      pot.noodleId === order.noodleId &&
+      (!order.size || pot.size === order.size) &&
+      pot.spicyLevel === order.spicyLevel &&
+      (!order.toppingId || pot.toppings.includes(order.toppingId)));
+  }
+
+  // Render 3 Phiếu Order Treo Trên Thanh Ray Bếp
+  // Chỉ dựng lại phiếu khi đơn thay đổi; mỗi giây chỉ cập nhật thanh kiên nhẫn để không nuốt mất cú chạm của người chơi
   renderOrderQueue() {
     const queueGrid = document.getElementById("order-queue-grid");
     if (!queueGrid) return;
 
-    queueGrid.innerHTML = this.orderSlots.map((slot, idx) => {
-      if (!slot) {
-        return `
-          <div class="order-slot-card slot-empty">
-            <div class="empty-slot-coaster">
-              <span class="empty-slot-chair-icon">🪑</span>
-              <span class="empty-slot-label">Slot #${idx + 1} Trống</span>
-              <span class="empty-slot-sub">🍵 Chờ khách ghé...</span>
-            </div>
-          </div>
-        `;
+    if (!this.ticketSigs || queueGrid.children.length !== this.orderSlots.length) {
+      this.ticketSigs = [];
+      queueGrid.innerHTML = this.orderSlots.map(() => "<div></div>").join("");
+    }
+
+    this.orderSlots.forEach((slot, idx) => {
+      const view = this.getOrderTicketView(slot, idx);
+      let card = queueGrid.children[idx];
+      if (this.ticketSigs[idx] !== view.sig) {
+        this.ticketSigs[idx] = view.sig;
+        const holder = document.createElement("div");
+        holder.innerHTML = view.html.trim();
+        const fresh = holder.firstElementChild;
+        card.replaceWith(fresh);
+        card = fresh;
       }
+      if (slot) this.updateOrderTicketPatience(card, slot);
+    });
 
-      const cust = slot.customer;
-      const order = slot.order;
-      const patiencePct = Math.max(0, Math.min(100, (slot.patience / slot.maxPatience) * 100));
-      const patienceClass = patiencePct < 25 ? "patience-danger" : (patiencePct < 55 ? "patience-warning" : "");
+    if (this.scene) this.scene.requestSync();
+  }
 
-      // Kiểm tra xem niêu đất đang nấu có khớp đơn khách này không
-      const pot = this.currentPot;
-      const isMatch = pot.noodleId &&
-        pot.noodleId === order.noodleId &&
-        (!order.size || pot.size === order.size) &&
-        (pot.spicyLevel === order.spicyLevel) &&
-        (!order.toppingId || pot.toppings.includes(order.toppingId));
-
-      const isSpecialCombo = Boolean(slot.isSpecialCombo || this.isSpecialComboOrder(order));
-      const isVipCust = Boolean(cust.isVip);
-      const noodleItem = this.state.noodles[order.noodleId];
-      const topItem = order.toppingId ? this.state.toppings[order.toppingId] : null;
-      const noodlePrice = noodleItem ? noodleItem.price : 40;
-      const topPrice = topItem ? topItem.price : 0;
-      const sizePrice = order.size === "L" ? 7 : 0;
-      const orderCurrentPrice = noodlePrice + topPrice + sizePrice;
-      const isNoodleOutOfStock = !noodleItem || (noodleItem.stock <= 0);
-
-      return `
-        <div id="order-slot-${idx}" class="order-slot-card ${isVipCust ? 'is-vip-customer-card' : ''} ${isSpecialCombo ? 'is-special-combo-slot' : ''} ${isMatch ? 'is-matching-dish' : ''}">
-          <div class="order-customer-head">
-            <div class="order-cust-avatar-wrap">
-              <img src="${cust.avatar}" alt="${cust.name}" class="order-cust-avatar" onerror="this.src='assets/cust_cat.png'" />
-              ${isVipCust ? '<span class="cust-vip-crown-icon">👑</span>' : ''}
-            </div>
-            <div class="order-cust-info">
-              <span class="order-cust-title">${isVipCust ? '👑 ' : (isSpecialCombo ? '🌟 ' : (slot.isSpecial ? '⭐ ' : ''))}${cust.name}</span>
-              <span class="order-cust-mood ${patienceClass}">
-                ${this.isFeverActive ? '🔥 Giờ vàng x1.35' : (patiencePct > 55 ? '😊 Đang đợi món' : (patiencePct > 25 ? '🤤 Sốt ruột' : '💦 Sắp về'))}
-              </span>
-            </div>
+  getOrderTicketView(slot, idx) {
+    if (!slot) {
+      return {
+        sig: "empty",
+        html: `
+          <div class="order-slot-card slot-empty kt-ticket kt-ticket-empty">
+            <span class="kt-clip"></span>
+            <span class="kt-empty-icon">🪑</span>
+            <span class="kt-empty-label">Phiếu #${idx + 1}</span>
+            <span class="kt-empty-sub">Chờ khách ghé...</span>
           </div>
-          <div class="order-speech-bubble" onclick="window.game.quickCookForSlot(${idx})" style="cursor: pointer;" title="Chạm để nạp nhanh công thức này vào niêu đất!">
-            ${isVipCust ? '<div class="vip-cust-gold-badge">👑 KHÁCH VIP THẦN TÀI (+TIP VÀNG) 💰</div>' : ''}
-            ${isSpecialCombo ? '<div class="special-combo-order-badge">✨ ĐƠN ĐẶC BIỆT (+BONUS) ✨</div>' : (slot.isSpecial ? '<div style="font-size:9.5px; color:#C44569; font-weight:800; margin-bottom:1px;">Món tâm đắc:</div>' : '')}
-            ${isSpecialCombo ? '<div style="font-size:9px; color:#D35400; font-weight:800; margin-bottom:2px;">🔥 Món đặc biệt: Tip + Thưởng Thêm!</div>' : ''}
-            <div class="dish-order-row">
-              <span class="dish-highlight-badge">${order.noodleName}</span>
-              <span class="order-price-pill" title="Giá bán bạn đã set trong Tab Giá Bán">🏷️ ${txaformat.formatVND(orderCurrentPrice)}</span>
-            </div>
-            ${isNoodleOutOfStock ? '<div style="font-size:8.5px; color:#E74C3C; font-weight:800; margin-top:2px; background:rgba(231,76,60,0.12); padding:1px 5px; border-radius:4px; border:1px solid rgba(231,76,60,0.3);">⚠️ Hết mì trong kho (Đơn cuối trên khay)</div>' : ''}
-            <div style="margin-top: 2px; font-size: 10.5px;">
-              Size <strong>${order.size}</strong> · Cấp <strong>${order.spicyLevel} 🌶️</strong>
-              ${order.toppingName ? `<br/>+ thêm <strong>${order.toppingName}</strong> <span style="color:#258A6D; font-weight:700;">(+${topPrice}k)</span>` : ''}
-            </div>
+        `
+      };
+    }
+
+    const cust = slot.customer;
+    const order = slot.order;
+    const isMatch = this.isPotMatchingOrder(order);
+    const isSpecialCombo = Boolean(slot.isSpecialCombo || this.isSpecialComboOrder(order));
+    const isVipCust = Boolean(cust.isVip);
+    const noodleItem = this.state.noodles[order.noodleId];
+    const topItem = order.toppingId ? this.state.toppings[order.toppingId] : null;
+    const orderCurrentPrice = (noodleItem ? noodleItem.price : 40) + (topItem ? topItem.price : 0) + (order.size === "L" ? 7 : 0);
+    const isNoodleOutOfStock = !noodleItem || noodleItem.stock <= 0;
+    const dishName = (order.noodleName || "Mì cay").replace(/^Mì cay\s+/i, "");
+
+    let ribbon = "";
+    if (isVipCust) ribbon = '<div class="kt-tk-ribbon is-vip">👑 VIP Thần Tài · Tip vàng</div>';
+    else if (isSpecialCombo) ribbon = '<div class="kt-tk-ribbon is-special">✨ Món đặc biệt +Bonus</div>';
+    else if (slot.isSpecial) ribbon = '<div class="kt-tk-ribbon">⭐ Món tâm đắc</div>';
+
+    const sig = [cust.name, order.noodleId, order.size, order.spicyLevel, order.toppingId, isMatch, isSpecialCombo, isVipCust, slot.isSpecial, isNoodleOutOfStock, orderCurrentPrice].join("|");
+
+    return {
+      sig,
+      html: `
+        <div id="order-slot-${idx}" class="order-slot-card kt-ticket ${isVipCust ? 'is-vip-customer-card' : ''} ${isSpecialCombo ? 'is-special-combo-slot' : ''} ${isMatch ? 'is-matching-dish' : ''}">
+          <span class="kt-clip"></span>
+          <div class="kt-tk-head">
+            <span class="kt-tk-avatar">
+              <img src="${cust.avatar}" alt="" onerror="this.src='assets/cust_cat.png'" />
+              ${isVipCust ? '<span class="kt-tk-crown">👑</span>' : ''}
+            </span>
+            <span class="kt-tk-who">
+              <b class="kt-tk-name" title="${cust.name}">${cust.name}</b>
+              <small class="kt-tk-mood"></small>
+            </span>
+            <button class="kt-tk-reject" onclick="window.game.rejectSlot(${idx})" title="Từ chối khách" aria-label="Từ chối khách">✕</button>
           </div>
-          <div class="order-patience-track">
-            <div class="order-patience-fill ${patienceClass}" style="width: ${patiencePct}%;"></div>
+          ${ribbon}
+          <button class="kt-tk-dish" onclick="window.game.quickCookForSlot(${idx})" title="Chạm để nấu nhanh đúng đơn này">
+            <span class="kt-tk-dish-icon">${noodleItem ? noodleItem.icon : "🍜"}</span>
+            <span class="kt-tk-dish-name">${dishName}</span>
+          </button>
+          <div class="kt-tk-chips">
+            <span class="kt-chip">Size ${order.size}</span>
+            <span class="kt-chip is-spicy">🌶️ ${order.spicyLevel}</span>
+            ${topItem ? `<span class="kt-chip is-top">+${topItem.icon} ${topItem.shortName || topItem.name}</span>` : ""}
           </div>
+          <div class="kt-tk-price" title="Giá bán bạn đã set trong Tab Giá Bán">🏷️ ${txaformat.formatVND(orderCurrentPrice)}</div>
+          ${isNoodleOutOfStock ? '<div class="kt-tk-warn">⚠️ Hết mì trong kho</div>' : ""}
+          <div class="order-patience-track"><div class="order-patience-fill"></div></div>
           <div class="order-actions-row">
-            <button class="btn-quick-cook" onclick="window.game.quickCookForSlot(${idx})" title="Tự động chuẩn bị niêu đất đúng đơn khách này">
-              ⚡ Nấu
-            </button>
-            <button class="btn-serve-slot ${isMatch ? 'is-matching' : ''} ${isSpecialCombo ? 'is-special-combo-btn' : ''}" onclick="window.game.serveToSlot(${idx})">
-              ${isMatch ? (isSpecialCombo ? '🌟 Bưng (+Bonus)' : '✨ Bưng') : (isSpecialCombo ? 'Bưng (+Bonus) 🌟' : 'Bưng 🍜')}
-            </button>
-            <button class="btn-reject-slot" onclick="window.game.rejectSlot(${idx})" title="Từ chối khách">✕</button>
+            <button class="btn-quick-cook" onclick="window.game.quickCookForSlot(${idx})" title="Tự động chuẩn bị niêu đất đúng đơn khách này">⚡ Nấu</button>
+            <button class="btn-serve-slot ${isMatch ? 'is-matching' : ''} ${isSpecialCombo ? 'is-special-combo-btn' : ''}" onclick="window.game.serveToSlot(${idx})" title="Bưng món cho khách (phím ${idx + 1})">🛎️ Bưng</button>
           </div>
         </div>
-      `;
-    }).join("");
+      `
+    };
+  }
+
+  updateOrderTicketPatience(card, slot) {
+    const pct = Math.max(0, Math.min(100, (slot.patience / slot.maxPatience) * 100));
+    const patienceClass = pct < 25 ? "patience-danger" : (pct < 55 ? "patience-warning" : "");
+    const fill = card.querySelector(".order-patience-fill");
+    if (fill) {
+      fill.style.width = `${pct}%`;
+      fill.className = `order-patience-fill ${patienceClass}`;
+    }
+    const mood = card.querySelector(".kt-tk-mood");
+    const moodText = this.isFeverActive ? "🔥 Giờ vàng x1.35" : (pct > 55 ? "😊 Đang đợi món" : (pct > 25 ? "🤤 Sốt ruột" : "💦 Sắp về"));
+    if (mood && mood.textContent !== moodText) mood.textContent = moodText;
+    card.classList.toggle("is-impatient", pct < 25);
+  }
+
+  // ==========================================================
+  // BẢNG ĐIỀU KHIỂN BẾP: CHUỖI PHỤC VỤ, THỐNG KÊ HÔM NAY, MÓN ĐẶC BIỆT, PHỤ BẾP
+  // ==========================================================
+  bumpServeStreak() {
+    this.serveStreak = (this.serveStreak || 0) + 1;
+    this.bestServeStreak = Math.max(this.bestServeStreak || 0, this.serveStreak);
+    if (this.serveStreak % 5 === 0) {
+      GameUIModal.showToast(`🔥 Chuỗi phục vụ x${this.serveStreak}! Bếp đang vào phom cực cháy!`, "success", "🔥");
+    }
+    this.renderKitchenPanel(true);
+  }
+
+  resetServeStreak() {
+    this.serveStreak = 0;
+    this.renderKitchenPanel();
+  }
+
+  renderKitchenPanel(popStreak = false) {
+    const streakEl = document.getElementById("kt-streak");
+    if (streakEl) {
+      const streak = this.serveStreak || 0;
+      const text = `🔥 Chuỗi x${streak}`;
+      if (streakEl.textContent !== text) streakEl.textContent = text;
+      streakEl.classList.toggle("is-hot", streak >= 5);
+      streakEl.classList.toggle("is-zero", streak === 0);
+      if (popStreak) {
+        streakEl.classList.remove("pop");
+        void streakEl.offsetWidth;
+        streakEl.classList.add("pop");
+      }
+    }
+
+    const todayEl = document.getElementById("kt-today");
+    if (todayEl) {
+      const text = `🍜 ${this.state.todayBowlsSold || 0} · 🧋 ${this.state.todayDrinksSold || 0} · 💰 +${txaformat.formatVND(this.state.todayEarnings || 0)}`;
+      if (todayEl.textContent !== text) todayEl.textContent = text;
+    }
+
+    const specialEl = document.getElementById("kt-special-chip");
+    const combo = this.state.specialCombo;
+    if (specialEl && combo) {
+      const sig = `${combo.noodleId}|${combo.spicyLevel}|${combo.toppingId}`;
+      if (specialEl.dataset.sig !== sig) {
+        specialEl.dataset.sig = sig;
+        const noodle = this.state.noodles[combo.noodleId];
+        const top = this.state.toppings[combo.toppingId];
+        const dish = noodle ? `${noodle.icon} ${noodle.name.replace(/^Mì cay\s+/i, "")}` : "";
+        specialEl.innerHTML = `<span class="kt-special-label">🌟 Đặc biệt hôm nay</span><span class="kt-special-dish">${dish} · 🌶️ ${combo.spicyLevel}${top ? ` · +${top.icon} ${top.shortName || top.name}` : ""}</span>`;
+      }
+    }
+
+    this.renderKitchenHelpers();
+  }
+
+  // Phụ bếp đã thuê đứng cạnh bếp niêu (Kenji nấu, Ducky pha trà, Usagi bưng, Shiba dọn)
+  renderKitchenHelpers() {
+    const wrap = document.getElementById("kt-helpers");
+    if (!wrap) return;
+    const staff = this.state.staff || {};
+    const helpers = [
+      { key: "kenji", name: "Kenji", role: "Tự nấu", avatar: "assets/staff_kenji.png" },
+      { key: "ducky", name: "Ducky", role: "Pha trà", avatar: "assets/staff_ducky.png" },
+      { key: "usagi", name: "Usagi", role: "Bưng bê", avatar: "assets/staff_usagi.png" },
+      { key: "shiba", name: "Shiba", role: "Dọn bàn", avatar: "assets/staff_shiba.png" }
+    ].filter(h => staff[h.key]);
+    const sig = helpers.map(h => h.key).join(",") || "none";
+    if (wrap.dataset.sig === sig) return;
+    wrap.dataset.sig = sig;
+    wrap.innerHTML = helpers.length
+      ? helpers.map(h => `<span class="kt-helper" title="${h.name}: ${h.role}"><img src="${h.avatar}" alt="${h.name}" onerror="this.src='assets/cust_cat.png'" /><b>${h.role}</b></span>`).join("")
+      : '<span class="kt-helper-hint">💡 Thuê Kenji & Usagi để bếp tự chạy</span>';
   }
 
   // Render Khu Vực Niêu Đất Nấu Mì (Workstation Trung Tâm Sôi Sùng Sục)
@@ -3128,22 +3244,14 @@ export class SpicyNoodleGame {
       miniL.classList.toggle("active", pot.size === "L");
     }
 
-    // Cập nhật nút Bưng Khớp Đơn trên bảng niêu đất
+    // Cập nhật nút Bưng Khớp Đơn (chuông 🛎️ rung khi niêu đã khớp đơn) và trạng thái bếp
+    const hasMatch = this.orderSlots.some(slot => slot && this.isPotMatchingOrder(slot.order));
     const directServeBtn = document.getElementById("btn-direct-serve");
-    if (directServeBtn) {
-      const hasMatch = this.orderSlots.some(slot => slot && pot.noodleId &&
-        pot.noodleId === slot.order.noodleId &&
-        (!slot.order.size || pot.size === slot.order.size) &&
-        (pot.spicyLevel === slot.order.spicyLevel) &&
-        (!slot.order.toppingId || pot.toppings.includes(slot.order.toppingId))
-      );
-      if (hasMatch) {
-        directServeBtn.style.animation = "servePulse 1.2s infinite alternate ease-in-out";
-        directServeBtn.style.background = "linear-gradient(135deg, #10B981 0%, #059669 100%)";
-      } else {
-        directServeBtn.style.animation = "none";
-        directServeBtn.style.background = "linear-gradient(135deg, #258A6D 0%, #166534 100%)";
-      }
+    if (directServeBtn) directServeBtn.classList.toggle("is-ready", hasMatch);
+    const potCard = document.querySelector(".pot-workstation-card");
+    if (potCard) {
+      potCard.classList.toggle("is-ready", hasMatch);
+      potCard.classList.toggle("is-cooking", Boolean(pot.noodleId));
     }
   }
 
@@ -3280,7 +3388,7 @@ export class SpicyNoodleGame {
     if (noodleWrap) {
       const activeNoodles = Object.values(this.state.noodles).filter(n => n.unlocked);
       noodleWrap.innerHTML = activeNoodles.map(n => `
-        <div class="ingredient-badge-card ${this.currentPot.noodleId === n.id ? 'selected' : ''}" onclick="window.game.selectNoodle('${n.id}')">
+        <div class="ingredient-badge-card ${this.currentPot.noodleId === n.id ? 'selected' : ''} ${this.getStockClass(n.stock)}" onclick="window.game.selectNoodle('${n.id}')">
           <span class="ingredient-stock-bubble">${n.stock}</span>
           <span class="ingredient-icon">${n.icon}</span>
           <span class="ingredient-name">${n.name}</span>
@@ -3295,7 +3403,7 @@ export class SpicyNoodleGame {
       topWrap.innerHTML = activeTops.map(t => {
         const isSelected = this.currentPot.toppings.includes(t.id);
         return `
-          <div class="ingredient-badge-card ${isSelected ? 'selected' : ''}" onclick="window.game.toggleTopping('${t.id}')">
+          <div class="ingredient-badge-card ${isSelected ? 'selected' : ''} ${this.getStockClass(t.stock)}" onclick="window.game.toggleTopping('${t.id}')">
             <span class="ingredient-stock-bubble">${t.stock}</span>
             <span class="ingredient-icon">${t.icon}</span>
             <span class="ingredient-name">${t.name}</span>
@@ -3311,7 +3419,7 @@ export class SpicyNoodleGame {
       drinkWrap.innerHTML = activeDrinks.map(d => {
         const isSelected = this.currentPot.drinkId === d.id;
         return `
-          <div class="ingredient-badge-card ${isSelected ? 'selected' : ''}" onclick="window.game.toggleDrink('${d.id}')">
+          <div class="ingredient-badge-card ${isSelected ? 'selected' : ''} ${this.getStockClass(d.stock)}" onclick="window.game.toggleDrink('${d.id}')">
             <span class="ingredient-stock-bubble">${d.stock}</span>
             <span class="ingredient-icon">${d.icon}</span>
             <span class="ingredient-name">${d.name}</span>
@@ -3347,6 +3455,13 @@ export class SpicyNoodleGame {
         guidePill.style.borderColor = "#FFE082";
       }
     }
+  }
+
+  // Thùng nguyên liệu: cảnh báo sắp hết (≤3 phần) và đã hết
+  getStockClass(stock) {
+    if (stock <= 0) return "is-out";
+    if (stock <= 3) return "is-low";
+    return "";
   }
 
   triggerPotBounce() {
@@ -3649,6 +3764,7 @@ export class SpicyNoodleGame {
     this.state.todayEarnings += totalEarned;
     this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + totalEarned;
     this.state.todayBowlsSold += 1;
+    this.bumpServeStreak();
     this.state.todayTips += (tip + specialBonus + vipBonus);
     this.state.stats.bowlsServed += 1;
     this.state.stats.tipsEarned += (tip + specialBonus + vipBonus);
@@ -3873,6 +3989,7 @@ export class SpicyNoodleGame {
     }
 
     this.orderSlots[slotIdx] = null;
+    this.resetServeStreak();
     this.sound.playButtonClick();
     GameUIModal.showToast("Đã từ chối đơn hàng, khay đã sẵn sàng đón khách mới!", "info", "🚪");
     this.renderHeader();
@@ -4687,6 +4804,7 @@ export class SpicyNoodleGame {
     this.state.todaySpecialBowlsSold = 0;
     this.dayRemaining = this.dayDuration;
     this.orderSlots = [null, null, null];
+    this.serveStreak = 0;
     this.clearCurrentPot();
 
     // Reset Giờ Vàng FEVER RUSH đầu ca
@@ -4706,6 +4824,7 @@ export class SpicyNoodleGame {
 
     this.sound.playDoorBell();
     GameUIModal.showToast(`Khai trương Ngày ${this.state.day}! Tiệm mỳ cay xì xèo ấm áp đón khách!`, "success", "🏮");
+    if (this.scene) this.scene.announce("open");
 
     // Khách đầu tiên ghé ngay lập tức
     this.spawnCustomerToSlot();
@@ -4813,6 +4932,7 @@ export class SpicyNoodleGame {
                 });
 
                 this.orderSlots[idx] = null;
+                this.resetServeStreak();
                 this.renderHeader();
               }
             }
@@ -5416,11 +5536,12 @@ export class SpicyNoodleGame {
 
   resumeShift() {
     this.isPaused = false;
-    GameUIModal.closeModal();
+    GameUIModal.closeDialogs();
     GameUIModal.showToast("Tiệm đã tiếp tục ca bán! ▶️", "info", "🍜");
   }
 
   endDay() {
+    if (this.scene) this.scene.announce("close");
     if (this.dayTimerInterval) clearInterval(this.dayTimerInterval);
     if (this.customerInterval) clearInterval(this.customerInterval);
     if (this.onlineOrderInterval) clearInterval(this.onlineOrderInterval);
@@ -5721,6 +5842,12 @@ export class SpicyNoodleGame {
     document.querySelectorAll(".nav-grid-btn").forEach(b => {
       b.classList.toggle("active", b.getAttribute("data-tab") === tabId);
     });
+
+    const activeNavBtn = document.querySelector(`.nav-grid-btn[data-tab="${tabId}"]`);
+    const tabArea = document.querySelector(".tab-content-area");
+    if (tabArea && activeNavBtn) {
+      tabArea.setAttribute("data-title", activeNavBtn.textContent.replace(/\s+/g, " ").trim());
+    }
 
     document.querySelectorAll(".tab-pane").forEach(p => {
       p.classList.toggle("active", p.id === tabId);

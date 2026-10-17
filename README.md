@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
 [![Phiên Bản](https://img.shields.io/github/package-json/v/TXAVL/MyCay?color=F59E0B&label=Phi%C3%AAn%20B%E1%BA%A3n&logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-16%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-17%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
@@ -10,6 +10,18 @@
 ---
 
 ## 🌟 Tính Năng Nổi Bật
+
+### 0. 🎮 Giao Diện Chuẩn Game Tiệm Nhỏ (v1.6.0)
+- **Khung cảnh tiệm sống động**: khách chibi bước vào từ cửa, xếp hàng ở quầy gọi món, cầm tô về bàn ngồi ăn rồi ra về; đầu bếp & nhân viên đứng quầy trò chuyện, nồi niêu bốc khói, ánh sáng đổi từ sáng sớm → hoàng hôn → đêm theo giờ ca bán.
+- **Chạm khách để chơi**: chạm khách lần 1 để nấu đúng món (bong bóng chuyển xanh ✓), chạm lần 2 để bưng ra; chạm bàn bẩn 🧹 để dọn nhận tip.
+- **HUD game**: ví xu vàng, sao đánh giá, đồng hồ ca bán, avatar có vòng XP và **Cấp độ tiệm (Lv)** kèm màn hình *LÊN CẤP!* pháo giấy.
+- **Xu vàng bay về ví** mỗi khi có tiền vào, **dock nút tròn** cố định đáy màn hình, nút bấm 3D lún khi chạm, màn hình chờ với mặt tiền quán vẽ tay.
+
+### 0.1 🍳 Khu Bếp Nấu Kiểu Game (v1.6.0)
+- **Phiếu order treo trên ray inox**: phiếu giấy đung đưa khi khách mới tới, đóng dấu **✓ ĐÚNG MÓN** khi niêu đã nấu khớp, nút 🛎️ Bưng rung chuông.
+- **Bếp niêu trên quầy gỗ** với tường gạch men & kệ gia vị, **thùng nguyên liệu 3D** báo sắp hết (≤3) / đã hết.
+- **Chuỗi phục vụ liên tiếp**, doanh thu hôm nay và lời nhắc **Món đặc biệt** ngay trên thanh tiêu đề bếp; phụ bếp đã thuê đứng cạnh bếp.
+- Gọn hơn ~1/3 trên điện thoại, phiếu order cập nhật tại chỗ nên không mất cú chạm; gợi ý phím tắt trên máy tính.
 
 ### 1. 🍲 Màn Hình Loading Đầy Đủ
 - Hoạt họa nồi mì cay niêu đất sôi sùng sục, bốc khói nghi ngút.
@@ -67,10 +79,12 @@ MyCay/
 ├── _headers            # Tối ưu cache và security cho Cloudflare Pages
 ├── README.md           # Tài liệu hướng dẫn
 ├── styles/
-│   └── main.css        # Giao diện Cozy Anime, Responsive, Glassmorphism
+│   ├── main.css        # Giao diện Cozy Anime, Responsive, Glassmorphism
+│   └── game-skin.css   # Lớp giao diện game: HUD, khung cảnh tiệm, dock, nút 3D
 └── js/
     ├── app.js          # Khởi động, điều phối loading, popup đặt tên và version
     ├── game.js         # Logic tiệm mì, nấu mì 7 cấp độ, review, nhân viên
+    ├── shop-scene.js   # Khung cảnh tiệm sống động: khách chibi, nhân viên, xu bay, cấp độ tiệm
     ├── txaversion.js   # Quản lý phiên bản game và thông báo cập nhật mới
     ├── filter.js       # Bộ lọc kiểm duyệt tên quán, cảnh báo đỏ tự biến mất
     └── audio.js        # Bộ âm thanh Web Audio API Lo-Fi & SFX sống động
