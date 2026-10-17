@@ -826,7 +826,7 @@ html, body {
   border-radius: var(--radius-card);
   padding: 6px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
   margin-bottom: 14px;
   box-shadow: 0 2px 8px rgba(60, 35, 15, 0.05);
@@ -9614,6 +9614,366 @@ body.is-device-locked #loading-screen {
   line-height: 1.25;
   margin-top: 2px;
 }
+
+/* ==========================================================
+   HỆ THỐNG NGÂN HÀNG TIẾT KIỆM (BOBA SAVINGS BANK)
+   ========================================================== */
+.bank-atm-card {
+  position: relative;
+  background: linear-gradient(135deg, #1C2833 0%, #2C3E50 50%, #17202A 100%);
+  border: 1.5px solid rgba(255, 215, 0, 0.4);
+  border-radius: 20px;
+  padding: 18px;
+  color: #FFF;
+  box-shadow: 0 10px 24px rgba(23, 32, 42, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.bank-atm-card::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.bank-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bank-brand-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bank-brand-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.bank-brand-name {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  color: #FFD700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.bank-brand-sub {
+  font-size: 10.5px;
+  color: #CBD5E1;
+  font-weight: 600;
+}
+
+.bank-chip-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.bank-balance-display {
+  margin: 16px 0 14px 0;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.bank-balance-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #F8D7DA;
+  font-weight: 700;
+}
+
+.bank-balance-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: #FFF9E6;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  margin: 4px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.bank-interest-sub {
+  font-size: 11.5px;
+  color: #E2E8F0;
+  font-weight: 600;
+}
+
+.bank-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #CBD5E1;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 10px;
+}
+
+.bank-owner-name {
+  letter-spacing: 0.5px;
+}
+
+.bank-interest-total {
+  color: #82E0AA;
+}
+
+/* KHỐI NỘI DUNG NGÂN HÀNG */
+.bank-section-box {
+  background: var(--bg-card, #FFFFFF);
+  border: 1.5px solid var(--border-card, #E8D8C8);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(60, 35, 15, 0.04);
+}
+
+.bank-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-title, #2D1E17);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.bank-wallet-pill {
+  background: var(--bg-tray, #F9F5F0);
+  border: 1px solid var(--border-subtle, #EFE4D2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent-orange, #D35400);
+}
+
+.bank-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.bank-action-col {
+  background: var(--bg-tray, #F9F5F0);
+  border: 1px solid var(--border-subtle, #EFE4D2);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bank-action-subtitle {
+  font-size: 11.5px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.bank-btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-bank-quick {
+  background: var(--bg-card, #FFF);
+  border: 1.5px solid var(--border-card, #E8D8C8);
+  border-radius: 8px;
+  padding: 7px 4px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text-title, #2D1E17);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-bank-quick:hover {
+  background: #FFF9F0;
+  border-color: var(--accent-orange, #D35400);
+  transform: translateY(-1px);
+}
+
+.btn-bank-quick:active {
+  transform: scale(0.95);
+}
+
+.btn-bank-all {
+  grid-column: span 2;
+  background: linear-gradient(135deg, #E67E22, #D35400);
+  color: #FFF !important;
+  border: none;
+  font-weight: 900;
+  box-shadow: 0 2px 6px rgba(211, 84, 0, 0.25);
+}
+
+.btn-bank-all:hover {
+  filter: brightness(1.08);
+}
+
+/* CÁC GÓI TIẾT KIỆM KỲ HẠN */
+.bank-plans-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bank-plan-card {
+  background: var(--bg-tray, #F9F5F0);
+  border: 1.5px solid var(--border-subtle, #EFE4D2);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.bank-plan-card.active-plan {
+  border-color: #27AE60;
+  background: #F4FBF7;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.15);
+}
+
+.bank-plan-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bank-plan-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bank-plan-icon {
+  font-size: 18px;
+}
+
+.bank-plan-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-title, #2D1E17);
+}
+
+.bank-plan-rate-badge {
+  font-size: 12px;
+  font-weight: 900;
+  color: #27AE60;
+  background: rgba(39, 174, 96, 0.12);
+  border: 1px solid rgba(39, 174, 96, 0.3);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.bank-plan-desc {
+  font-size: 11px;
+  color: var(--text-muted, #7D6B5D);
+  line-height: 1.35;
+}
+
+.bank-plan-action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-subtle, #EFE4D2);
+}
+
+.bank-plan-status-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted, #7D6B5D);
+}
+
+.btn-select-plan {
+  background: var(--bg-card, #FFF);
+  border: 1.5px solid var(--border-card, #E8D8C8);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--text-title, #2D1E17);
+  transition: all 0.15s ease;
+}
+
+.btn-select-plan:hover {
+  background: #27AE60;
+  color: #FFF;
+  border-color: #27AE60;
+}
+
+.btn-select-plan.is-current {
+  background: #27AE60;
+  color: #FFF;
+  border-color: #27AE60;
+  cursor: default;
+}
+
+/* LỊCH SỬ GIAO DỊCH NGÂN HÀNG */
+.bank-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.bank-history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  background: var(--bg-tray, #F9F5F0);
+  border-radius: 8px;
+  font-size: 11.5px;
+}
+
+.bank-history-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bank-history-day {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted, #7D6B5D);
+  background: rgba(0,0,0,0.05);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.bank-history-title {
+  font-weight: 700;
+  color: var(--text-title, #2D1E17);
+}
+
+.bank-history-val {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
 
 
 

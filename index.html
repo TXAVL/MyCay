@@ -265,6 +265,10 @@
             <span class="tab-btn-icon">🚚</span>
             <span class="tab-btn-label">Online</span>
           </button>
+          <button class="nav-grid-btn" data-tab="tab-bank">
+            <span class="tab-btn-icon">🏦</span>
+            <span class="tab-btn-label">Ngân hàng</span>
+          </button>
           <button class="nav-grid-btn" data-tab="tab-collection">
             <span class="tab-btn-icon">⭐</span>
             <span class="tab-btn-label">Bộ sưu tập</span>
@@ -474,6 +478,85 @@
               <h3 class="category-heading">⭐ Sổ Tay Đánh Giá Của Khách Ăn Mì</h3>
               <div id="reviews-list" class="reviews-list">
                 <!-- Render các đánh giá và phản hồi nhận tip -->
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= TAB 9: NGÂN HÀNG TIẾT KIỆM (BOBA SAVINGS BANK) ================= -->
+          <section id="tab-bank" class="tab-pane">
+            <div class="bank-atm-card">
+              <div class="bank-card-header">
+                <div class="bank-brand-block">
+                  <span class="bank-brand-icon">🏦</span>
+                  <div>
+                    <h3 class="bank-brand-name">BOBA SAVINGS BANK</h3>
+                    <span class="bank-brand-sub">Ngân Hàng Tiết Kiệm Quán Mì Anime</span>
+                  </div>
+                </div>
+                <div class="bank-chip-icon">💳</div>
+              </div>
+
+              <div class="bank-balance-display">
+                <span class="bank-balance-label">Tổng Số Dư Tiết Kiệm Sinh Lời</span>
+                <div class="bank-balance-num" id="bank-savings-display">0đ</div>
+                <div class="bank-interest-sub" id="bank-interest-sub">
+                  📈 Lãi suất ban đêm: <strong class="text-green">+2.5%/ngày</strong>
+                </div>
+              </div>
+
+              <div class="bank-card-footer">
+                <span class="bank-owner-name" id="bank-card-owner">CHỦ SỔ: BẾP TRƯỞNG MÈO</span>
+                <span class="bank-interest-total" id="bank-total-earned">Tổng lãi nhận: +0đ 🪙</span>
+              </div>
+            </div>
+
+            <!-- Giao dịch gửi / rút tiền mặt -->
+            <div class="bank-section-box">
+              <div class="bank-section-title">
+                <span>💰 Giao Dịch Tiền Mặt & Sổ Tiết Kiệm</span>
+                <span class="bank-wallet-pill" id="bank-current-wallet">Ví: 400.000đ</span>
+              </div>
+
+              <div class="bank-actions-grid">
+                <div class="bank-action-col">
+                  <span class="bank-action-subtitle text-green">📥 Gửi Tiết Kiệm</span>
+                  <div class="bank-btn-group">
+                    <button class="btn-bank-quick" onclick="window.game.depositToBank(10)">+10k</button>
+                    <button class="btn-bank-quick" onclick="window.game.depositToBank(50)">+50k</button>
+                    <button class="btn-bank-quick" onclick="window.game.depositToBank(200)">+200k</button>
+                    <button class="btn-bank-quick btn-bank-all" onclick="window.game.depositToBank('all')">Gửi Hết Ví</button>
+                  </div>
+                </div>
+
+                <div class="bank-action-col">
+                  <span class="bank-action-subtitle text-red">📤 Rút Tiền Về Ví</span>
+                  <div class="bank-btn-group">
+                    <button class="btn-bank-quick" onclick="window.game.withdrawFromBank(10)">-10k</button>
+                    <button class="btn-bank-quick" onclick="window.game.withdrawFromBank(50)">-50k</button>
+                    <button class="btn-bank-quick" onclick="window.game.withdrawFromBank(200)">-200k</button>
+                    <button class="btn-bank-quick btn-bank-all" onclick="window.game.withdrawFromBank('all')">Rút Toàn Bộ</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Các gói gửi tiết kiệm kỳ hạn -->
+            <div class="bank-section-box">
+              <div class="bank-section-title">
+                <span>📈 Các Gói Tiết Kiệm Kỳ Hạn Sinh Lời Khủng</span>
+              </div>
+              <div id="bank-plans-container" class="bank-plans-grid">
+                <!-- Render động các gói tiết kiệm -->
+              </div>
+            </div>
+
+            <!-- Lịch sử giao dịch ngân hàng -->
+            <div class="bank-section-box">
+              <div class="bank-section-title">
+                <span>📋 Lịch Sử Giao Dịch & Nhận Lãi Đêm</span>
+              </div>
+              <div id="bank-history-list" class="bank-history-list">
+                <!-- Render động lịch sử giao dịch -->
               </div>
             </div>
           </section>
@@ -1360,6 +1443,14 @@
             <div class="buff-btn-content">
               <span class="buff-btn-title">Nhảy Tới Ngày 50</span>
               <span class="buff-btn-sub">Đỉnh cao Thần Long Ryu giáng thế</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('bank_100m')">
+            <span class="buff-btn-icon">🏦</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">+100.000k Vào Ngân Hàng</span>
+              <span class="buff-btn-sub">+100 triệu VNĐ gửi tiết kiệm sinh lãi</span>
             </div>
           </button>
         </div>

@@ -39,6 +39,13 @@ export class txaversion {
           badgeType: "star"
         },
         {
+          title: "Hệ Thống Ngân Hàng Tiết Kiệm (Boba Savings Bank)",
+          desc: "Khai trương Ngân Hàng Tiết Kiệm Quán Mì: Gửi tiền an toàn không lo thâm hụt, rút linh hoạt bất kỳ lúc nào. Sinh lãi mỗi đêm từ 2.5%/ngày đến 12%/ngày với các gói kỳ hạn 3 ngày & 7 ngày VIP siêu lợi nhuận, kết hợp đặc quyền buff lãi suất từ Cụ Rùa Torto!",
+          icon: "🏦",
+          badge: "Ngân Hàng Mới 💳",
+          badgeType: "hot"
+        },
+        {
           title: "Cân Bằng Kinh Tế & Chiều Sâu Chơi Càng Lâu Càng Cuốn",
           desc: "Chuẩn hóa bảng chi phí vận hành, giá bán người chơi thiết lập, phân bổ kiên nhẫn và chuỗi ngày dài hạn đến Ngày 55+ đầy thử thách và cuốn hút!",
           icon: "📈",
@@ -53,7 +60,7 @@ export class txaversion {
           badgeType: "star"
         }
       ],
-      "Đại Tiệc Nâng Cấp & Tuyển Dụng"
+      "Đại Tiệc Nâng Cấp & Ngân Hàng Tiết Kiệm"
     );
   }
 

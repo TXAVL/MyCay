@@ -151,6 +151,16 @@ export class SpicyNoodleGame {
         specialBowlsServed: 0,
         specialBonusEarned: 0,
         totalRevenue: 400
+      },
+
+      // Hệ thống Ngân Hàng Tiết Kiệm (Boba Savings Bank)
+      bank: {
+        savings: 0, // Tiền gửi tiết kiệm sinh lãi (đơn vị k)
+        totalInterestEarned: 0, // Tổng lãi đã nhận lũy kế
+        activePlan: "flexi", // Gói tiết kiệm: "flexi" | "term3" | "term7"
+        termDepositAmount: 0, // Tiền đang gửi kỳ hạn
+        termDaysRemaining: 0, // Ngày còn lại của kỳ hạn
+        history: [] // Nhật ký giao dịch
       }
     };
 
@@ -614,9 +624,30 @@ export class SpicyNoodleGame {
         if (parsed.ownerAvatar) this.state.ownerAvatar = parsed.ownerAvatar;
         if (parsed.ownerName) this.state.ownerName = parsed.ownerName;
         if (parsed.tutorialDismissed) this.state.tutorialDismissed = parsed.tutorialDismissed;
+        if (parsed.bank && typeof parsed.bank === "object") {
+          this.state.bank = Object.assign({
+            savings: 0,
+            totalInterestEarned: 0,
+            activePlan: "flexi",
+            termDepositAmount: 0,
+            termDaysRemaining: 0,
+            history: []
+          }, parsed.bank);
+        }
       } catch (e) {
         console.error("Lỗi nạp game:", e);
       }
+    }
+
+    if (!this.state.bank) {
+      this.state.bank = {
+        savings: 0,
+        totalInterestEarned: 0,
+        activePlan: "flexi",
+        termDepositAmount: 0,
+        termDaysRemaining: 0,
+        history: []
+      };
     }
 
     // Đảm bảo luôn có basePrice thị trường chuẩn cho toàn bộ món ăn & đồ uống
@@ -680,6 +711,7 @@ export class SpicyNoodleGame {
     this.renderOnlineTab();
     this.renderCollectionTab();
     this.renderSummaryTab();
+    this.renderBankTab();
 
     this.renderBottomActionBar();
     this.renderDiningStage();
@@ -1992,6 +2024,291 @@ export class SpicyNoodleGame {
 
         reviewsList.innerHTML = headerHtml + distributionHtml + filtersHtml + listHtml;
       }
+    }
+  }
+
+  // ==========================================================
+  // HỆ THỐNG NGÂN HÀNG TIẾT KIỆM (BOBA SAVINGS BANK)
+  // ==========================================================
+  renderBankTab() {
+    const bankSection = document.getElementById("tab-bank");
+    if (!bankSection) return;
+
+    if (!this.state.bank) {
+      this.state.bank = {
+        savings: 0,
+        totalInterestEarned: 0,
+        activePlan: "flexi",
+        termDepositAmount: 0,
+        termDaysRemaining: 0,
+        history: []
+      };
+    }
+
+    const savingsDisplay = document.getElementById("bank-savings-display");
+    const walletDisplay = document.getElementById("bank-current-wallet");
+    const ownerDisplay = document.getElementById("bank-card-owner");
+    const totalEarnedDisplay = document.getElementById("bank-total-earned");
+    const interestSubDisplay = document.getElementById("bank-interest-sub");
+    const plansContainer = document.getElementById("bank-plans-container");
+    const historyList = document.getElementById("bank-history-list");
+
+    if (savingsDisplay) {
+      savingsDisplay.textContent = txaformat.formatVND(this.state.bank.savings || 0);
+    }
+    if (walletDisplay) {
+      walletDisplay.textContent = `Ví: ${txaformat.formatVND(this.state.money || 0)}`;
+    }
+    if (ownerDisplay) {
+      const owner = (this.state.ownerName || "Bếp Trưởng Mèo").toUpperCase();
+      ownerDisplay.textContent = `CHỦ SỔ: ${owner}`;
+    }
+    if (totalEarnedDisplay) {
+      totalEarnedDisplay.textContent = `Tổng lãi nhận: +${txaformat.formatVND(this.state.bank.totalInterestEarned || 0)} 🪙`;
+    }
+
+    const tortoActive = !!this.state.staff.torto;
+    const currentPlan = this.state.bank.activePlan || "flexi";
+
+    if (interestSubDisplay) {
+      let rateDesc = "";
+      if (currentPlan === "flexi") {
+        rateDesc = tortoActive ? "+5.0%/ngày (Linh hoạt · Được Cụ Rùa x2 lãi 🐢)" : "+2.5%/ngày (Linh hoạt mỗi đêm)";
+      } else if (currentPlan === "term3") {
+        rateDesc = tortoActive ? "+9.0%/ngày (Kỳ hạn 3 ngày · Được Cụ Rùa buff 🐢)" : "+6.0%/ngày (Kỳ hạn 3 ngày)";
+      } else {
+        rateDesc = tortoActive ? "+16.0%/ngày (Kỳ hạn 7 ngày VIP · Được Cụ Rùa buff 🐢)" : "+12.0%/ngày (Kỳ hạn 7 ngày VIP)";
+      }
+      interestSubDisplay.innerHTML = `📈 Lãi suất ban đêm: <strong class="text-green">${rateDesc}</strong>`;
+    }
+
+    if (plansContainer) {
+      const plans = [
+        {
+          id: "flexi",
+          icon: "🌱",
+          name: "Tiết Kiệm Linh Hoạt (Không Kỳ Hạn)",
+          baseRate: "2.5%",
+          tortoRate: "5.0%",
+          desc: "Nạp rút bất kỳ lúc nào không lo mất lãi. Tiền gửi tự động sinh lời mỗi khi kết thúc ca bán ban đêm.",
+          termDays: 0
+        },
+        {
+          id: "term3",
+          icon: "🚀",
+          name: "Kỳ Hạn 3 Ngày (Tăng Tốc Vốn)",
+          baseRate: "6.0%",
+          tortoRate: "9.0%",
+          desc: "Khóa tiền gửi 3 ngày. Nhận cả vốn lẫn trọn gói lãi suất cao gấp hơn 2 lần khi đáo hạn.",
+          termDays: 3
+        },
+        {
+          id: "term7",
+          icon: "👑",
+          name: "Kỳ Hạn 7 Ngày VIP (Đại Gia Mì Cay)",
+          baseRate: "12.0%",
+          tortoRate: "16.0%",
+          desc: "Gói tiết kiệm thượng lưu khóa 7 ngày. Lãi suất khủng tới 12% - 16%/ngày giúp tiệm bứt phá tài chính!",
+          termDays: 7
+        }
+      ];
+
+      plansContainer.innerHTML = plans.map(p => {
+        const isActive = currentPlan === p.id;
+        const rateShow = tortoActive ? `${p.tortoRate}/ngày 🐢` : `${p.baseRate}/ngày`;
+        let statusBadge = "";
+        let actionBtn = "";
+
+        if (p.id === "flexi") {
+          if (isActive) {
+            statusBadge = `<span class="bank-plan-status-text text-green">● Đang kích hoạt gói này</span>`;
+            actionBtn = `<button class="btn-select-plan is-current" disabled>Đang Dùng</button>`;
+          } else {
+            statusBadge = `<span class="bank-plan-status-text">Không khóa vốn</span>`;
+            actionBtn = `<button class="btn-select-plan" onclick="window.game.selectBankPlan('flexi')">Chuyển Sang</button>`;
+          }
+        } else {
+          if (isActive && this.state.bank.termDepositAmount > 0) {
+            statusBadge = `<span class="bank-plan-status-text text-green">🔒 Đang gửi ${txaformat.formatVND(this.state.bank.termDepositAmount)} (Còn ${this.state.bank.termDaysRemaining} ngày)</span>`;
+            actionBtn = `<button class="btn-select-plan is-current" disabled>Đang Chạy</button>`;
+          } else {
+            statusBadge = `<span class="bank-plan-status-text">Kỳ hạn ${p.termDays} ca ngày</span>`;
+            actionBtn = `<button class="btn-select-plan" onclick="window.game.promptTermDeposit('${p.id}', ${p.termDays})">Mở Sổ Gửi</button>`;
+          }
+        }
+
+        return `
+          <div class="bank-plan-card ${isActive ? 'active-plan' : ''}">
+            <div class="bank-plan-top">
+              <div class="bank-plan-name-wrap">
+                <span class="bank-plan-icon">${p.icon}</span>
+                <span class="bank-plan-name">${p.name}</span>
+              </div>
+              <span class="bank-plan-rate-badge">${rateShow}</span>
+            </div>
+            <div class="bank-plan-desc">${p.desc}</div>
+            <div class="bank-plan-action-row">
+              ${statusBadge}
+              ${actionBtn}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    if (historyList) {
+      const history = this.state.bank.history || [];
+      if (history.length === 0) {
+        historyList.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 12px;">Chưa có giao dịch gửi / nhận lãi nào. Hãy gửi tiền tiết kiệm ngay hôm nay!</div>`;
+      } else {
+        historyList.innerHTML = history.slice(0, 15).map(h => {
+          let icon = "💰";
+          let valClass = "text-green";
+          let sign = "+";
+          if (h.type === "deposit") {
+            icon = "📥";
+            valClass = "text-green";
+            sign = "+";
+          } else if (h.type === "withdraw") {
+            icon = "📤";
+            valClass = "text-red";
+            sign = "-";
+          } else if (h.type === "interest") {
+            icon = "📈";
+            valClass = "text-green";
+            sign = "+";
+          } else if (h.type === "term_payout") {
+            icon = "🎉";
+            valClass = "text-green";
+            sign = "+";
+          }
+          return `
+            <div class="bank-history-row">
+              <div class="bank-history-left">
+                <span>${icon}</span>
+                <span class="bank-history-day">Ngày ${h.day || 1}</span>
+                <span class="bank-history-title">${h.desc || 'Giao dịch'}</span>
+              </div>
+              <span class="bank-history-val ${valClass}">${sign}${txaformat.formatVND(h.amount || 0)}</span>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+  }
+
+  depositToBank(amount) {
+    if (this.state.dayPhase === "open") {
+      GameUIModal.showToast("Quán đang trong ca bán bận rộn! Hãy gửi tiền sau giờ đóng cửa nhé!", "info", "⏱️");
+      return;
+    }
+
+    let val = 0;
+    if (amount === "all") {
+      val = Math.floor(this.state.money || 0);
+    } else {
+      val = Number(amount);
+    }
+
+    if (val <= 0 || this.state.money < val) {
+      GameUIModal.showToast("Ví tiền mặt của bạn không đủ để gửi tiết kiệm số tiền này!", "warning", "⚠️");
+      return;
+    }
+
+    this.state.money -= val;
+    this.state.bank.savings = (this.state.bank.savings || 0) + val;
+    this.addBankHistory("deposit", val, "Gửi tiết kiệm tiền mặt");
+
+    this.sound.playCoinChime();
+    GameUIModal.showToast(`Đã gửi thành công +${txaformat.formatVND(val)} vào sổ tiết kiệm!`, "success", "🏦");
+    this.saveGame();
+    this.renderHeader();
+    this.renderBankTab();
+  }
+
+  withdrawFromBank(amount) {
+    if (this.state.dayPhase === "open") {
+      GameUIModal.showToast("Quán đang trong ca bán bận rộn! Hãy rút tiền sau giờ đóng cửa nhé!", "info", "⏱️");
+      return;
+    }
+
+    const currentSavings = this.state.bank.savings || 0;
+    let val = 0;
+    if (amount === "all") {
+      val = Math.floor(currentSavings);
+    } else {
+      val = Number(amount);
+    }
+
+    if (val <= 0 || currentSavings < val) {
+      GameUIModal.showToast("Số dư trong sổ tiết kiệm của bạn không đủ để rút số tiền này!", "warning", "⚠️");
+      return;
+    }
+
+    this.state.bank.savings -= val;
+    this.state.money = (this.state.money || 0) + val;
+    this.addBankHistory("withdraw", val, "Rút tiền về ví");
+
+    this.sound.playCoinChime();
+    GameUIModal.showToast(`Đã rút thành công +${txaformat.formatVND(val)} về ví tiền mặt!`, "success", "💵");
+    this.saveGame();
+    this.renderHeader();
+    this.renderBankTab();
+  }
+
+  promptTermDeposit(planId, termDays) {
+    if (this.state.dayPhase === "open") {
+      GameUIModal.showToast("Hãy mở sổ kỳ hạn sau giờ đóng cửa quán nhé!", "info", "⏱️");
+      return;
+    }
+
+    if (this.state.bank.termDepositAmount > 0 && this.state.bank.termDaysRemaining > 0) {
+      GameUIModal.showToast(`Bạn đang có một gói kỳ hạn đang chạy (${this.state.bank.termDaysRemaining} ngày nữa mới đáo hạn)!`, "warning", "🔒");
+      return;
+    }
+
+    const availableSavings = this.state.bank.savings || 0;
+    if (availableSavings < 50) {
+      GameUIModal.showToast("Cần tối thiểu 50.000đ trong sổ tiết kiệm để mở gói kỳ hạn!", "warning", "⚠️");
+      return;
+    }
+
+    const depositAmt = Math.floor(availableSavings);
+    this.state.bank.savings -= depositAmt;
+    this.state.bank.termDepositAmount = depositAmt;
+    this.state.bank.termDaysRemaining = termDays;
+    this.state.bank.activePlan = planId;
+
+    const planName = planId === "term7" ? "Kỳ Hạn 7 Ngày VIP" : "Kỳ Hạn 3 Ngày";
+    this.addBankHistory("deposit", depositAmt, `Mở sổ ${planName} (Khóa vốn ${termDays} ngày)`);
+
+    this.sound.playCoinChime();
+    GameUIModal.showToast(`Đã khóa gửi ${txaformat.formatVND(depositAmt)} vào ${planName}! Lãi sẽ tự động tất toán sau ${termDays} ngày!`, "success", "🎉");
+    this.saveGame();
+    this.renderBankTab();
+  }
+
+  selectBankPlan(planId) {
+    if (planId === "flexi") {
+      this.state.bank.activePlan = "flexi";
+      GameUIModal.showToast("Đã chuyển về gói Tiết Kiệm Linh Hoạt (Rút nạp tự do)! ✨", "info", "🌱");
+      this.saveGame();
+      this.renderBankTab();
+    }
+  }
+
+  addBankHistory(type, amount, desc) {
+    if (!this.state.bank) return;
+    if (!Array.isArray(this.state.bank.history)) this.state.bank.history = [];
+    this.state.bank.history.unshift({
+      day: this.state.day || 1,
+      type,
+      amount,
+      desc,
+      timestamp: Date.now()
+    });
+    if (this.state.bank.history.length > 25) {
+      this.state.bank.history = this.state.bank.history.slice(0, 25);
     }
   }
 
@@ -5139,6 +5456,45 @@ export class SpicyNoodleGame {
       this.state.todayTortoInterest = 0;
     }
 
+    // 3. Tính lãi Ngân Hàng Tiết Kiệm Boba Savings Bank
+    if (!this.state.bank) {
+      this.state.bank = { savings: 0, totalInterestEarned: 0, activePlan: "flexi", termDepositAmount: 0, termDaysRemaining: 0, history: [] };
+    }
+
+    let dailyBankInterest = 0;
+    // Gói tiết kiệm linh hoạt không kỳ hạn (Flexi)
+    if (this.state.bank.savings > 0) {
+      const tortoBonus = this.state.staff.torto ? 0.025 : 0;
+      const flexiRate = 0.025 + tortoBonus;
+      const flexiInterest = Math.max(1, Math.round(this.state.bank.savings * flexiRate));
+      this.state.bank.savings += flexiInterest;
+      this.state.bank.totalInterestEarned = (this.state.bank.totalInterestEarned || 0) + flexiInterest;
+      dailyBankInterest += flexiInterest;
+      this.addBankHistory("interest", flexiInterest, `Lãi tiết kiệm linh hoạt (+${(flexiRate * 100).toFixed(1)}%/ngày)`);
+    }
+
+    // Gói tiết kiệm kỳ hạn (Term 3 hoặc Term 7)
+    if (this.state.bank.termDepositAmount > 0 && this.state.bank.termDaysRemaining > 0) {
+      this.state.bank.termDaysRemaining -= 1;
+      if (this.state.bank.termDaysRemaining <= 0) {
+        const isTerm7 = this.state.bank.activePlan === "term7";
+        const tortoRateBonus = this.state.staff.torto ? (isTerm7 ? 0.04 : 0.03) : 0;
+        const dailyRate = (isTerm7 ? 0.12 : 0.06) + tortoRateBonus;
+        const totalDays = isTerm7 ? 7 : 3;
+        const termInterest = Math.round(this.state.bank.termDepositAmount * dailyRate * totalDays);
+        const totalPayout = this.state.bank.termDepositAmount + termInterest;
+
+        this.state.bank.savings += totalPayout;
+        this.state.bank.totalInterestEarned = (this.state.bank.totalInterestEarned || 0) + termInterest;
+        dailyBankInterest += termInterest;
+
+        this.addBankHistory("term_payout", totalPayout, `Tất toán ${isTerm7 ? 'Kỳ Hạn 7 Ngày VIP' : 'Kỳ Hạn 3 Ngày'} (Gốc + Lãi ${txaformat.formatVND(termInterest)})`);
+        this.state.bank.termDepositAmount = 0;
+        this.state.bank.activePlan = "flexi";
+      }
+    }
+    this.state.todayBankInterest = dailyBankInterest;
+
     const totalDailyExpenses = rentCost + totalPayroll;
     this.state.todayExpenses = totalDailyExpenses;
 
@@ -5194,6 +5550,12 @@ export class SpicyNoodleGame {
             <div class="receipt-row">
               <span>🐢 Lãi kép Cụ Rùa (+5% két sắt):</span>
               <strong class="receipt-val-gold">+${txaformat.formatVND(this.state.todayTortoInterest)}</strong>
+            </div>
+          ` : ''}
+          ${this.state.todayBankInterest > 0 ? `
+            <div class="receipt-row">
+              <span>🏦 Lãi Ngân Hàng Tiết Kiệm:</span>
+              <strong class="receipt-val-gold">+${txaformat.formatVND(this.state.todayBankInterest)}</strong>
             </div>
           ` : ''}
 
@@ -5332,6 +5694,7 @@ export class SpicyNoodleGame {
     if (tabId === "tab-upgrades") this.renderUpgradesTab();
     if (tabId === "tab-staff") this.renderStaffTab();
     if (tabId === "tab-online") this.renderOnlineTab();
+    if (tabId === "tab-bank") this.renderBankTab();
     if (tabId === "tab-collection") this.renderCollectionTab();
     if (tabId === "tab-summary") this.renderSummaryTab();
 
@@ -5444,6 +5807,16 @@ export class SpicyNoodleGame {
       case "skip_day_50":
         this.state.day = 50;
         GameUIModal.showToast("🐉 Đã tua nhanh thời gian tới Ngày 50!", "info", "📅");
+        break;
+
+      case "bank_100m":
+        if (!this.state.bank) {
+          this.state.bank = { savings: 0, totalInterestEarned: 0, activePlan: "flexi", termDepositAmount: 0, termDaysRemaining: 0, history: [] };
+        }
+        this.state.bank.savings = (this.state.bank.savings || 0) + 100000;
+        this.addBankHistory("deposit", 100000, "👑 Buff Trợ Lực Chủ Quán (+100 Triệu VNĐ)");
+        this.renderBankTab();
+        GameUIModal.showToast("🏦 Đã buff +100.000k (100 Triệu VNĐ) vào Ngân Hàng Tiết Kiệm!", "success", "✨");
         break;
     }
 
