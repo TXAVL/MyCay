@@ -414,9 +414,9 @@ export class SpicyNoodleGame {
     this.isFeverActive = false;
     this.feverRemainingSeconds = 0;
 
-    // Thời gian ngày (4 phút = 240s)
-    this.dayDuration = 240;
-    this.dayRemaining = 240;
+    // Thời gian ngày (2 phút = 120s - nhịp độ nhanh & quản lý chuẩn mực)
+    this.dayDuration = 120;
+    this.dayRemaining = 120;
     this.isPaused = false;
     this.dayTimerInterval = null;
     this.customerInterval = null;
@@ -1184,7 +1184,7 @@ export class SpicyNoodleGame {
     return totalRatio / activeNoodles.length;
   }
 
-  // 6. Tab 3: Giá bán
+  // 6. Tab 3: Giá bán (Bảng Thiết Lập Giá Bán Thực Tế Của Quán)
   renderPriceTab() {
     const listEl = document.getElementById("price-settings-list");
     if (!listEl) return;
@@ -1220,14 +1220,22 @@ export class SpicyNoodleGame {
       return `
         <div class="price-card">
           <div class="price-card-info">
-            <span class="price-card-title">${item.icon} ${item.name}</span>
-            <span class="price-card-desc">Vốn: ${txaformat.formatVND(item.unitCost)} · Gốc: ${txaformat.formatVND(base)} · Lãi: +${txaformat.formatVND(profit)}</span>
+            <div class="price-card-head">
+              <span class="price-card-title">${item.icon} ${item.name}</span>
+              <span class="price-stock-tag">Kho: <strong>${item.stock || 0}</strong></span>
+            </div>
+            <span class="price-card-desc">Vốn: <strong>${txaformat.formatVND(item.unitCost)}</strong> · Chuẩn thị trường: <strong>${txaformat.formatVND(base)}</strong> · Lãi dự kiến: <strong style="color: #258A6D;">+${txaformat.formatVND(profit)} / phần</strong></span>
             <span class="price-indicator-badge ${badgeClass}">${badgeText}</span>
           </div>
           <div class="price-card-controls">
-            <button class="btn-stepper" onclick="window.game.adjustPrice('${item.id}', -1)">−</button>
-            <span style="font-weight: 800; min-width: 55px; text-align: center; color: var(--accent-money);">${txaformat.formatVND(item.price)}</span>
-            <button class="btn-stepper" onclick="window.game.adjustPrice('${item.id}', 1)">+</button>
+            <button class="btn-stepper btn-stepper-jump" onclick="window.game.adjustPrice('${item.id}', -5)" title="Giảm nhanh 5.000đ">−5k</button>
+            <button class="btn-stepper" onclick="window.game.adjustPrice('${item.id}', -1)" title="Giảm 1.000đ">−1k</button>
+            <div class="price-active-display">
+              <span class="price-active-label">Giá niêm yết:</span>
+              <strong class="price-active-amount">${txaformat.formatVND(item.price)}</strong>
+            </div>
+            <button class="btn-stepper" onclick="window.game.adjustPrice('${item.id}', 1)" title="Tăng 1.000đ">+1k</button>
+            <button class="btn-stepper btn-stepper-jump" onclick="window.game.adjustPrice('${item.id}', 5)" title="Tăng nhanh 5.000đ">+5k</button>
           </div>
         </div>
       `;
@@ -1244,39 +1252,47 @@ export class SpicyNoodleGame {
     this.saveGame();
     this.renderPriceTab();
     this.renderChalkboardBanner();
+    this.renderOrderQueue();
+    this.renderKhoTab();
   }
 
-  // 7. Tab 4: Nâng cấp
+  // 7. Tab 4: Nâng cấp (Độ Sâu Tiến Trình Mở Dài Hạn Đến Ngày 26+)
   renderUpgradesTab() {
     const listEl = document.getElementById("upgrades-list");
     if (!listEl) return;
 
     const upgradesConfig = [
-      { key: "tableCount", name: "Thêm Bàn Ghế Gỗ Sồi", desc: "Tăng số lượng bàn đón khách cùng lúc", baseCost: 280, max: 6, icon: "🪑", minDay: 1 },
-      { key: "stoveSpeed", name: "Bếp Niêu Đất Cao Cấp", desc: "Tăng tốc độ ninh mỳ và nấu song song", baseCost: 350, max: 4, icon: "🔥", minDay: 2 },
-      { key: "chiliSecret", name: "Sốt Ớt Hiểm Bí Truyền", desc: "Gia vị cay nồng độc quyền tăng 15% giá bán", baseCost: 420, max: 3, icon: "🌶️", minDay: 2 },
-      { key: "acCooling", name: "Điều Hòa Daikin Mát Rượi", desc: "Giải nhiệt ăn cay, tăng 30% kiên nhẫn của khách", baseCost: 320, max: 3, icon: "❄️", minDay: 2 },
-      { key: "decorScore", name: "Đèn Lồng Đỏ Tokyo - Seoul", desc: "Tăng danh tiếng và kéo khách nườm nượp", baseCost: 380, max: 4, icon: "🏮", minDay: 3 }
+      { key: "tableCount", name: "Thêm Bàn Ghế Gỗ Sồi", desc: "Tăng số lượng bàn đón khách cùng lúc", baseCost: 320, scale: 1.65, max: 8, icon: "🪑", minDays: [1, 2, 4, 7, 11, 15, 20, 26] },
+      { key: "stoveSpeed", name: "Bếp Niêu Đất Cao Cấp", desc: "Tăng tốc độ ninh mỳ và giảm thời gian nấu song song", baseCost: 400, scale: 1.7, max: 6, icon: "🔥", minDays: [1, 3, 6, 10, 15, 22] },
+      { key: "chiliSecret", name: "Sốt Ớt Hiểm Bí Truyền", desc: "Gia vị cay nồng độc quyền tăng 12% giá bán mỗi cấp", baseCost: 450, scale: 1.75, max: 5, icon: "🌶️", minDays: [1, 3, 7, 13, 19] },
+      { key: "acCooling", name: "Điều Hòa Daikin Mát Rượi", desc: "Giải nhiệt ăn cay, tăng 25% độ kiên nhẫn của khách", baseCost: 350, scale: 1.65, max: 5, icon: "❄️", minDays: [1, 3, 8, 14, 20] },
+      { key: "decorScore", name: "Đèn Lồng Đỏ Tokyo - Seoul", desc: "Tăng danh tiếng và kéo khách ghé tiệm nườm nượp", baseCost: 420, scale: 1.7, max: 6, icon: "🏮", minDays: [1, 4, 8, 13, 18, 25] },
+      { key: "freezerStorage", name: "Tủ Đông Sanaky Bảo Quản", desc: "Tăng trữ lượng kho sỉ, giảm tối đa hao hụt nước dùng", baseCost: 360, scale: 1.6, max: 5, icon: "🧊", minDays: [1, 5, 9, 14, 21] },
+      { key: "lofiAcoustic", name: "Dàn Loa Lo-Fi Cafe Acoustic", desc: "Nhạc du dương thư giãn, giảm 20% cáu gắt khi quán đông", baseCost: 380, scale: 1.65, max: 4, icon: "📻", minDays: [1, 6, 11, 17] }
     ];
 
     listEl.innerHTML = upgradesConfig.map(up => {
       const currentLv = this.state.upgrades[up.key] || 1;
       const isMax = currentLv >= up.max;
-      const cost = Math.round(up.baseCost * Math.pow(1.6, currentLv - 1));
-      const isDayUnlocked = this.state.day >= up.minDay;
+      const cost = Math.round(up.baseCost * Math.pow(up.scale || 1.65, currentLv - 1));
+      const nextMinDay = (up.minDays && up.minDays[currentLv]) ? up.minDays[currentLv] : 1;
+      const isDayUnlocked = this.state.day >= nextMinDay;
 
       return `
         <div class="upgrade-card">
           <div class="upgrade-card-info">
             <span class="upgrade-card-title">${up.icon} ${up.name} (Cấp ${currentLv}/${up.max})</span>
             <span class="upgrade-card-desc">${up.desc}</span>
+            <div class="upgrade-lv-progress-bar">
+              <div class="upgrade-lv-progress-fill" style="width: ${(currentLv / up.max) * 100}%;"></div>
+            </div>
           </div>
           <div>
-            ${isMax ? `<span style="font-weight: 800; color: #258A6D;">Tối đa</span>` : (
-              !isDayUnlocked ? `<span class="staff-lock-badge">🔒 Ngày ${up.minDay}</span>` : `
-              <button class="btn-menu-action btn-buy-lock" onclick="window.game.buyUpgrade('${up.key}', ${cost}, ${up.minDay})">
+            ${isMax ? `<span class="upgrade-badge-max">⭐ Tối đa</span>` : (
+              !isDayUnlocked ? `<span class="staff-lock-badge">🔒 Mở Ngày ${nextMinDay}</span>` : `
+              <button class="btn-menu-action btn-buy-lock" onclick="window.game.buyUpgrade('${up.key}', ${cost}, ${nextMinDay})">
                 <span class="btn-price-top">${cost}k</span>
-                <span class="btn-action-sub">Nâng Cấp</span>
+                <span class="btn-action-sub">Lên Cấp ${currentLv + 1}</span>
               </button>
             `)}
           </div>
@@ -1285,9 +1301,9 @@ export class SpicyNoodleGame {
     }).join("");
   }
 
-  buyUpgrade(key, cost, minDay = 1) {
-    if (this.state.day < minDay) {
-      GameUIModal.showToast(`Trang bị này mở khóa từ Ngày ${minDay}!`, "warning", "📅");
+  buyUpgrade(key, cost, nextMinDay = 1) {
+    if (this.state.day < nextMinDay) {
+      GameUIModal.showToast(`Trang bị cấp độ này chỉ mở khóa từ Ngày ${nextMinDay}!`, "warning", "📅");
       return;
     }
     if (this.state.money < cost) {
@@ -1333,38 +1349,47 @@ export class SpicyNoodleGame {
     this.renderUpgradesTab();
   }
 
-  // 8. Tab 5: Nhân viên
+  // 8. Tab 5: Nhân viên (Lộ Trình Tuyển Dụng Dài Hạn Gắn Liền Với Danh Tiếng ⭐ & Ngày)
   renderStaffTab() {
     const listEl = document.getElementById("staff-list");
     if (!listEl) return;
 
     const staffConfig = [
-      { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Tự động chào đón khách & tăng 35% tiền tip", cost: 350, minDay: 2, icon: "🐱" },
-      { key: "usagi", name: "Thỏ Usagi (Bưng bê niêu đất)", desc: "Tự động bưng mì nóng hổi ra bàn cho khách", cost: 480, minDay: 2, icon: "🐰" },
-      { key: "shiba", name: "Cún Shiba (Tạp vụ dọn bàn)", desc: "Tự động lau dọn bàn sạch bóng & nhặt tiền tip", cost: 520, minDay: 3, icon: "🐶" },
-      { key: "kenji", name: "Gấu Kenji (Đầu bếp ninh mì)", desc: "Tự động nấu niêu đất khi khách gọi món", cost: 680, minDay: 4, icon: "🐼" },
-      { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và giao đơn online cho Shipper", cost: 750, minDay: 5, icon: "🦊" },
-      { key: "ducky", name: "Vịt Ducky (Barista Pha Chế)", desc: "Tự động pha chế & phục vụ trà sữa, tăng +25% doanh thu nước", cost: 850, minDay: 6, icon: "🦆" },
-      { key: "owl", name: "Cú Mèo Owl (Trưởng Marketing)", desc: "Bão khách ghé tiệm +40%, nổ đơn Online 10s & x2 review 5 sao", cost: 980, minDay: 7, icon: "🦉" },
-      { key: "fawn", name: "Nai Fawn (Logistics & Quản Lý Kho)", desc: "Nhập sỉ chiết khấu -15%, tự động restock & thưởng +50% đơn giao", cost: 1200, minDay: 8, icon: "🦌" }
+      { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Chào đón khách nồng hậu & tăng +25% tiền tip", cost: 450, dailyWage: 35, minDay: 2, minRep: 25, icon: "🐱" },
+      { key: "usagi", name: "Thỏ Usagi (Bưng bê niêu đất)", desc: "Tự động bưng mì nóng hổi ra bàn khi nấu xong", cost: 850, dailyWage: 45, minDay: 4, minRep: 50, icon: "🐰" },
+      { key: "shiba", name: "Cún Shiba (Tạp vụ dọn bàn)", desc: "Tự động lau dọn bàn sạch bóng & nhặt tiền tip", cost: 1350, dailyWage: 45, minDay: 6, minRep: 80, icon: "🐶" },
+      { key: "kenji", name: "Gấu Kenji (Đầu bếp ninh mì)", desc: "Tự động nấu niêu đất khi khách gọi món", cost: 2200, dailyWage: 65, minDay: 9, minRep: 120, icon: "🐼" },
+      { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và giao đơn online cho Shipper", cost: 3200, dailyWage: 60, minDay: 12, minRep: 165, icon: "🦊" },
+      { key: "ducky", name: "Vịt Ducky (Barista Pha Chế)", desc: "Tự pha & kèm trà sữa, tăng +25% doanh thu nước", cost: 4500, dailyWage: 60, minDay: 16, minRep: 220, icon: "🦆" },
+      { key: "owl", name: "Cú Mèo Owl (Trưởng Marketing)", desc: "Bão khách ghé tiệm +35%, nổ đơn Online 12s & review 5 sao", cost: 5800, dailyWage: 75, minDay: 21, minRep: 290, icon: "🦉" },
+      { key: "fawn", name: "Nai Fawn (Logistics & Quản Lý Kho)", desc: "Nhập sỉ chiết khấu -15%, tự động restock & thưởng +15% đơn giao", cost: 7500, dailyWage: 85, minDay: 27, minRep: 380, icon: "🦌" }
     ];
 
     listEl.innerHTML = staffConfig.map(st => {
       const isHired = !!this.state.staff[st.key];
       const isDayUnlocked = this.state.day >= st.minDay;
+      const isRepUnlocked = (this.state.reputation || 0) >= st.minRep;
+      const isUnlocked = isDayUnlocked && isRepUnlocked;
 
       return `
         <div class="staff-card">
           <div class="staff-card-info">
-            <span class="staff-card-title">${st.icon} ${st.name}</span>
+            <div class="staff-card-head">
+              <span class="staff-card-title">${st.icon} ${st.name}</span>
+              <span class="staff-card-wage">Lương: ${st.dailyWage}k/ngày</span>
+            </div>
             <span class="staff-card-desc">${st.desc}</span>
+            <div class="staff-card-reqs">
+              <span class="req-pill ${isDayUnlocked ? 'req-met' : 'req-unmet'}">📅 Ngày ${st.minDay}+</span>
+              <span class="req-pill ${isRepUnlocked ? 'req-met' : 'req-unmet'}">⭐ ${st.minRep} Danh tiếng</span>
+            </div>
           </div>
           <div>
-            ${isHired ? `<span style="font-weight: 800; color: #258A6D;">Đang làm việc</span>` : (
-              !isDayUnlocked ? `<span class="staff-lock-badge">🔒 Ngày ${st.minDay}</span>` : `
-              <button class="btn-menu-action btn-buy-lock" onclick="window.game.hireStaff('${st.key}', ${st.cost}, ${st.minDay})">
+            ${isHired ? `<span class="staff-badge-working">✨ Đang làm việc</span>` : (
+              !isUnlocked ? `<span class="staff-lock-badge">🔒 Ngày ${st.minDay} · ${st.minRep}⭐</span>` : `
+              <button class="btn-menu-action btn-buy-lock" onclick="window.game.hireStaff('${st.key}', ${st.cost}, ${st.minDay}, ${st.minRep})">
                 <span class="btn-price-top">${st.cost}k</span>
-                <span class="btn-action-sub">Thuê</span>
+                <span class="btn-action-sub">Ký Hợp Đồng</span>
               </button>
             `)}
           </div>
@@ -1373,9 +1398,13 @@ export class SpicyNoodleGame {
     }).join("");
   }
 
-  hireStaff(key, cost, minDay = 1) {
+  hireStaff(key, cost, minDay = 1, minRep = 0) {
     if (this.state.day < minDay) {
-      GameUIModal.showToast(`Nhân viên này chỉ nhận hợp đồng từ Ngày ${minDay}!`, "warning", "📅");
+      GameUIModal.showToast(`Nhân viên này chỉ nhận hồ sơ từ Ngày ${minDay}!`, "warning", "📅");
+      return;
+    }
+    if ((this.state.reputation || 0) < minRep) {
+      GameUIModal.showToast(`Tiệm cần đạt tối thiểu ${minRep}⭐ Danh tiếng để chiêu mộ nhân sự này!`, "warning", "⭐");
       return;
     }
     if (this.state.money < cost) {
@@ -1391,7 +1420,7 @@ export class SpicyNoodleGame {
     if (key === "ducky") welcomeMsg = `🦆 Vịt Ducky đã đứng quầy Barista! Sẵn sàng lắc trà sữa & tăng 25% doanh thu nước!`;
     else if (key === "owl") welcomeMsg = `🦉 Cú Mèo Owl đã lên sóng Marketing! Lượng khách & đơn online sắp bùng nổ!`;
     else if (key === "fawn") welcomeMsg = `🦌 Nai Fawn đã tiếp quản kho hàng! Toàn bộ nguyên liệu được chiết khấu sỉ 15%!`;
-    else welcomeMsg = `Đã đón chào nhân viên mới về tiệm mì cay & trà sữa!`;
+    else welcomeMsg = `Đã ký hợp đồng thành công với nhân sự mới về tiệm mì cay!`;
 
     GameUIModal.showToast(welcomeMsg, "success", "🐾");
     this.saveGame();
@@ -2506,6 +2535,11 @@ export class SpicyNoodleGame {
       const isSpecialCombo = Boolean(slot.isSpecialCombo || this.isSpecialComboOrder(order));
       const isVipCust = Boolean(cust.isVip);
       const noodleItem = this.state.noodles[order.noodleId];
+      const topItem = order.toppingId ? this.state.toppings[order.toppingId] : null;
+      const noodlePrice = noodleItem ? noodleItem.price : 40;
+      const topPrice = topItem ? topItem.price : 0;
+      const sizePrice = order.size === "L" ? 7 : 0;
+      const orderCurrentPrice = noodlePrice + topPrice + sizePrice;
       const isNoodleOutOfStock = !noodleItem || (noodleItem.stock <= 0);
 
       return `
@@ -2518,19 +2552,22 @@ export class SpicyNoodleGame {
             <div class="order-cust-info">
               <span class="order-cust-title">${isVipCust ? '👑 ' : (isSpecialCombo ? '🌟 ' : (slot.isSpecial ? '⭐ ' : ''))}${cust.name}</span>
               <span class="order-cust-mood ${patienceClass}">
-                ${this.isFeverActive ? '🔥 Giờ vàng x2' : (patiencePct > 55 ? '😊 Đang đợi món' : (patiencePct > 25 ? '🤤 Sốt ruột' : '💦 Sắp về'))}
+                ${this.isFeverActive ? '🔥 Giờ vàng x1.35' : (patiencePct > 55 ? '😊 Đang đợi món' : (patiencePct > 25 ? '🤤 Sốt ruột' : '💦 Sắp về'))}
               </span>
             </div>
           </div>
           <div class="order-speech-bubble" onclick="window.game.quickCookForSlot(${idx})" style="cursor: pointer;" title="Chạm để nạp nhanh công thức này vào niêu đất!">
             ${isVipCust ? '<div class="vip-cust-gold-badge">👑 KHÁCH VIP THẦN TÀI (+TIP VÀNG) 💰</div>' : ''}
             ${isSpecialCombo ? '<div class="special-combo-order-badge">✨ ĐƠN ĐẶC BIỆT (+BONUS) ✨</div>' : (slot.isSpecial ? '<div style="font-size:9.5px; color:#C44569; font-weight:800; margin-bottom:1px;">Món tâm đắc:</div>' : '')}
-            ${isSpecialCombo ? '<div style="font-size:9px; color:#D35400; font-weight:800; margin-bottom:2px;">🔥 Món đặc biệt: Tip x2 + Siêu Bonus!</div>' : ''}
-            <span class="dish-highlight-badge">${order.noodleName}</span>
+            ${isSpecialCombo ? '<div style="font-size:9px; color:#D35400; font-weight:800; margin-bottom:2px;">🔥 Món đặc biệt: Tip + Thưởng Thêm!</div>' : ''}
+            <div class="dish-order-row">
+              <span class="dish-highlight-badge">${order.noodleName}</span>
+              <span class="order-price-pill" title="Giá bán bạn đã set trong Tab Giá Bán">🏷️ ${txaformat.formatVND(orderCurrentPrice)}</span>
+            </div>
             ${isNoodleOutOfStock ? '<div style="font-size:8.5px; color:#E74C3C; font-weight:800; margin-top:2px; background:rgba(231,76,60,0.12); padding:1px 5px; border-radius:4px; border:1px solid rgba(231,76,60,0.3);">⚠️ Hết mì trong kho (Đơn cuối trên khay)</div>' : ''}
             <div style="margin-top: 2px; font-size: 10.5px;">
               Size <strong>${order.size}</strong> · Cấp <strong>${order.spicyLevel} 🌶️</strong>
-              ${order.toppingName ? `<br/>+ thêm <strong>${order.toppingName}</strong>` : ''}
+              ${order.toppingName ? `<br/>+ thêm <strong>${order.toppingName}</strong> <span style="color:#258A6D; font-weight:700;">(+${topPrice}k)</span>` : ''}
             </div>
           </div>
           <div class="order-patience-track">
@@ -3123,10 +3160,10 @@ export class SpicyNoodleGame {
       }
     }
 
-    // Nâng cấp Sốt Ớt Hiểm Bí Truyền (chiliSecret): Tăng 15% doanh thu mỗi cấp!
+    // Nâng cấp Sốt Ớt Hiểm Bí Truyền (chiliSecret): Tăng 12% giá bán mỗi cấp!
     const chiliLv = this.state.upgrades.chiliSecret || 1;
     if (chiliLv > 1) {
-      bowlPrice = Math.round(bowlPrice * (1 + (chiliLv - 1) * 0.15));
+      bowlPrice = Math.round(bowlPrice * (1 + (chiliLv - 1) * 0.12));
     }
 
     // Tính giá gốc thị trường chuẩn của tô mì để đo lường mức độ đắt/rẻ
@@ -3141,26 +3178,26 @@ export class SpicyNoodleGame {
     const orderPriceRatio = baseBowlPrice > 0 ? (bowlPrice / baseBowlPrice) : 1.0;
 
     // Tỷ lệ tiền tip phụ thuộc vào giá bán (Rẻ -> tip đậm, Đắt -> tip ít hoặc không tip):
-    let baseTipRate = 0.25;
+    let baseTipRate = 0.18;
     if (orderPriceRatio <= 0.85) {
-      baseTipRate = 0.35; // Giá hạt dẻ hời quá nên khách vui vẻ tip đậm!
+      baseTipRate = 0.28; // Giá hạt dẻ hời quá nên khách vui vẻ tip đậm!
     } else if (orderPriceRatio > 1.35) {
-      baseTipRate = 0.08; // Quá đắt đỏ, khách chỉ tip tượng trưng
+      baseTipRate = 0.05; // Quá đắt đỏ, khách chỉ tip tượng trưng
     } else if (orderPriceRatio > 1.15) {
-      baseTipRate = 0.16; // Hơi đắt
+      baseTipRate = 0.10; // Hơi đắt
     }
 
-    // Tiền tip (Nhân viên Mèo Mochi tăng 35% tip)
+    // Tiền tip (Nhân viên Mèo Mochi tăng 25% tip)
     let tip = Math.round(bowlPrice * baseTipRate * (slot.customer.tipMultiplier || 1));
-    if (this.state.staff.mochi) tip = Math.round(tip * 1.35);
+    if (this.state.staff.mochi) tip = Math.round(tip * 1.25);
 
     // KIỂM TRA ĐƠN ĐẶC BIỆT (SPECIAL COMBO TRÙNG VỚI BẢNG CHUẨN BỊ NGÀY)
     const isSpecialCombo = Boolean(slot.isSpecialCombo || this.isSpecialComboOrder(order) || this.isSpecialComboPot(pot));
     let specialBonus = 0;
     if (isSpecialCombo) {
-      // Đơn đặc biệt: Khách tip gấp đôi và tặng thêm một khoản BONUS tiền khủng!
-      tip = Math.round(tip * 2.0);
-      specialBonus = Math.round(bowlPrice * 0.85) + 50; // Thưởng thêm nóng cực nhiều tiền
+      // Đơn đặc biệt: Khách tip thêm +1.5x và thưởng món đặc biệt
+      tip = Math.round(tip * 1.5);
+      specialBonus = Math.round(bowlPrice * 0.20) + 12; // Thưởng thêm hợp lý +20% + 12k
 
       this.state.specialCombo.streak = (this.state.specialCombo.streak || 0) + 1;
       this.state.todaySpecialBowlsSold = (this.state.todaySpecialBowlsSold || 0) + 1;
@@ -3169,18 +3206,18 @@ export class SpicyNoodleGame {
       this.state.stats.specialBonusEarned = (this.state.stats.specialBonusEarned || 0) + specialBonus;
     }
 
-    // TÍNH NĂNG VIP v1.5.5: GIỜ VÀNG FEVER RUSH (x2 Doanh Thu) & KHÁCH VIP THẦN TÀI
-    const feverMultiplier = this.isFeverActive ? 2 : 1;
+    // TÍNH NĂNG VIP: GIỜ VÀNG FEVER RUSH (x1.35 Doanh Thu) & KHÁCH VIP THẦN TÀI (+25k - 40k)
+    const feverMultiplier = this.isFeverActive ? 1.35 : 1.0;
     let vipBonus = 0;
     if (slot.customer.isVip) {
-      vipBonus = Math.floor(Math.random() * 41) + 88; // Thưởng nóng 88k - 128k tip vàng thần tài
+      vipBonus = Math.floor(Math.random() * 16) + 25; // Thưởng nóng 25k - 40k tip vàng thần tài
     }
 
-    const subTotal = (bowlPrice + tip + specialBonus) * feverMultiplier;
+    const subTotal = Math.round((bowlPrice + tip + specialBonus) * feverMultiplier);
     const totalEarned = subTotal + vipBonus;
 
-    // Tích điểm Giờ Vàng FEVER RUSH (+35 điểm mỗi đơn thành công)
-    this.addFeverPoints(35);
+    // Tích điểm Giờ Vàng FEVER RUSH (+25 điểm mỗi đơn thành công)
+    this.addFeverPoints(25);
 
     // Trừ 1 suất nguyên liệu trong kho
     if (noodle.stock > 0) noodle.stock -= 1;
@@ -3224,11 +3261,13 @@ export class SpicyNoodleGame {
     const slotCard = document.getElementById(`order-slot-${slotIdx}`);
     if (slotCard && typeof GameUIModal.spawnFloatingFx === "function") {
       if (this.isFeverActive) {
-        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🔥 x2 FEVER!`, true);
+        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🔥 x1.35 FEVER!`, true);
       } else if (vipBonus > 0) {
-        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 👑 VIP!`, true);
+        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 👑 (+${vipBonus}k VIP)`, true);
+      } else if (specialBonus > 0) {
+        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🌟 (Mì ${bowlPrice}k + Thưởng)`, true);
       } else {
-        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k 🍜`, true);
+        GameUIModal.spawnFloatingFx(slotCard, `+${totalEarned}k (Mì ${bowlPrice}k + Tip)`, true);
       }
       if (vipBonus > 0 && !this.isFeverActive) {
         setTimeout(() => {
@@ -4404,22 +4443,25 @@ export class SpicyNoodleGame {
               table.status = "empty";
               table.customer = null;
               table.order = null;
-              const autoTip = Math.floor(Math.random() * 4) + 6;
-              this.state.money += autoTip;
-              this.state.todayTips += autoTip;
-              this.state.todayEarnings += autoTip;
-              this.state.stats.tipsEarned += autoTip;
-              this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + autoTip;
+              const hasTip = Math.random() < 0.6;
+              const autoTip = hasTip ? (Math.floor(Math.random() * 3) + 2) : 0; // 2k - 4k tip
+              if (autoTip > 0) {
+                this.state.money += autoTip;
+                this.state.todayTips += autoTip;
+                this.state.todayEarnings += autoTip;
+                this.state.stats.tipsEarned += autoTip;
+                this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + autoTip;
+              }
               if (this.sound && typeof this.sound.playCleaningSound === "function") {
                 this.sound.playCleaningSound();
               } else {
                 this.sound.playCoinChime();
               }
               const tableEl = document.getElementById(`dining-table-${table.id}`);
-              if (tableEl && typeof GameUIModal.spawnFloatingFx === "function") {
+              if (tableEl && autoTip > 0 && typeof GameUIModal.spawnFloatingFx === "function") {
                 GameUIModal.spawnFloatingFx(tableEl, `+${autoTip}k 🐶`, true);
               }
-              GameUIModal.showToast(`🐶 Cún Shiba đã lau dọn sạch bàn #${table.id}! Nhặt được +${autoTip}k tip!`, "success", "✨");
+              GameUIModal.showToast(`🐶 Cún Shiba đã lau dọn sạch bàn #${table.id}!${autoTip > 0 ? ` Nhặt được +${autoTip}k tip!` : ''}`, "success", "✨");
             } else {
               table.status = "dirty";
             }
@@ -4543,8 +4585,8 @@ export class SpicyNoodleGame {
     }
 
     // 3. Cún Shiba (Tạp vụ): Dọn dẹp bàn ghế, nhặt thêm tiền tip ngẫu nhiên
-    if (staff.shiba && Math.random() < 0.28) {
-      const extraTip = Math.floor(Math.random() * 6) + 6; // 6k - 11k
+    if (staff.shiba && Math.random() < 0.08) {
+      const extraTip = Math.floor(Math.random() * 2) + 2; // 2k - 3k
       this.state.money += extraTip;
       this.state.todayTips += extraTip;
       this.state.todayEarnings += extraTip;
@@ -4727,12 +4769,15 @@ export class SpicyNoodleGame {
     const noodlePrice = chosenNoodle ? chosenNoodle.price : 40;
     const noodleName = chosenNoodle ? chosenNoodle.name : "Mì cay Bò Mỹ";
 
-    const trasua = this.state.drinks.trasua;
-    const trasuaPrice = (trasua && trasua.unlocked && trasua.inMenu) ? trasua.price : 25;
-    const price = noodlePrice + trasuaPrice;
+    const activeDrinks = Object.values(this.state.drinks).filter(d => d.unlocked && d.inMenu);
+    const chosenDrink = activeDrinks.length > 0 ? activeDrinks[Math.floor(Math.random() * activeDrinks.length)] : this.state.drinks.trasua;
+    const drinkPrice = (chosenDrink && chosenDrink.unlocked && chosenDrink.inMenu) ? chosenDrink.price : 25;
+    const drinkName = chosenDrink ? chosenDrink.name : "Trà sữa trân châu";
+
+    const price = noodlePrice + drinkPrice;
 
     const spicyLevel = Math.floor(Math.random() * 4) + 1;
-    const itemsText = `1 ${noodleName} (Cấp ${spicyLevel}) + 1 Trà sữa trân châu`;
+    const itemsText = `1 ${noodleName} (Cấp ${spicyLevel}) [${noodlePrice}k] + 1 ${drinkName} [${drinkPrice}k]`;
 
     const baseShipper = (this.shipperTemplates && this.shipperTemplates.length > 0)
       ? this.shipperTemplates[Math.floor(Math.random() * this.shipperTemplates.length)]
@@ -4752,6 +4797,10 @@ export class SpicyNoodleGame {
       id: id,
       app: app,
       price: price,
+      noodlePrice: noodlePrice,
+      drinkPrice: drinkPrice,
+      noodleId: chosenNoodle.id,
+      drinkId: chosenDrink ? chosenDrink.id : null,
       bowlsCount: 1,
       itemsText: itemsText,
       remainingSeconds: 20,
@@ -4837,10 +4886,18 @@ export class SpicyNoodleGame {
 
     let fawnDeliveryBonus = 0;
     if (this.state.staff.fawn) {
-      fawnDeliveryBonus = Math.round(order.price * 0.5);
+      fawnDeliveryBonus = Math.round(order.price * 0.15); // +15% chiết khấu sỉ logistics
       this.state.money += fawnDeliveryBonus;
       this.state.todayEarnings += fawnDeliveryBonus;
       this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + fawnDeliveryBonus;
+    }
+
+    // Trừ 1 suất nguyên liệu trong kho nếu còn hàng
+    if (order.noodleId && this.state.noodles[order.noodleId] && this.state.noodles[order.noodleId].stock > 0) {
+      this.state.noodles[order.noodleId].stock -= 1;
+    }
+    if (order.drinkId && this.state.drinks[order.drinkId] && this.state.drinks[order.drinkId].stock > 0) {
+      this.state.drinks[order.drinkId].stock -= 1;
     }
 
     this.state.money += order.price;
@@ -4942,66 +4999,121 @@ export class SpicyNoodleGame {
     if (prepView) prepView.style.display = "block";
     if (openView) openView.style.display = "none";
 
-    // Chi phí mặt bằng & điện nước vận hành (từ Ngày 2 trở đi để game có độ thử thách thực tế)
-    const rentCost = this.state.day === 1 ? 0 : Math.min(120, 25 + (this.state.day - 1) * 15);
+    // 1. Tính toán chi phí lương nhân viên phục vụ trong ngày
+    const staffWagesList = {
+      mochi: { name: "Mèo Mochi", wage: 35 },
+      usagi: { name: "Thỏ Usagi", wage: 45 },
+      shiba: { name: "Cún Shiba", wage: 45 },
+      kenji: { name: "Gấu Kenji", wage: 65 },
+      shiro: { name: "Cáo Shiro", wage: 60 },
+      ducky: { name: "Vịt Ducky", wage: 60 },
+      owl: { name: "Cú Mèo Owl", wage: 75 },
+      fawn: { name: "Nai Fawn", wage: 85 }
+    };
+
+    let totalPayroll = 0;
+    const activeStaffNames = [];
+    Object.keys(this.state.staff).forEach(k => {
+      if (this.state.staff[k] && staffWagesList[k]) {
+        totalPayroll += staffWagesList[k].wage;
+        activeStaffNames.push(staffWagesList[k].name);
+      }
+    });
+    this.state.todayStaffWages = totalPayroll;
+
+    // 2. Chi phí mặt bằng & điện nước vận hành (từ Ngày 2 trở đi để game có độ thử thách thực tế)
+    const rentCost = this.state.day === 1 ? 0 : Math.min(180, 25 + (this.state.day - 1) * 12);
     this.state.todayRentCost = rentCost;
-    if (rentCost > 0) {
-      this.state.money = Math.max(0, this.state.money - rentCost);
+
+    const totalDailyExpenses = rentCost + totalPayroll;
+    this.state.todayExpenses = totalDailyExpenses;
+
+    if (totalDailyExpenses > 0) {
+      this.state.money = Math.max(0, this.state.money - totalDailyExpenses);
     }
 
-    this.showDaySummaryModal();
+    this.showDaySummaryModal(activeStaffNames);
     this.state.day += 1;
     this.rollDailySpecialCombo(true); // Chuẩn bị Món Đặc Biệt mới cho ngày tiếp theo ở bảng chuẩn bị
     this.saveGame();
     this.renderAll();
   }
 
-  showDaySummaryModal() {
+  showDaySummaryModal(activeStaffNames = []) {
     const modal = document.getElementById("modal-day-summary");
     const titleEl = document.getElementById("day-summary-title");
     const bodyEl = document.getElementById("day-summary-body");
 
     const rentCost = this.state.todayRentCost || 0;
-    const netProfit = this.state.todayEarnings - rentCost;
+    const staffWages = this.state.todayStaffWages || 0;
+    const totalExpenses = (this.state.todayExpenses || (rentCost + staffWages));
+    const grossRevenue = this.state.todayEarnings || 0;
+    const netProfit = grossRevenue - totalExpenses;
 
-    if (titleEl) titleEl.textContent = `🎉 Kết Quả Ngày ${this.state.day}`;
+    if (titleEl) titleEl.textContent = `🧾 Hóa Đơn Kết Toán Ngày ${this.state.day}`;
     if (bodyEl) {
       bodyEl.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 10px 0;">
-          <div style="display: flex; justify-content: space-between; font-weight: 700;">
-            <span>Số tô mì đã bán:</span>
-            <span>${this.state.todayBowlsSold} tô 🍜</span>
+        <div class="day-receipt-box">
+          <div class="receipt-header">
+            <div class="receipt-shop-badge">🍜 TIỆM MỲ CAY 7 CẤP ĐỘ</div>
+            <div class="receipt-date">Ca Bán Ngày ${this.state.day} · ${this.state.todayBowlsSold} Tô Mì Phục Vụ</div>
           </div>
-          <div style="display: flex; justify-content: space-between; font-weight: 700;">
-            <span>Doanh thu bán mỳ:</span>
-            <span style="color: var(--accent-money);">+${txaformat.formatVND(this.state.todayEarnings - this.state.todayTips)}</span>
+
+          <div class="receipt-divider-dash"></div>
+
+          <div class="receipt-section-title">DOANH THU THU VÀO</div>
+          <div class="receipt-row">
+            <span>🍜 Bán mỳ & đồ uống:</span>
+            <strong class="receipt-val-green">+${txaformat.formatVND(Math.max(0, grossRevenue - this.state.todayTips))}</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; font-weight: 700;">
-            <span>Tiền tip của khách:</span>
-            <span style="color: var(--accent-berry);">+${txaformat.formatVND(this.state.todayTips - (this.state.todaySpecialBonus || 0))} 💖</span>
+          <div class="receipt-row">
+            <span>💖 Tiền tip thực khách:</span>
+            <strong class="receipt-val-green">+${txaformat.formatVND(Math.max(0, this.state.todayTips - (this.state.todaySpecialBonus || 0)))}</strong>
           </div>
           ${this.state.todaySpecialBonus > 0 ? `
-            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #D35400;">
-              <span>🎁 Thưởng Món Đặc Biệt (${this.state.todaySpecialBowlsSold || 0} đơn):</span>
-              <span style="color: #E67E22; font-weight: 800;">+${txaformat.formatVND(this.state.todaySpecialBonus)} 🌟</span>
+            <div class="receipt-row">
+              <span>🌟 Thưởng Món Đặc Biệt (${this.state.todaySpecialBowlsSold || 0} tô):</span>
+              <strong class="receipt-val-gold">+${txaformat.formatVND(this.state.todaySpecialBonus)}</strong>
             </div>
           ` : ''}
+
+          <div class="receipt-divider-dash"></div>
+
+          <div class="receipt-section-title">CHI PHÍ VẬN HÀNH</div>
           ${rentCost > 0 ? `
-            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #E74C3C;">
-              <span>Chi phí điện nước & mặt bằng:</span>
-              <span>-${txaformat.formatVND(rentCost)} ⚡</span>
+            <div class="receipt-row">
+              <span>⚡ Điện nước & mặt bằng:</span>
+              <strong class="receipt-val-red">-${txaformat.formatVND(rentCost)}</strong>
             </div>
           ` : `
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #27AE60; font-weight: 700;">
-              <span>Hỗ trợ ngày khai trương:</span>
-              <span>Miễn phí mặt bằng ✨</span>
+            <div class="receipt-row">
+              <span>⚡ Mặt bằng:</span>
+              <span class="receipt-val-free">Miễn phí khai trương ✨</span>
             </div>
           `}
-          <hr style="border: none; border-top: 1px solid var(--border-subtle);" />
-          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 800;">
-            <span>Lợi nhuận ròng ngày:</span>
-            <span style="color: ${netProfit >= 0 ? '#258A6D' : '#E74C3C'};">${netProfit >= 0 ? '+' : ''}${txaformat.formatVND(netProfit)} 🪙</span>
+          ${staffWages > 0 ? `
+            <div class="receipt-row">
+              <span>👥 Lương nhân viên (${activeStaffNames.length} bạn):</span>
+              <strong class="receipt-val-red">-${txaformat.formatVND(staffWages)}</strong>
+            </div>
+            <div class="receipt-sub-staff">${activeStaffNames.join(", ")}</div>
+          ` : `
+            <div class="receipt-row">
+              <span>👥 Lương nhân viên:</span>
+              <span class="receipt-val-free">Tự quản (Chưa thuê) 🐾</span>
+            </div>
+          `}
+
+          <div class="receipt-divider-double"></div>
+
+          <div class="receipt-summary-row">
+            <span class="receipt-net-label">LỢI NHUẬN RÒNG:</span>
+            <span class="receipt-net-val ${netProfit >= 0 ? 'profit-pos' : 'profit-neg'}">
+              ${netProfit >= 0 ? '+' : ''}${txaformat.formatVND(netProfit)}
+            </span>
           </div>
+
+          <div class="receipt-stamp-badge">💮 ĐÃ THANH TOÁN</div>
         </div>
       `;
     }
