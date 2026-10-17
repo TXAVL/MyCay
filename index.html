@@ -18,13 +18,13 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=1.5.6" />
+  <link rel="stylesheet" href="styles/main.css?v=1.5.7" />
 
-  <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
-  <script src="js/security-shield.js?v=1.5.6"></script>
+  <script src="js/security-shield.js?v=1.5.7"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -1246,7 +1246,128 @@
     </div>
   </div>
 
+  <!-- ==========================================================
+       14. MODAL TRỢ LỰC BÍ MẬT (SECRET DEVELOPER BUFF CONSOLE)
+       ========================================================== -->
+  <div id="modal-dev-buff" class="modal-overlay">
+    <div class="modal-dialog modal-dev-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="dev-modal-title-row">
+          <span class="dev-modal-icon">👑</span>
+          <div>
+            <h3>Trợ Lực Hệ Thống (Secret Buff)</h3>
+            <span class="dev-modal-sub">Menu bí mật độc quyền dành cho Chủ Quán</span>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="btn-close-dev-buff">✕</button>
+      </div>
+      <div class="modal-body dev-buff-body" id="dev-buff-body">
+        <div class="dev-buff-notice">
+          ⚡ <em>Lưu ý: Các lệnh trợ lực sẽ có hiệu lực ngay tức thì vào tiệm mì!</em>
+        </div>
+
+        <div class="dev-buff-grid">
+          <button class="btn-buff-action" onclick="window.game.devBuff('money_50m')">
+            <span class="buff-btn-icon">💰</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">+50.000k Tiền Vàng</span>
+              <span class="buff-btn-sub">+50 triệu VNĐ vào két sắt tiệm mì</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('money_500m')">
+            <span class="buff-btn-icon">💎</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">+500.000k Tiền Vàng</span>
+              <span class="buff-btn-sub">+500 triệu VNĐ tài chính vô hạn</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('reputation_max')">
+            <span class="buff-btn-icon">⭐</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Max 100⭐ Danh Tiếng</span>
+              <span class="buff-btn-sub">Mở khóa toàn bộ nhân sự & trang thiết bị</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('fever_rush')">
+            <span class="buff-btn-icon">🔥</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Bật Giờ Vàng FEVER RUSH</span>
+              <span class="buff-btn-sub">x1.35 Doanh thu & bão khách 25 giây</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('stock_full')">
+            <span class="buff-btn-icon">📦</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Bơm Đầy Kho Hàng (+99)</span>
+              <span class="buff-btn-sub">Full 99 mì, topping & trà sữa boba</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('hire_all_staff')">
+            <span class="buff-btn-icon">👥</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Thuê Toàn Bộ 11 Nhân Viên</span>
+              <span class="buff-btn-sub">Mở khóa đủ đội ngũ toàn năng tự động</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('max_all_upgrades')">
+            <span class="buff-btn-icon">🛠️</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Max Toàn Bộ 12 Nâng Cấp</span>
+              <span class="buff-btn-sub">Nâng cấp tối đa toàn bộ cơ ngơi quán mì</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('unlock_customers')">
+            <span class="buff-btn-icon">👑</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Mở Khóa Full 16 Khách Quen</span>
+              <span class="buff-btn-sub">Sưu tập đủ toàn bộ khách quen & khách VIP</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('clean_tables')">
+            <span class="buff-btn-icon">✨</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Lau Sạch Tất Cả Bàn Ghế</span>
+              <span class="buff-btn-sub">Dọn sạch bàn bẩn về trạng thái trống</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('skip_day_10')">
+            <span class="buff-btn-icon">⏭️</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Nhảy Tới Ngày 10</span>
+              <span class="buff-btn-sub">Vượt qua giai đoạn khởi đầu tân thủ</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('skip_day_30')">
+            <span class="buff-btn-icon">🚀</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Nhảy Tới Ngày 30</span>
+              <span class="buff-btn-sub">Giai đoạn tiệm mì đông đúc & bùng nổ</span>
+            </div>
+          </button>
+
+          <button class="btn-buff-action" onclick="window.game.devBuff('skip_day_50')">
+            <span class="buff-btn-icon">🐉</span>
+            <div class="buff-btn-content">
+              <span class="buff-btn-title">Nhảy Tới Ngày 50</span>
+              <span class="buff-btn-sub">Đỉnh cao Thần Long Ryu giáng thế</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=1.5.6"></script>
+  <script type="module" src="js/app.js?v=1.5.7"></script>
 </body>
 </html>

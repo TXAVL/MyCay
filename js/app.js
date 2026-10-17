@@ -3,14 +3,14 @@
 // Kết nối UI, Sự kiện, Tab Navigation và Logic Game
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.5.6";
-import { NameValidator } from "./filter.js?v=1.5.6";
-import { SpicyNoodleGame } from "./game.js?v=1.5.6";
-import { txatheme } from "./txatheme.js?v=1.5.6";
-import { txacoachmark } from "./txacoachmark.js?v=1.5.6";
-import { txaqr } from "./txaqr.js?v=1.5.6";
-import { GameUIModal } from "./modal.js?v=1.5.6";
-import { realtimeStats } from "./realtime-stats.js?v=1.5.6";
+import { txaversion } from "./txaversion.js?v=1.5.7";
+import { NameValidator } from "./filter.js?v=1.5.7";
+import { SpicyNoodleGame } from "./game.js?v=1.5.7";
+import { txatheme } from "./txatheme.js?v=1.5.7";
+import { txacoachmark } from "./txacoachmark.js?v=1.5.7";
+import { txaqr } from "./txaqr.js?v=1.5.7";
+import { GameUIModal } from "./modal.js?v=1.5.7";
+import { realtimeStats } from "./realtime-stats.js?v=1.5.7";
 
 // Gắn biến toàn cục phục vụ Console Admin và Dashboard phân tích số liệu
 if (typeof window !== "undefined") {
@@ -641,11 +641,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSaveOwner = document.getElementById("btn-save-owner-profile");
   const ownerModal = document.getElementById("modal-owner-profile");
 
+  let ownerAvatarClickCount = 0;
+  let ownerAvatarClickTimer = null;
+
   if (btnOwnerProfile) {
     btnOwnerProfile.addEventListener("click", () => {
+      ownerAvatarClickCount++;
+      clearTimeout(ownerAvatarClickTimer);
+
+      // Nhấp nhanh 5 lần vào avatar chủ quán để mở menu buff bí mật!
+      if (ownerAvatarClickCount >= 5) {
+        ownerAvatarClickCount = 0;
+        game.openSecretBuffModal();
+        return;
+      }
+
+      ownerAvatarClickTimer = setTimeout(() => {
+        ownerAvatarClickCount = 0;
+      }, 1500);
+
       game.showOwnerProfileModal();
     });
   }
+
+  // Đóng modal buff hệ thống
+  const btnCloseDevBuff = document.getElementById("btn-close-dev-buff");
+  const modalDevBuff = document.getElementById("modal-dev-buff");
+  if (btnCloseDevBuff) {
+    btnCloseDevBuff.addEventListener("click", () => {
+      if (modalDevBuff) modalDevBuff.style.display = "none";
+    });
+  }
+
+  // Cung cấp hàm bí mật toàn cục cho console
+  window.mycayBuff = function() {
+    if (window.game) {
+      window.game.openSecretBuffModal();
+    }
+  };
 
   if (btnCloseOwner) {
     btnCloseOwner.addEventListener("click", () => {

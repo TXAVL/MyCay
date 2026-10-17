@@ -1,19 +1,19 @@
-// Service Worker cho Tiệm Mỳ Cay & Trà Sữa Boba v1.5.6
+// Service Worker cho Tiệm Mỳ Cay & Trà Sữa Boba v1.5.7
 // Hỗ trợ chơi game 100% Offline không cần mạng sau lần tải đầu tiên
-// Khắc phục triệt để lỗi "Response served by service worker has redirections" trên Safari iOS
+// Khắc phục triệt để lỗi "Response served by service worker has redirections" & lỗi WebKit Offline trên Safari iOS
 
-const CACHE_NAME = "mycay-pwa-v1.5.6";
+const CACHE_NAME = "mycay-pwa-v1.5.7";
 
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./styles/main.css",
-  "./styles/main.css?v=1.5.6",
+  "./styles/main.css?v=1.5.7",
   "./js/app.js",
-  "./js/app.js?v=1.5.6",
+  "./js/app.js?v=1.5.7",
   "./js/game.js",
-  "./js/game.js?v=1.5.6",
+  "./js/game.js?v=1.5.7",
   "./js/audio.js",
   "./js/modal.js",
   "./js/street.js",
@@ -22,13 +22,14 @@ const PRECACHE_ASSETS = [
   "./js/txaqr.js",
   "./js/txatheme.js",
   "./js/txaversion.js",
-  "./js/txaversion.js?v=1.5.6",
+  "./js/txaversion.js?v=1.5.7",
   "./js/filter.js",
-  "./js/filter.js?v=1.5.6",
+  "./js/filter.js?v=1.5.7",
   "./js/realtime-stats.js",
-  "./js/realtime-stats.js?v=1.5.6",
+  "./js/realtime-stats.js?v=1.5.7",
   "./js/security-shield.js",
-  "./js/security-shield.js?v=1.5.6",
+  "./js/security-shield.js?v=1.5.7",
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
   "./assets/favicon.png",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
@@ -147,24 +148,54 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Bỏ qua các API của bên thứ ba & Supabase (để trình duyệt gọi trực tiếp, không bị nuốt bởi SW)
+  // Bỏ qua các API Supabase RPC thực thi trực tiếp qua mạng (nếu mất mạng thì code game đã có fallback rỗng)
   try {
     const url = new URL(req.url);
-    if (url.hostname.includes("supabase.co") || url.hostname.includes("country.is")) {
+    if (url.hostname.includes("supabase.co") && url.pathname.includes("/rpc/")) {
+      return;
+    }
+    if (url.hostname.includes("country.is") || url.hostname.includes("ipwho.is")) {
       return;
     }
   } catch (e) {}
 
   // 1. ĐIỀU HƯỚNG TRANG (HTML NAVIGATION):
-  // Xử lý đặc thù cho Safari iOS: Loại bỏ triệt để cờ redirected
-  if (req.mode === "navigate") {
+  // Xử lý đặc thù cho Safari iOS: Cache First cho Navigation!
+  // Đảm bảo khi tắt mạng WiFi/4G, iOS Safari standalone WebKit mở lập tức từ Cache không bị Native Error
+  if (req.mode === "navigate" || (req.headers.get("accept") && req.headers.get("accept").includes("text/html"))) {
     event.respondWith(
       (async () => {
+        const cache = await caches.open(CACHE_NAME);
+
+        // ƯU TIÊN MATCH CACHE TRƯỚC ĐỂ iOS SAFARI MỞ NGAY LẬP TỨC 100% OFFLINE
+        const cachedHtml = 
+          (await cache.match("./index.html", { ignoreSearch: true })) ||
+          (await cache.match("index.html", { ignoreSearch: true })) ||
+          (await cache.match("./", { ignoreSearch: true })) ||
+          (await caches.match(req, { ignoreSearch: true }));
+
+        if (cachedHtml) {
+          // Nếu đang có mạng: Cập nhật ngầm cache index.html ở background
+          if (navigator.onLine) {
+            fetch(req).then(async (netRes) => {
+              if (netRes && netRes.status === 200) {
+                const bodyBlob = await netRes.blob();
+                const cleanCached = new Response(bodyBlob, {
+                  status: 200,
+                  statusText: "OK",
+                  headers: netRes.headers
+                });
+                await cache.put("./index.html", cleanCached);
+              }
+            }).catch(() => {});
+          }
+          return cleanResponse(cachedHtml);
+        }
+
+        // Nếu máy chưa có cache (lần mở web đầu tiên), tải từ mạng
         try {
-          // Thử lấy từ mạng trước nếu có kết nối
           const networkResponse = await fetch(req);
           if (networkResponse && networkResponse.status === 200) {
-            const cache = await caches.open(CACHE_NAME);
             const bodyBlob = await networkResponse.clone().blob();
             const cleanCached = new Response(bodyBlob, {
               status: 200,
@@ -175,23 +206,7 @@ self.addEventListener("fetch", (event) => {
           }
           return cleanResponse(networkResponse);
         } catch (err) {
-          // KHI NGOẠI TUYẾN (OFFLINE): Trả về index.html từ Cache
-          const cache = await caches.open(CACHE_NAME);
-          const cachedHtml = 
-            (await cache.match("./index.html", { ignoreSearch: true })) ||
-            (await cache.match("index.html", { ignoreSearch: true })) ||
-            (await cache.match("./", { ignoreSearch: true })) ||
-            (await caches.match(req, { ignoreSearch: true }));
-
-          if (cachedHtml) {
-            return new Response(await cachedHtml.blob(), {
-              status: 200,
-              statusText: "OK",
-              headers: cachedHtml.headers
-            });
-          }
-
-          // Trang thông báo thân thiện nếu chưa từng nạp cache
+          // Trang thông báo nếu chưa từng nạp cache
           return new Response(
             `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tiệm Mỳ Cay - Ngoại Tuyến</title><style>body{font-family:sans-serif;text-align:center;padding:40px;background:#FAF5ED;color:#3B2110;line-height:1.6;}h1{color:#C4385E;margin-bottom:10px;}p{font-size:15px;color:#664C3B;margin-bottom:20px;}button{padding:12px 24px;border-radius:12px;background:#C4385E;color:#fff;border:none;font-size:15px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(196,56,94,0.3);}</style></head><body><h1>🍜 Tiệm Mỳ Cay</h1><p>Bạn đang ở chế độ Ngoại Tuyến (Offline).<br>Vui lòng kết nối mạng một lần để tải toàn bộ tài nguyên game vào máy nhé!</p><button onclick="location.reload()">🔄 Tải Lại Trang</button></body></html>`,
             {
@@ -205,10 +220,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 2. CÁC TÀI NGUYÊN TĨNH KHÁC (CSS, JS, ẢNH, FONTS):
+  // 2. CÁC TÀI NGUYÊN TĨNH KHÁC (CSS, JS, ẢNH, FONTS, CDN):
   event.respondWith(
     (async () => {
-      // Tìm trong cache trước (kèm ignoreSearch: true để bắt trúng query ?v=1.5.6)
+      // Tìm trong cache trước (kèm ignoreSearch: true để bắt trúng query ?v=1.5.7)
       const cached = await caches.match(req, { ignoreSearch: true });
       if (cached) {
         // Cập nhật ngầm nếu có mạng

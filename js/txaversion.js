@@ -10,57 +10,50 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.5.6 - Phòng Hộ An Ninh, Fix Safari & Chơi Offline 100%)
+  // Khai báo phiên bản hiện tại của game (Bản 1.5.7 - 3 Siêu Nhân Viên, 5 Nâng Cấp Mới & Fix Offline Safari iOS)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.5.6",
-      156,
-      "16/10/2026",
+      "1.5.7",
+      157,
+      "17/10/2026",
       [
         {
-          title: "Hỗ Trợ Chơi Ngoại Tuyến 100% (Offline PWA)",
-          desc: "Nâng cấp Service Worker v1.5.6: Toàn bộ mã nguồn, dữ liệu, âm thanh và hình ảnh được lưu trữ sạch trong bộ nhớ đệm. Chơi mượt mà không cần mạng Internet sau lần tải đầu tiên!",
-          icon: "📶",
-          badge: "Offline 100% ⚡",
-          badgeType: "hot"
-        },
-        {
-          title: "Khắc Phục Triệt Để Lỗi Safari iOS",
-          desc: "Khử hoàn toàn lỗi 'Response served by service worker has redirections' trên Safari iPhone/iPad. Chuẩn hóa luồng phản hồi trực tiếp không chuyển hướng.",
+          title: "Khắc Phục 100% Offline Trên iOS Safari",
+          desc: "Tối ưu bộ điều hướng Cache-First cho Service Worker: Đã cài app vào màn hình chính iPhone/iPad, kể cả tắt mạng hoặc bật chế độ máy bay vẫn mở và chơi mượt mà 100% không còn bị Safari bắt kết nối Internet!",
           icon: "🍏",
-          badge: "Safari Fix 🛠️",
-          badgeType: "manage"
-        },
-        {
-          title: "Hệ Thống Phòng Hộ An Ninh (Security Shield)",
-          desc: "Chặn phím F12, DevTools, chống gian lận. Cảnh báo tự động reload và khóa 15 phút, tái phạm lần 2 sẽ Ban vĩnh viễn theo mã phần cứng máy tính!",
-          icon: "🛡️",
-          badge: "Bảo Mật Mới 🔒",
+          badge: "iOS Offline Fix ⚡",
           badgeType: "hot"
         },
         {
-          title: "Đồng Hồ Đếm Ngược 2 Chữ Số (MM:SS) Chuẩn Anime",
-          desc: "Đồng hồ khóa an ninh hiển thị số điện tử phát sáng chuẩn 2 chữ số (15:00 đếm ngược tới 00:00), định dạng Monospace chống rung lắc số.",
-          icon: "⏱️",
-          badge: "Đồng Hồ 2 Số 🕒",
+          title: "3 Siêu Nhân Viên Mới (Cụ Rùa, Bạch Hổ & Thần Long)",
+          desc: "Đội ngũ nhân sự cao cấp: Cụ Rùa Torto (giảm 50% tiền nhà & sinh lãi két sắt), Bạch Hổ Tora (85% hóa giải khách giận dữ) và Thần Long Ryu (gọi bão FEVER & mưa vàng)!",
+          icon: "🐾",
+          badge: "Nhân Sự Mới 👥",
+          badgeType: "hot"
+        },
+        {
+          title: "5 Nâng Cấp Trang Thiết Bị Chiều Sâu",
+          desc: "Mở rộng 5 trang bị cấp cao: Máy Ép Màng Tự Động (+20k/đơn online), Bếp Niêu Đôi Song Song (+40% tốc độ), Quạt Hút Mùi Ion Khói Cay (+35% ăn nhanh), Hồ Cá Koi Zen (+50% khách VIP) và Gia Vị 7 Vị Shichimi (+25% giá mì cay).",
+          icon: "🛠️",
+          badge: "Trang Bị Mới ✨",
           badgeType: "star"
         },
         {
-          title: "Thống Kê Người Chơi Online & Lượt Xem Thực Tế",
-          desc: "Tích hợp Supabase Realtime Presence: Cập nhật trực tiếp số người đang mở quán mì tại thời điểm hiện tại và tổng lượt xem thực tế chống spam.",
-          icon: "👥",
-          badge: "Realtime 🟢",
-          badgeType: "star"
-        },
-        {
-          title: "Cảnh Báo Đổi Tên Quán Rung Anime & Màn Loading Mới",
-          desc: "Hộp cảnh báo đỏ rung lắc sinh động khi tên không hợp lệ, tự biến mất sau 3.5s hoặc chuyển sang xanh hợp lệ. Dòng trạng thái màn hình loading đổi theo từng tiến trình.",
-          icon: "🍜",
-          badge: "Giao Diện ✨",
+          title: "Cân Bằng Kinh Tế & Chiều Sâu Chơi Càng Lâu Càng Cuốn",
+          desc: "Chuẩn hóa bảng chi phí vận hành, giá bán người chơi thiết lập, phân bổ kiên nhẫn và chuỗi ngày dài hạn đến Ngày 55+ đầy thử thách và cuốn hút!",
+          icon: "📈",
+          badge: "Cân Bằng Game 🍲",
           badgeType: "manage"
+        },
+        {
+          title: "Hệ Thống Trợ Lực Tối Thượng (Secret Developer Console)",
+          desc: "Tích hợp menu công cụ điều phối bí mật dành riêng cho nhà quản lý tiệm để buff tiền bạc, danh tiếng, giờ vàng và mở khóa nhanh.",
+          icon: "⚡",
+          badge: "Quản Trị Quán 👑",
+          badgeType: "star"
         }
       ],
-      "Phòng Hộ An Ninh, Fix Safari & Chơi Offline 100%"
+      "Đại Tiệc Nâng Cấp & Tuyển Dụng"
     );
   }
 

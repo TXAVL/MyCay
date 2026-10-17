@@ -99,17 +99,24 @@ export class SpicyNoodleGame {
       // Bàn ghế quán mỳ
       tables: [],
 
-      // Nâng cấp trang thiết bị
+      // Nâng cấp trang thiết bị (12 trang bị chiều sâu)
       upgrades: {
         potCount: 1, // Số bếp niêu đất nấu cùng lúc
         stoveSpeed: 1, // Tốc độ bếp
         tableCount: 3, // Bàn gỗ sồi
         decorScore: 1, // Điểm decor đèn lồng
         chiliSecret: 1, // Sốt ớt bí truyền tăng giá bán
-        acCooling: 1 // Điều hòa Daikin tăng kiên nhẫn
+        acCooling: 1, // Điều hòa Daikin tăng kiên nhẫn
+        freezerStorage: 1, // Tủ đông trữ lượng kho
+        lofiAcoustic: 1, // Loa lofi thư giãn
+        autoSealer: 0, // Máy ép màng tự động (+20k/đơn online)
+        dualStove: 0, // Bếp niêu đôi (+40% tốc độ nấu)
+        airPurifier: 0, // Quạt hút mùi ion khói cay (+35% ăn nhanh)
+        zenGarden: 0, // Hồ cá Koi Zen (+50% khách VIP)
+        shichimiSpice: 0 // Gia vị 7 vị Shichimi (+25% giá mì cay)
       },
 
-      // Nhân viên tiệm (8 nhân viên toàn năng)
+      // Nhân viên tiệm (11 nhân viên toàn năng chuẩn Anime)
       staff: {
         mochi: false, // Mèo tiếp tân đón khách & tăng tip (+35%)
         kenji: false, // Gấu Panda đầu bếp ninh mì tự động
@@ -118,7 +125,10 @@ export class SpicyNoodleGame {
         shiro: false, // Cáo Shiro thu ngân tự động giao Shipper
         ducky: false, // Vịt Ducky Barista pha chế trà sữa tự động & buff 25% doanh thu nước
         owl: false,   // Cú Mèo Owl Marketing bão khách +40%, đơn online 10s & x2 review 5 sao
-        fawn: false   // Nai Fawn Logistics sỉ chiết khấu -15% & tự động restock kho thông minh
+        fawn: false,  // Nai Fawn Logistics sỉ chiết khấu -15% & tự động restock kho thông minh
+        torto: false, // Cụ Rùa Torto Kế toán trưởng: giảm 50% tiền mặt bằng & sinh 5% lãi két sắt
+        tora: false,  // Bạch Hổ Tora Vệ sĩ & an ninh: 85% dỗ dành khách giận dữ ở lại (+30 kiên nhẫn)
+        ryu: false    // Thần Long Ryu Linh vật tối thượng: liên tục nạp FEVER & rơi mưa tiền vàng
       },
 
       // Đơn hàng Online
@@ -1256,25 +1266,31 @@ export class SpicyNoodleGame {
     this.renderKhoTab();
   }
 
-  // 7. Tab 4: Nâng cấp (Độ Sâu Tiến Trình Mở Dài Hạn Đến Ngày 26+)
+  // 7. Tab 4: Nâng cấp (Độ Sâu Tiến Trình Mở Dài Hạn Đến Ngày 55+)
   renderUpgradesTab() {
     const listEl = document.getElementById("upgrades-list");
     if (!listEl) return;
 
     const upgradesConfig = [
-      { key: "tableCount", name: "Thêm Bàn Ghế Gỗ Sồi", desc: "Tăng số lượng bàn đón khách cùng lúc", baseCost: 320, scale: 1.65, max: 8, icon: "🪑", minDays: [1, 2, 4, 7, 11, 15, 20, 26] },
-      { key: "stoveSpeed", name: "Bếp Niêu Đất Cao Cấp", desc: "Tăng tốc độ ninh mỳ và giảm thời gian nấu song song", baseCost: 400, scale: 1.7, max: 6, icon: "🔥", minDays: [1, 3, 6, 10, 15, 22] },
-      { key: "chiliSecret", name: "Sốt Ớt Hiểm Bí Truyền", desc: "Gia vị cay nồng độc quyền tăng 12% giá bán mỗi cấp", baseCost: 450, scale: 1.75, max: 5, icon: "🌶️", minDays: [1, 3, 7, 13, 19] },
-      { key: "acCooling", name: "Điều Hòa Daikin Mát Rượi", desc: "Giải nhiệt ăn cay, tăng 25% độ kiên nhẫn của khách", baseCost: 350, scale: 1.65, max: 5, icon: "❄️", minDays: [1, 3, 8, 14, 20] },
-      { key: "decorScore", name: "Đèn Lồng Đỏ Tokyo - Seoul", desc: "Tăng danh tiếng và kéo khách ghé tiệm nườm nượp", baseCost: 420, scale: 1.7, max: 6, icon: "🏮", minDays: [1, 4, 8, 13, 18, 25] },
-      { key: "freezerStorage", name: "Tủ Đông Sanaky Bảo Quản", desc: "Tăng trữ lượng kho sỉ, giảm tối đa hao hụt nước dùng", baseCost: 360, scale: 1.6, max: 5, icon: "🧊", minDays: [1, 5, 9, 14, 21] },
-      { key: "lofiAcoustic", name: "Dàn Loa Lo-Fi Cafe Acoustic", desc: "Nhạc du dương thư giãn, giảm 20% cáu gắt khi quán đông", baseCost: 380, scale: 1.65, max: 4, icon: "📻", minDays: [1, 6, 11, 17] }
+      { key: "tableCount", name: "Thêm Bàn Ghế Gỗ Sồi", desc: "Tăng số lượng bàn đón khách cùng lúc", baseCost: 320, scale: 1.65, max: 8, startLv: 3, icon: "🪑", minDays: [1, 2, 4, 7, 11, 15, 20, 26] },
+      { key: "stoveSpeed", name: "Bếp Niêu Đất Cao Cấp", desc: "Tăng tốc độ ninh mỳ và giảm thời gian nấu song song", baseCost: 400, scale: 1.7, max: 6, startLv: 1, icon: "🔥", minDays: [1, 3, 6, 10, 15, 22] },
+      { key: "chiliSecret", name: "Sốt Ớt Hiểm Bí Truyền", desc: "Gia vị cay nồng độc quyền tăng 12% giá bán mỗi cấp", baseCost: 450, scale: 1.75, max: 5, startLv: 1, icon: "🌶️", minDays: [1, 3, 7, 13, 19] },
+      { key: "acCooling", name: "Điều Hòa Daikin Mát Rượi", desc: "Giải nhiệt ăn cay, tăng 25% độ kiên nhẫn của khách", baseCost: 350, scale: 1.65, max: 5, startLv: 1, icon: "❄️", minDays: [1, 3, 8, 14, 20] },
+      { key: "decorScore", name: "Đèn Lồng Đỏ Tokyo - Seoul", desc: "Tăng danh tiếng và kéo khách ghé tiệm nườm nượp", baseCost: 420, scale: 1.7, max: 6, startLv: 1, icon: "🏮", minDays: [1, 4, 8, 13, 18, 25] },
+      { key: "freezerStorage", name: "Tủ Đông Sanaky Bảo Quản", desc: "Tăng trữ lượng kho sỉ, giảm tối đa hao hụt nước dùng", baseCost: 360, scale: 1.6, max: 5, startLv: 1, icon: "🧊", minDays: [1, 5, 9, 14, 21] },
+      { key: "lofiAcoustic", name: "Dàn Loa Lo-Fi Cafe Acoustic", desc: "Nhạc du dương thư giãn, giảm 20% cáu gắt khi quán đông", baseCost: 380, scale: 1.65, max: 4, startLv: 1, icon: "📻", minDays: [1, 6, 11, 17] },
+      { key: "autoSealer", name: "Máy Ép Màng Nắp Tự Động", desc: "Tự động đóng gói đơn Online & tặng thêm +20k/đơn hỏa tốc", baseCost: 550, scale: 1.6, max: 5, startLv: 0, icon: "⚡", minDays: [1, 8, 14, 21, 29] },
+      { key: "dualStove", name: "Bếp Niêu Đôi Song Song", desc: "Tăng tốc độ ninh mỳ tổng thể +40% và giảm thời gian nấu", baseCost: 650, scale: 1.7, max: 5, startLv: 0, icon: "🍲", minDays: [1, 12, 18, 26, 35] },
+      { key: "airPurifier", name: "Quạt Hút Mùi Ion Khói Cay", desc: "Khách ăn nhanh hơn +35%, mau chóng giải phóng bàn trống", baseCost: 500, scale: 1.65, max: 5, startLv: 0, icon: "🌀", minDays: [1, 15, 22, 30, 38] },
+      { key: "zenGarden", name: "Hồ Cá Koi Zen Quán Mỳ", desc: "Tăng +50% tỉ lệ khách VIP Thần Tài ghé thăm tiệm", baseCost: 750, scale: 1.75, max: 5, startLv: 0, icon: "🎏", minDays: [1, 20, 28, 37, 48] },
+      { key: "shichimiSpice", name: "Gia Vị 7 Vị Shichimi Thượng Hạng", desc: "Mì từ cấp 3 trở lên được cộng thêm +15% giá bán mỗi cấp", baseCost: 700, scale: 1.7, max: 5, startLv: 0, icon: "🍱", minDays: [1, 25, 34, 44, 55] }
     ];
 
     listEl.innerHTML = upgradesConfig.map(up => {
-      const currentLv = this.state.upgrades[up.key] || 1;
+      const currentLv = (this.state.upgrades[up.key] !== undefined) ? this.state.upgrades[up.key] : (up.startLv || 0);
       const isMax = currentLv >= up.max;
-      const cost = Math.round(up.baseCost * Math.pow(up.scale || 1.65, currentLv - 1));
+      const costIndex = Math.max(0, currentLv - (up.startLv || 0));
+      const cost = Math.round(up.baseCost * Math.pow(up.scale || 1.65, costIndex));
       const nextMinDay = (up.minDays && up.minDays[currentLv]) ? up.minDays[currentLv] : 1;
       const isDayUnlocked = this.state.day >= nextMinDay;
 
@@ -1312,7 +1328,8 @@ export class SpicyNoodleGame {
     }
 
     this.state.money -= cost;
-    this.state.upgrades[key] = (this.state.upgrades[key] || 1) + 1;
+    this.state.upgrades[key] = (this.state.upgrades[key] || 0) + 1;
+    const newLv = this.state.upgrades[key];
 
     if (key === "tableCount") {
       this.initTables();
@@ -1324,10 +1341,8 @@ export class SpicyNoodleGame {
         patience: 100,
         maxPatience: 100
       });
-    }
-
-    if (key === "acCooling") {
-      const newLv = this.state.upgrades.acCooling;
+      GameUIModal.showToast(`🪑 Đã mở thêm bàn ghế gỗ sồi #${this.state.tables.length}! Sẵn sàng đón thêm khách!`, "success", "🪑");
+    } else if (key === "acCooling") {
       const tempText = newLv >= 3 ? "16°C Turbo Max" : "20°C Inverter";
       this.state.acTemp = this.getBaseDaikinTemp();
       this.state.acTurboActive = false;
@@ -1335,6 +1350,16 @@ export class SpicyNoodleGame {
       GameUIModal.showToast(`❄️ Đã nâng cấp Điều Hòa Daikin lên Cấp ${newLv} (${tempText})! Cả tiệm mát lạnh sâu, khách kiên nhẫn hơn +${newLv * 25}%!`, "success", "❄️");
       this.renderDaikinAC();
       this.renderDiningStage();
+    } else if (key === "autoSealer") {
+      GameUIModal.showToast(`⚡ Máy Ép Màng Nắp Tự Động Cấp ${newLv} đã hoạt động! Tự động đóng gói & tăng +20k/đơn online!`, "success", "⚡");
+    } else if (key === "dualStove") {
+      GameUIModal.showToast(`🍲 Bếp Niêu Đôi Song Song Cấp ${newLv} đã hoàn tất! Tốc độ nấu mỳ tăng vọt +40%!`, "success", "🔥");
+    } else if (key === "airPurifier") {
+      GameUIModal.showToast(`🌀 Quạt Hút Mùi Ion Khói Cay Cấp ${newLv} đã bật! Khách ăn nhanh hơn +35%, mau trống bàn!`, "success", "💨");
+    } else if (key === "zenGarden") {
+      GameUIModal.showToast(`🎏 Hồ Cá Koi Zen Quán Mỳ Cấp ${newLv} đã khánh thành! Tỉ lệ khách VIP Thần Tài tăng +50%!`, "success", "🎏");
+    } else if (key === "shichimiSpice") {
+      GameUIModal.showToast(`🍱 Gia Vị 7 Vị Shichimi Cấp ${newLv} đã chuẩn bị! Mì cấp >= 3 tăng thêm +${newLv * 15}% giá bán!`, "success", "🍱");
     } else {
       if (this.sound && typeof this.sound.playUpgradeSound === "function") {
         this.sound.playUpgradeSound();
@@ -1362,7 +1387,10 @@ export class SpicyNoodleGame {
       { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và giao đơn online cho Shipper", cost: 3200, dailyWage: 60, minDay: 12, minRep: 165, icon: "🦊" },
       { key: "ducky", name: "Vịt Ducky (Barista Pha Chế)", desc: "Tự pha & kèm trà sữa, tăng +25% doanh thu nước", cost: 4500, dailyWage: 60, minDay: 16, minRep: 220, icon: "🦆" },
       { key: "owl", name: "Cú Mèo Owl (Trưởng Marketing)", desc: "Bão khách ghé tiệm +35%, nổ đơn Online 12s & review 5 sao", cost: 5800, dailyWage: 75, minDay: 21, minRep: 290, icon: "🦉" },
-      { key: "fawn", name: "Nai Fawn (Logistics & Quản Lý Kho)", desc: "Nhập sỉ chiết khấu -15%, tự động restock & thưởng +15% đơn giao", cost: 7500, dailyWage: 85, minDay: 27, minRep: 380, icon: "🦌" }
+      { key: "fawn", name: "Nai Fawn (Logistics & Quản Lý Kho)", desc: "Nhập sỉ chiết khấu -15%, tự động restock & thưởng +15% đơn giao", cost: 7500, dailyWage: 85, minDay: 27, minRep: 380, icon: "🦌" },
+      { key: "torto", name: "Cụ Rùa Torto (Kế Toán Trưởng)", desc: "Giảm 50% tiền mặt bằng & sinh 5% lãi két sắt qua đêm", cost: 9500, dailyWage: 90, minDay: 33, minRep: 480, icon: "🐢" },
+      { key: "tora", name: "Bạch Hổ Tora (Vệ Sĩ & An Ninh)", desc: "85% hóa giải khách giận dữ bỏ về, tăng +30 kiên nhẫn", cost: 12000, dailyWage: 110, minDay: 40, minRep: 600, icon: "🐯" },
+      { key: "ryu", name: "Thần Long Ryu (Linh Vật May Mắn)", desc: "Tự động kích hoạt Giờ Vàng FEVER & rơi mưa vàng ngẫu nhiên", cost: 18000, dailyWage: 150, minDay: 50, minRep: 800, icon: "🐉" }
     ];
 
     listEl.innerHTML = staffConfig.map(st => {
@@ -1420,6 +1448,9 @@ export class SpicyNoodleGame {
     if (key === "ducky") welcomeMsg = `🦆 Vịt Ducky đã đứng quầy Barista! Sẵn sàng lắc trà sữa & tăng 25% doanh thu nước!`;
     else if (key === "owl") welcomeMsg = `🦉 Cú Mèo Owl đã lên sóng Marketing! Lượng khách & đơn online sắp bùng nổ!`;
     else if (key === "fawn") welcomeMsg = `🦌 Nai Fawn đã tiếp quản kho hàng! Toàn bộ nguyên liệu được chiết khấu sỉ 15%!`;
+    else if (key === "torto") welcomeMsg = `🐢 Cụ Rùa Torto đã nhậm chức Kế toán trưởng! Tiền mặt bằng giảm 50% & sinh lãi 5% két sắt!`;
+    else if (key === "tora") welcomeMsg = `🐯 Bạch Hổ Tora đã đứng gác bảo an! 85% khách sắp bực mình sẽ được dỗ dành ở lại!`;
+    else if (key === "ryu") welcomeMsg = `🐉 Thần Long Ryu đã giáng thế tiệm mì! Giờ vàng FEVER sẽ liên tục bùng nổ cùng mưa tiền vàng!`;
     else welcomeMsg = `Đã ký hợp đồng thành công với nhân sự mới về tiệm mì cay!`;
 
     GameUIModal.showToast(welcomeMsg, "success", "🐾");
@@ -2479,6 +2510,27 @@ export class SpicyNoodleGame {
         avatar: "assets/staff_fawn.png",
         active: !!staff.fawn,
         className: "role-logistics"
+      },
+      {
+        name: "Torto",
+        role: "Kế toán trưởng (-50% phí)",
+        avatar: "assets/cust_bear.png",
+        active: !!staff.torto,
+        className: "role-finance"
+      },
+      {
+        name: "Tora",
+        role: "Vệ sĩ hòa giải",
+        avatar: "assets/cust_shiba.png",
+        active: !!staff.tora,
+        className: "role-security"
+      },
+      {
+        name: "Ryu",
+        role: "Thần Long FEVER",
+        avatar: "assets/cust_fox.png",
+        active: !!staff.ryu,
+        className: "role-dragon"
       }
     ];
 
@@ -3166,6 +3218,12 @@ export class SpicyNoodleGame {
       bowlPrice = Math.round(bowlPrice * (1 + (chiliLv - 1) * 0.12));
     }
 
+    // Nâng cấp Gia Vị 7 Vị Shichimi Thượng Hạng (shichimiSpice): Mì cấp >= 3 tăng thêm 15% mỗi cấp!
+    const shichimiLv = this.state.upgrades.shichimiSpice || 0;
+    if (shichimiLv > 0 && pot.spicyLevel >= 3) {
+      bowlPrice = Math.round(bowlPrice * (1 + shichimiLv * 0.15));
+    }
+
     // Tính giá gốc thị trường chuẩn của tô mì để đo lường mức độ đắt/rẻ
     let baseBowlPrice = noodle.basePrice || noodle.price;
     if (pot.size === "L") baseBowlPrice += 7;
@@ -3498,7 +3556,10 @@ export class SpicyNoodleGame {
 
     const vipList = this.customerTemplates.filter(c => c.isVip);
     const normalList = this.customerTemplates.filter(c => !c.isVip);
-    const chosenCust = (vipList.length > 0 && Math.random() < 0.20)
+    // Nâng cấp Hồ Cá Koi Zen (zenGarden): Tăng tỉ lệ khách VIP Thần Tài thêm 10% mỗi cấp
+    const zenLv = this.state.upgrades.zenGarden || 0;
+    const vipRate = Math.min(0.70, 0.20 + (zenLv * 0.10));
+    const chosenCust = (vipList.length > 0 && Math.random() < vipRate)
       ? vipList[Math.floor(Math.random() * vipList.length)]
       : (normalList.length > 0 ? normalList[Math.floor(Math.random() * normalList.length)] : this.customerTemplates[0]);
 
@@ -4364,31 +4425,41 @@ export class SpicyNoodleGame {
 
             slot.patience -= (patienceLoss * pricePatienceMod);
             if (slot.patience <= 0) {
-              GameUIModal.showToast(`${slot.customer.name} đã tức giận bỏ về vì chờ quá lâu! (-1 ⭐)`, "warning", "😡");
-              this.sound.playReviewChime();
+              // Bạch Hổ Tora (Vệ Sĩ): 85% hòa giải thành công dỗ dành khách kiên nhẫn
+              if (this.state.staff.tora && Math.random() < 0.85) {
+                slot.patience = 35;
+                GameUIModal.showToast(`🐯 Bạch Hổ Tora đã dỗ dành ${slot.customer.name}! Tặng nước thanh nhiệt giữ khách thành công (+35 Kiên nhẫn)!`, "success", "🐯");
+                const slotCard = document.getElementById(`order-slot-${idx}`);
+                if (slotCard && typeof GameUIModal.spawnFloatingFx === "function") {
+                  GameUIModal.spawnFloatingFx(slotCard, "🐯 Hòa Giải!", true);
+                }
+              } else {
+                GameUIModal.showToast(`${slot.customer.name} đã tức giận bỏ về vì chờ quá lâu! (-1 ⭐)`, "warning", "😡");
+                this.sound.playReviewChime();
 
-              const angryComments = [
-                `Chờ mòn mỏi cả 20 phút không thấy tô mì đâu! Đói lả cả người đành phải bỏ về, quán phục vụ quá chậm chạp! 😡`,
-                `Quán gì để khách chờ sốt ruột toát mồ hôi hột. Gọi món xong ngồi ngó nhân viên, bực mình bỏ về luôn. 1 sao! 👎`,
-                `Bảo quán mì cay đệ nhất mà làm ăn như rùa bò, không bao giờ quay lại lần thứ hai! 💢`
-              ];
-              const angryText = angryComments[Math.floor(Math.random() * angryComments.length)];
+                const angryComments = [
+                  `Chờ mòn mỏi cả 20 phút không thấy tô mì đâu! Đói lả cả người đành phải bỏ về, quán phục vụ quá chậm chạp! 😡`,
+                  `Quán gì để khách chờ sốt ruột toát mồ hôi hột. Gọi món xong ngồi ngó nhân viên, bực mình bỏ về luôn. 1 sao! 👎`,
+                  `Bảo quán mì cay đệ nhất mà làm ăn như rùa bò, không bao giờ quay lại lần thứ hai! 💢`
+                ];
+                const angryText = angryComments[Math.floor(Math.random() * angryComments.length)];
 
-              this.state.reputation = Math.max(5, this.state.reputation - 4);
-              this.state.reviews.unshift({
-                id: Date.now() + Math.random().toString(36).substr(2, 4),
-                customerName: slot.customer.name,
-                customerAvatar: slot.customer.avatar || "assets/cust_cat.png",
-                stars: 1,
-                comment: angryText,
-                date: `Ngày ${this.state.day}`,
-                replied: false,
-                ownerReply: null,
-                customerFeedback: null
-              });
+                this.state.reputation = Math.max(5, this.state.reputation - 4);
+                this.state.reviews.unshift({
+                  id: Date.now() + Math.random().toString(36).substr(2, 4),
+                  customerName: slot.customer.name,
+                  customerAvatar: slot.customer.avatar || "assets/cust_cat.png",
+                  stars: 1,
+                  comment: angryText,
+                  date: `Ngày ${this.state.day}`,
+                  replied: false,
+                  ownerReply: null,
+                  customerFeedback: null
+                });
 
-              this.orderSlots[idx] = null;
-              this.renderHeader();
+                this.orderSlots[idx] = null;
+                this.renderHeader();
+              }
             }
           }
         });
@@ -4432,11 +4503,13 @@ export class SpicyNoodleGame {
         }
       }
 
-      // Cập nhật thực khách đang ăn tại các bàn
+      // Cập nhật thực khách đang ăn tại các bàn (Quạt hút ion airPurifier tăng tốc ăn 25% mỗi cấp)
       let tableChanged = false;
+      const purifierLv = this.state.upgrades.airPurifier || 0;
+      const eatStep = 1 + (purifierLv * 0.25);
       this.state.tables.forEach(table => {
         if (table.status === "eating") {
-          table.eatTimer = (table.eatTimer || 12) - 1;
+          table.eatTimer = (table.eatTimer || 12) - eatStep;
           if (table.eatTimer <= 0) {
             tableChanged = true;
             if (this.state.staff.shiba) {
@@ -4524,10 +4597,10 @@ export class SpicyNoodleGame {
       this.spawnOnlineOrder();
     }, onlineTimerMs);
 
-    // 4. Vòng lặp làm việc thực tế của nhân viên (Kenji nấu, Usagi bưng, Shiba dọn, Ducky pha nước, Fawn nhập kho)
-    // Nâng cấp Bếp Gas Cao Cấp (stoveSpeed) giúp Kenji và nhà bếp thao tác nhanh hơn
-    const stoveLv = this.state.upgrades.stoveSpeed || 1;
-    const autoIntervalMs = Math.max(1200, 2200 - (stoveLv - 1) * 350);
+    // 4. Vòng lặp làm việc thực tế của nhân viên (Kenji, Usagi, Shiba, Ducky, Fawn, Ryu)
+    // Nâng cấp Bếp Gas (stoveSpeed) & Bếp Niêu Đôi (dualStove) giúp thao tác nhanh vượt trội
+    const stoveLv = (this.state.upgrades.stoveSpeed || 1) + ((this.state.upgrades.dualStove || 0) * 1.5);
+    const autoIntervalMs = Math.max(850, 2200 - (stoveLv - 1) * 320);
 
     this.staffAutomationInterval = setInterval(() => {
       this.runStaffAutomation();
@@ -4633,6 +4706,18 @@ export class SpicyNoodleGame {
           }
         }
       }
+    }
+
+    // 6. Thần Long Ryu (Linh vật may mắn tối thượng): Nạp đầy FEVER & ban phát mưa tiền vàng
+    if (staff.ryu && Math.random() < 0.16) {
+      this.addFeverPoints(35);
+      const goldRain = Math.floor(Math.random() * 25) + 20; // 20k - 45k
+      this.state.money += goldRain;
+      this.state.todayEarnings += goldRain;
+      this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + goldRain;
+      this.sound.playCoinChime();
+      GameUIModal.showToast(`🐉 Thần Long Ryu giáng thế! Rơi mưa vàng +${goldRain}k & tích lũy năng lượng FEVER RUSH!`, "success", "✨");
+      this.renderHeader();
     }
   }
 
@@ -4793,18 +4878,23 @@ export class SpicyNoodleGame {
       quote: baseShipper.quote
     };
 
+    const autoSealerLv = this.state.upgrades.autoSealer || 0;
+    const isAutoSealed = autoSealerLv > 0;
+    const orderFinalPrice = isAutoSealed ? (price + 20) : price;
+    const finalItemsText = isAutoSealed ? `${itemsText} · ⚡ Đã ép màng tự động (+20k)` : itemsText;
+
     const order = {
       id: id,
       app: app,
-      price: price,
+      price: orderFinalPrice,
       noodlePrice: noodlePrice,
       drinkPrice: drinkPrice,
       noodleId: chosenNoodle.id,
       drinkId: chosenDrink ? chosenDrink.id : null,
       bowlsCount: 1,
-      itemsText: itemsText,
+      itemsText: finalItemsText,
       remainingSeconds: 20,
-      isPacked: false,
+      isPacked: isAutoSealed,
       shipper: shipper
     };
 
@@ -4841,13 +4931,19 @@ export class SpicyNoodleGame {
       }
 
       if (packBtn) {
-        packBtn.classList.remove("is-packed");
-        packBtn.disabled = false;
-        packBtn.innerHTML = `🔒 Ép Màng & Đóng Thùng (+15k)`;
+        if (isAutoSealed) {
+          packBtn.classList.add("is-packed");
+          packBtn.disabled = true;
+          packBtn.innerHTML = `⚡ Đã Ép Màng Tự Động (+20k)`;
+        } else {
+          packBtn.classList.remove("is-packed");
+          packBtn.disabled = false;
+          packBtn.innerHTML = `🔒 Ép Màng & Đóng Thùng (+15k)`;
+        }
       }
 
-      if (priceEl) priceEl.textContent = `+${price}k`;
-      if (descEl) descEl.textContent = itemsText;
+      if (priceEl) priceEl.textContent = `+${orderFinalPrice}k`;
+      if (descEl) descEl.textContent = finalItemsText;
 
       const timerBadge = document.getElementById("open-shipper-timer");
       const timerFill = document.getElementById("open-shipper-timer-fill");
@@ -5008,7 +5104,10 @@ export class SpicyNoodleGame {
       shiro: { name: "Cáo Shiro", wage: 60 },
       ducky: { name: "Vịt Ducky", wage: 60 },
       owl: { name: "Cú Mèo Owl", wage: 75 },
-      fawn: { name: "Nai Fawn", wage: 85 }
+      fawn: { name: "Nai Fawn", wage: 85 },
+      torto: { name: "Cụ Rùa Torto", wage: 90 },
+      tora: { name: "Bạch Hổ Tora", wage: 110 },
+      ryu: { name: "Thần Long Ryu", wage: 150 }
     };
 
     let totalPayroll = 0;
@@ -5022,8 +5121,23 @@ export class SpicyNoodleGame {
     this.state.todayStaffWages = totalPayroll;
 
     // 2. Chi phí mặt bằng & điện nước vận hành (từ Ngày 2 trở đi để game có độ thử thách thực tế)
-    const rentCost = this.state.day === 1 ? 0 : Math.min(180, 25 + (this.state.day - 1) * 12);
+    let rentCost = this.state.day === 1 ? 0 : Math.min(180, 25 + (this.state.day - 1) * 12);
+    // Cụ Rùa Torto (Kế toán trưởng): Giảm 50% tiền thuê mặt bằng
+    if (this.state.staff.torto && rentCost > 0) {
+      rentCost = Math.round(rentCost * 0.5);
+    }
     this.state.todayRentCost = rentCost;
+
+    // Cụ Rùa Torto sinh lãi két sắt 5% trên số tiền nhàn rỗi
+    let interestEarned = 0;
+    if (this.state.staff.torto && this.state.money > 0) {
+      interestEarned = Math.round(this.state.money * 0.05);
+      this.state.money += interestEarned;
+      this.state.todayEarnings += interestEarned;
+      this.state.todayTortoInterest = interestEarned;
+    } else {
+      this.state.todayTortoInterest = 0;
+    }
 
     const totalDailyExpenses = rentCost + totalPayroll;
     this.state.todayExpenses = totalDailyExpenses;
@@ -5064,7 +5178,7 @@ export class SpicyNoodleGame {
           <div class="receipt-section-title">DOANH THU THU VÀO</div>
           <div class="receipt-row">
             <span>🍜 Bán mỳ & đồ uống:</span>
-            <strong class="receipt-val-green">+${txaformat.formatVND(Math.max(0, grossRevenue - this.state.todayTips))}</strong>
+            <strong class="receipt-val-green">+${txaformat.formatVND(Math.max(0, grossRevenue - this.state.todayTips - (this.state.todayTortoInterest || 0)))}</strong>
           </div>
           <div class="receipt-row">
             <span>💖 Tiền tip thực khách:</span>
@@ -5076,13 +5190,19 @@ export class SpicyNoodleGame {
               <strong class="receipt-val-gold">+${txaformat.formatVND(this.state.todaySpecialBonus)}</strong>
             </div>
           ` : ''}
+          ${this.state.todayTortoInterest > 0 ? `
+            <div class="receipt-row">
+              <span>🐢 Lãi kép Cụ Rùa (+5% két sắt):</span>
+              <strong class="receipt-val-gold">+${txaformat.formatVND(this.state.todayTortoInterest)}</strong>
+            </div>
+          ` : ''}
 
           <div class="receipt-divider-dash"></div>
 
           <div class="receipt-section-title">CHI PHÍ VẬN HÀNH</div>
           ${rentCost > 0 ? `
             <div class="receipt-row">
-              <span>⚡ Điện nước & mặt bằng:</span>
+              <span>⚡ Điện nước & mặt bằng${this.state.staff.torto ? ' (Giảm 50% 🐢)' : ''}:</span>
               <strong class="receipt-val-red">-${txaformat.formatVND(rentCost)}</strong>
             </div>
           ` : `
@@ -5216,5 +5336,124 @@ export class SpicyNoodleGame {
     if (tabId === "tab-summary") this.renderSummaryTab();
 
     this.sound.playButtonClick();
+  }
+
+  // ==========================================================
+  // 15. MENU TRỢ LỰC BÍ MẬT (SECRET DEVELOPER BUFF CONSOLE)
+  // ==========================================================
+  openSecretBuffModal() {
+    const modal = document.getElementById("modal-dev-buff");
+    if (modal) {
+      modal.style.display = "flex";
+      this.sound.playCoinChime();
+      GameUIModal.showToast("👑 Đã mở Bảng Trợ Lực Hệ Thống dành riêng cho Chủ Quán!", "success", "✨");
+    }
+  }
+
+  devBuff(type) {
+    switch (type) {
+      case "money_50m":
+        this.state.money += 50000;
+        this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + 50000;
+        GameUIModal.showToast("💰 Đã buff +50.000k (50 Triệu VNĐ) vào két sắt!", "success", "✨");
+        break;
+
+      case "money_500m":
+        this.state.money += 500000;
+        this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + 500000;
+        GameUIModal.showToast("💎 Đã buff +500.000k (500 Triệu VNĐ) tài chính vô hạn!", "success", "✨");
+        break;
+
+      case "reputation_max":
+        this.state.reputation = 100;
+        GameUIModal.showToast("⭐ Đã nâng Danh Tiếng quán lên tối đa 100⭐!", "success", "👑");
+        break;
+
+      case "fever_rush":
+        this.feverPoints = 100;
+        this.triggerFeverRush();
+        GameUIModal.showToast("🔥 Đã kích hoạt Giờ Vàng FEVER RUSH bão khách ngay lập tức!", "success", "🔥");
+        break;
+
+      case "stock_full":
+        for (const k in this.state.noodles) this.state.noodles[k].stock = Math.max(99, (this.state.noodles[k].stock || 0) + 99);
+        for (const k in this.state.toppings) this.state.toppings[k].stock = Math.max(99, (this.state.toppings[k].stock || 0) + 99);
+        for (const k in this.state.drinks) this.state.drinks[k].stock = Math.max(99, (this.state.drinks[k].stock || 0) + 99);
+        for (const k in this.state.supplies) this.state.supplies[k].stock = Math.max(99, (this.state.supplies[k].stock || 0) + 99);
+        GameUIModal.showToast("📦 Kho hàng đã được bơm đầy +99 toàn bộ mì, topping & trà sữa!", "success", "📦");
+        break;
+
+      case "hire_all_staff":
+        for (const k in this.state.staff) this.state.staff[k] = true;
+        GameUIModal.showToast("👥 Đã chiêu mộ toàn bộ 11 nhân viên toàn năng về tiệm mì!", "success", "🐾");
+        break;
+
+      case "max_all_upgrades":
+        this.state.upgrades.tableCount = 8;
+        this.state.upgrades.stoveSpeed = 6;
+        this.state.upgrades.chiliSecret = 5;
+        this.state.upgrades.acCooling = 5;
+        this.state.upgrades.decorScore = 6;
+        this.state.upgrades.freezerStorage = 5;
+        this.state.upgrades.lofiAcoustic = 4;
+        this.state.upgrades.autoSealer = 5;
+        this.state.upgrades.dualStove = 5;
+        this.state.upgrades.airPurifier = 5;
+        this.state.upgrades.zenGarden = 5;
+        this.state.upgrades.shichimiSpice = 5;
+        this.initTables();
+        while (this.state.tables.length < 8) {
+          this.state.tables.push({
+            id: this.state.tables.length + 1,
+            status: "empty",
+            customer: null,
+            order: null,
+            patience: 100,
+            maxPatience: 100
+          });
+        }
+        GameUIModal.showToast("🛠️ Đã nâng cấp Max Cực Đại toàn bộ 12 trang thiết bị quán!", "success", "🌟");
+        break;
+
+      case "unlock_customers":
+        this.customerTemplates.forEach(c => {
+          this.unlockCustomer(c, false);
+        });
+        GameUIModal.showToast("👑 Đã mở khóa đủ toàn bộ 16 khách quen & VIP trong Bộ sưu tập!", "success", "🎉");
+        break;
+
+      case "clean_tables":
+        this.state.tables.forEach(t => {
+          t.status = "empty";
+          t.customer = null;
+          t.order = null;
+        });
+        GameUIModal.showToast("✨ Đã lau dọn sạch bóng toàn bộ bàn ghế trong tiệm!", "success", "🧹");
+        break;
+
+      case "skip_day_10":
+        this.state.day = 10;
+        GameUIModal.showToast("⏭️ Đã tua nhanh thời gian tới Ngày 10!", "info", "📅");
+        break;
+
+      case "skip_day_30":
+        this.state.day = 30;
+        GameUIModal.showToast("🚀 Đã tua nhanh thời gian tới Ngày 30!", "info", "📅");
+        break;
+
+      case "skip_day_50":
+        this.state.day = 50;
+        GameUIModal.showToast("🐉 Đã tua nhanh thời gian tới Ngày 50!", "info", "📅");
+        break;
+    }
+
+    this.sound.playCoinChime();
+    this.saveGame();
+    this.renderAll();
+    if (this.state.dayPhase === "open") {
+      this.renderOpenMode();
+      this.renderDiningStage();
+      this.renderStaffKitchenBar();
+    }
   }
 }
