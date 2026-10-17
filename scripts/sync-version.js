@@ -33,9 +33,9 @@ if (fs.existsSync(pkgFile)) {
 const readmeFile = path.join(rootDir, "README.md");
 if (fs.existsSync(readmeFile)) {
   let readme = fs.readFileSync(readmeFile, "utf-8");
-  readme = readme.replace(/# 🍜 Tiệm Mỳ Cay \(Phiên Bản [^)]+\)/, `# 🍜 Tiệm Mỳ Cay (Phiên Bản ${currentVer})`);
-  readme = readme.replace(/## 🌟 Tính Năng Nổi Bật \(Bản [^)]+\)/, `## 🌟 Tính Năng Nổi Bật (Bản ${currentVer})`);
+  readme = readme.replace(/Phi%C3%AAn%20B%E1%BA%A3n-[^)]+-F59E0B/, `Phi%C3%AAn%20B%E1%BA%A3n-v${currentVer}-F59E0B`);
   readme = readme.replace(/Ph%C3%A1t%20H%C3%A0nh-[^)]+-blue/, `Ph%C3%A1t%20H%C3%A0nh-${encodeURIComponent(releaseDate)}-blue`);
+  readme = readme.replace(/\(Phiên bản: \*\*v[^*]+\*\*\)/, `(Phiên bản: **v${currentVer}**)`);
   fs.writeFileSync(readmeFile, readme, "utf-8");
   console.log(`✓ Đã cập nhật README.md -> v${currentVer}`);
 }
