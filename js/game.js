@@ -924,50 +924,82 @@ export class SpicyNoodleGame {
 
     // Hàm render từng thẻ bài nguyên liệu trực quan (Card Grid)
     const renderCard = (item) => {
+      const isLocked = item.unlocked === false;
       const isOutOfStock = (item.stock || 0) <= 0;
       const isTutorialTarget = !this.state.tutorialDismissed && item.id === "mi_soi";
       const formattedPrice = txaformat.formatVND(item.unitCost);
       const isMinusDisabled = isOutOfStock;
 
+      let badgeHtml = "";
+      if (isLocked) {
+        badgeHtml = `<span class="kho-badge locked-badge">🔒 CHƯA MỞ MENU</span>`;
+      } else if (isOutOfStock) {
+        badgeHtml = `<span class="kho-badge out-of-stock">⚠️ HẾT HÀNG</span>`;
+      } else {
+        badgeHtml = `<span class="kho-badge in-stock">Còn ${item.stock} phần</span>`;
+      }
+
       return `
-        <div class="kho-card ${isOutOfStock ? 'card-out-of-stock' : ''}" data-item-id="${item.id}">
+        <div class="kho-card ${isLocked ? 'card-locked' : ''} ${isOutOfStock && !isLocked ? 'card-out-of-stock' : ''}" data-item-id="${item.id}">
           <div class="kho-card-badge-wrap">
-            ${isOutOfStock 
-              ? `<span class="kho-badge out-of-stock">⚠️ HẾT HÀNG</span>` 
-              : `<span class="kho-badge in-stock">Còn ${item.stock} phần</span>`
-            }
+            ${badgeHtml}
           </div>
 
           <div class="kho-card-icon-box">
             <span class="kho-card-icon">${item.icon}</span>
+            ${isLocked ? `<span class="card-lock-overlay-icon">🔒</span>` : ''}
           </div>
 
           <div class="kho-card-info">
             <h4 class="kho-card-name" title="${item.name}">${item.name}</h4>
-            <div class="kho-card-price">${formattedPrice} <span class="unit-text">/phần</span></div>
+            <div class="kho-card-price ${isLocked ? 'text-muted' : ''}">
+              ${isLocked ? `Chưa mở bán` : `${formattedPrice} <span class="unit-text">/phần</span>`}
+            </div>
+            <span class="kho-card-shelf-life" title="Nguyên liệu trữ đông tươi ngon, không bao giờ hư hỏng hay mất đi qua các ngày!">
+              ❄️ Hạn dùng: Vô hạn
+            </span>
           </div>
 
-          <!-- Cụm Stepper gọn gàng: nút -, số lượng, nút + -->
-          <div class="kho-stepper-control">
-            <button class="btn-stepper-action btn-minus ${isMinusDisabled ? 'disabled' : ''}" 
-                    ${isMinusDisabled ? 'disabled' : ''} 
-                    onclick="window.game.adjustStock('${item.id}', -1)"
-                    title="Bớt 1 phần">
-              −
-            </button>
-            <div class="kho-stepper-stock-val">${item.stock}</div>
-            <button class="btn-stepper-action btn-plus ${isTutorialTarget ? 'highlight-glow' : ''}" 
-                    onclick="window.game.adjustStock('${item.id}', 1)"
-                    title="Mua thêm 1 phần">
-              +
-            </button>
-          </div>
+          ${isLocked ? `
+            <!-- Nút điều hướng sang Menu nếu món chưa mở khóa -->
+            <div class="kho-locked-action-wrap">
+              ${item.stock > 0 ? `
+                <div class="kho-locked-refund-row">
+                  <span class="locked-stock-note">Còn ${item.stock}</span>
+                  <button class="btn-stepper-action btn-minus" 
+                          onclick="window.game.adjustStock('${item.id}', -1)" 
+                          title="Hoàn trả lại kho để lấy lại tiền">
+                    −
+                  </button>
+                </div>
+              ` : ''}
+              <button class="btn-goto-menu-unlock" onclick="window.game.switchTab('tab-menu')" title="Chuyển tới Tab Menu để mở khóa món này">
+                🔓 Mở Trong Menu
+              </button>
+            </div>
+          ` : `
+            <!-- Cụm Stepper gọn gàng: nút -, số lượng, nút + -->
+            <div class="kho-stepper-control">
+              <button class="btn-stepper-action btn-minus ${isMinusDisabled ? 'disabled' : ''}" 
+                      ${isMinusDisabled ? 'disabled' : ''} 
+                      onclick="window.game.adjustStock('${item.id}', -1)"
+                      title="Bớt 1 phần">
+                −
+              </button>
+              <div class="kho-stepper-stock-val">${item.stock}</div>
+              <button class="btn-stepper-action btn-plus ${isTutorialTarget ? 'highlight-glow' : ''}" 
+                      onclick="window.game.adjustStock('${item.id}', 1)"
+                      title="Mua thêm 1 phần">
+                +
+              </button>
+            </div>
 
-          <!-- Nút chọn mua nhanh số lượng lớn -->
-          <div class="kho-quick-chips">
-            <button class="btn-chip-qty" onclick="window.game.adjustStock('${item.id}', 5)" title="Mua nhanh +5 phần">+5</button>
-            <button class="btn-chip-qty" onclick="window.game.adjustStock('${item.id}', 10)" title="Mua nhanh +10 phần">+10</button>
-          </div>
+            <!-- Nút chọn mua nhanh số lượng lớn -->
+            <div class="kho-quick-chips">
+              <button class="btn-chip-qty" onclick="window.game.adjustStock('${item.id}', 5)" title="Mua nhanh +5 phần">+5</button>
+              <button class="btn-chip-qty" onclick="window.game.adjustStock('${item.id}', 10)" title="Mua nhanh +10 phần">+10</button>
+            </div>
+          `}
         </div>
       `;
     };
@@ -990,6 +1022,12 @@ export class SpicyNoodleGame {
     if (!item) return;
 
     if (amount > 0) {
+      // Chặn tuyệt đối mua nguyên liệu của món chưa mở khóa trong Menu
+      if (item.unlocked === false) {
+        GameUIModal.showToast(`Món "${item.name}" chưa được mở khóa trong Menu! Hãy qua tab Menu mở khóa trước khi nhập hàng nhé!`, "warning", "🔒");
+        return;
+      }
+
       const discount = this.state.staff.fawn ? 0.85 : 1.0;
       const cost = Math.round((item.unitCost * amount) * discount * 10) / 10;
       if (this.state.money < cost) {

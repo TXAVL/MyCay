@@ -53,10 +53,10 @@ export class txaversion {
           badgeType: "manage"
         },
         {
-          title: "Hệ Thống Trợ Lực Tối Thượng (Secret Developer Console)",
-          desc: "Tích hợp menu công cụ điều phối bí mật dành riêng cho nhà quản lý tiệm để buff tiền bạc, danh tiếng, giờ vàng và mở khóa nhanh.",
-          icon: "⚡",
-          badge: "Quản Trị Quán 👑",
+          title: "Tối Ưu Nhập Kho & Cam Kết Bảo Quản Vô Hạn",
+          desc: "Khóa thông minh nguyên liệu của những món chưa mở khóa trong Menu (kèm nút chuyển nhanh sang Menu mở khóa, không lo mua nhầm phí tiền). Toàn bộ nguyên liệu & topping nhập kho được bảo quản tươi ngon VÔ HẠN thời gian, vĩnh viễn không hư hỏng qua các ngày!",
+          icon: "❄️",
+          badge: "Lắng Nghe Góp Ý 💬",
           badgeType: "star"
         }
       ],
