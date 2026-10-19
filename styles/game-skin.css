@@ -3761,3 +3761,20 @@
     max-width: 100%;
   }
 }
+
+/* Điểm sao trung bình dạng số cạnh dãy sao trên HUD */
+.game-hud .hud-star .header-stars-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.game-hud .hud-star .hud-star-num {
+  font-family: var(--font-game);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  color: #FFFFFF;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}

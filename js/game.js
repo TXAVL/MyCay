@@ -1067,12 +1067,14 @@ export class SpicyNoodleGame {
     const hasReviews = this.state.reviews && this.state.reviews.length > 0;
     if (hasReviews) {
       const totalStars = this.state.reviews.reduce((sum, r) => sum + (r.stars || 5), 0);
-      const avgStars = Math.round(totalStars / this.state.reviews.length);
+      const avgExact = totalStars / this.state.reviews.length;
+      const avgStars = Math.round(avgExact);
       const starString = "★".repeat(Math.min(5, Math.max(1, avgStars))) + "☆".repeat(Math.max(0, 5 - avgStars));
-      if (starsEl) starsEl.textContent = starString;
+      // Hiện cả điểm số thật (vd 4.3) cạnh dãy sao để người chơi biết chính xác
+      if (starsEl) starsEl.innerHTML = `<b class="hud-star-num">${avgExact.toFixed(1)}</b>${starString}`;
       if (reviewsEl) reviewsEl.textContent = `${this.state.reviews.length} đánh giá`;
     } else {
-      if (starsEl) starsEl.textContent = "☆☆☆☆☆";
+      if (starsEl) starsEl.innerHTML = '<b class="hud-star-num">0.0</b>☆☆☆☆☆';
       if (reviewsEl) reviewsEl.textContent = "Chưa có đánh giá";
     }
 
