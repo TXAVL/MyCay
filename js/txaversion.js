@@ -10,78 +10,64 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.6.0 - Đại Tu Giao Diện Chuẩn Game Tiệm Nhỏ & Khu Bếp Mới)
+  // Khai báo phiên bản hiện tại của game (Bản 1.7.0 - Nhiệm Vụ Hằng Ngày, Thành Tựu & Đại Tu Logic Bán Hàng)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.6.0",
-      160,
-      "17/10/2026",
+      "1.7.0",
+      170,
+      "19/10/2026",
       [
         {
-          title: "Khung Cảnh Tiệm Sống Động",
-          desc: "Tiệm mì giờ là một thế giới thật sự: khách chibi bước vào từ cửa, xếp hàng ở quầy gọi món, cầm tô đi về bàn ngồi ăn xì xụp rồi mới ra về. Đầu bếp và nhân viên đứng quầy nói chuyện rôm rả, nồi niêu bốc khói, ánh sáng đổi từ sáng sớm sang hoàng hôn rồi đêm theo giờ ca bán!",
-          icon: "🏮",
-          badge: "Đại Tu Giao Diện 🎮",
-          badgeType: "hot"
-        },
-        {
-          title: "Chạm Khách Để Nấu & Bưng Món",
-          desc: "Chạm vào khách trong khung cảnh để nấu đúng món (bong bóng chuyển xanh ✓), chạm lần nữa để bưng ra. Chạm bàn bẩn 🧹 để dọn nhận tip, chạm khách đang ăn để nghe khen ngon!",
-          icon: "👆",
-          badge: "Lối Chơi Mới ✨",
-          badgeType: "hot"
-        },
-        {
-          title: "HUD Game, Cấp Độ Tiệm & Xu Vàng Bay",
-          desc: "Thanh trạng thái kiểu game với ví xu vàng, sao đánh giá, đồng hồ ca bán. Tiệm có Cấp độ (Lv) và thanh XP, mỗi tô bán ra đều cộng kinh nghiệm, lên cấp có pháo giấy ăn mừng. Tiền vào là xu vàng bay thẳng về ví!",
-          icon: "🪙",
-          badge: "Cấp Độ Tiệm ⭐",
-          badgeType: "star"
-        },
-        {
-          title: "Dock Nút Tròn & Nút Bấm 3D",
-          desc: "Thanh điều hướng mới dạng dock gỗ cố định đáy màn hình, nút bấm 3D lún xuống khi chạm, bảng nội dung có ruy băng tiêu đề, màn hình chờ mới với mặt tiền quán vẽ tay.",
-          icon: "🕹️",
-          badge: "Giao Diện Mới 🎨",
-          badgeType: "visual"
-        },
-        {
-          title: "Đại Tu Khu Bếp Nấu",
-          desc: "Bếp mới khung gỗ ấm cúng: phiếu order giấy treo trên thanh ray inox (đung đưa khi khách mới tới), bếp niêu đặt trên quầy gỗ với tường gạch men và kệ gia vị, dock nguyên liệu dạng thùng 3D bấm lún. Nấu đúng món là phiếu đóng dấu ✓ ĐÚNG MÓN và chuông 🛎️ Bưng rung lên!",
-          icon: "🍳",
-          badge: "Bếp Mới 🔥",
-          badgeType: "hot"
-        },
-        {
-          title: "Chuỗi Phục Vụ, Doanh Thu Hôm Nay & Món Đặc Biệt Ngay Trong Bếp",
-          desc: "Thanh tiêu đề bếp đếm Chuỗi phục vụ liên tiếp (mốc x5, x10... có thông báo ăn mừng, về 0 khi khách bỏ về hoặc bị từ chối), số tô · ly · tiền bán được hôm nay, kèm lời nhắc Món đặc biệt hôm nay để nấu đúng nhận Bonus.",
-          icon: "🔥",
+          title: "Nhiệm Vụ Hằng Ngày & Rương Thưởng",
+          desc: "Tab 🎯 Nhiệm vụ mới: mỗi ngày 3 nhiệm vụ ngẫu nhiên (bán đủ tô, giữ chuỗi, bưng thần tốc, đón khách VIP, giao shipper...) khó dần theo tuổi tiệm. Xong cả 3 mở Rương Thưởng Ngày. Quên bấm nhận thì cuối ca tự cộng thưởng, trong bếp có chip 🎯 xem nhanh tiến độ.",
+          icon: "🎯",
           badge: "Tính Năng Mới ✨",
           badgeType: "hot"
         },
         {
-          title: "Phụ Bếp, Cảnh Báo Sắp Hết Hàng & Phím Tắt",
-          desc: "Nhân viên đã thuê (Kenji, Ducky, Usagi, Shiba) hiện cạnh bếp. Thùng nguyên liệu báo cam khi còn ≤3 phần và xám khi đã hết. Trên máy tính có bảng gợi ý phím tắt 1·2·3 Bưng khách, C Làm lại, P Tạm dừng, Space Giao shipper.",
-          icon: "🧑‍🍳",
-          badge: "Tiện Ích 🛠️",
+          title: "Thành Tựu Tiệm 10 Nhóm Nhiều Bậc",
+          desc: "Bậc Thầy Niêu Đất, Chuỗi Không Gãy, Đại Gia Mì Cay, Ngôi Sao Khu Phố, Nhà Sưu Tập Thực Khách... mỗi bậc thưởng tiền & XP cấp độ tiệm. Dock hiện chấm đỏ khi có thưởng chờ nhận.",
+          icon: "🏆",
+          badge: "Thành Tựu 🏆",
           badgeType: "star"
         },
         {
-          title: "Gọn Gàng Trên Điện Thoại & Mượt Hơn",
-          desc: "Khu bếp trên điện thoại gọn hơn khoảng 1/3 (phiếu order từ ~650px còn ~220px, bỏ đồng hồ trùng với HUD). Phiếu order không còn bị dựng lại mỗi giây nên không còn mất cú chạm khi đang bấm Nấu/Bưng.",
-          icon: "📱",
+          title: "Khách Gọi Kèm Trà Sữa & Thưởng Tốc Độ",
+          desc: "Khách tại quán giờ gọi kèm đồ uống ngay trên phiếu order. Bưng khi khách còn ≥70% kiên nhẫn được Thần tốc (+25% tip, nạp Giờ Vàng nhanh hơn); mỗi mốc chuỗi x5 cộng thêm +5% doanh thu (tối đa +25%).",
+          icon: "🧋",
+          badge: "Lối Chơi Mới 🎮",
+          badgeType: "hot"
+        },
+        {
+          title: "Đại Tu Logic Bán Hàng",
+          desc: "Chỉ tính tiền đúng món khách gọi (hết cảnh pha nước khách không gọi vẫn thu tiền). Khách chỉ gọi món còn đủ hàng; món kèm hết giữa chừng thì được bưng thiếu. Nâng cấp Sốt Ớt/Shichimi không còn khiến khách chê đắt. Nguyên liệu phụ (mì sợi, nước hầm, niêu, trà, sữa) giờ thực sự tiêu hao mỗi phần bán.",
+          icon: "⚖️",
+          badge: "Cân Bằng Game 🍲",
+          badgeType: "manage"
+        },
+        {
+          title: "Nhân Viên Thông Minh Hơn",
+          desc: "Kenji ưu tiên nấu cho khách sốt ruột nhất, Ducky pha đúng ly khách gọi (hết lỗi trừ kho 2 lần), Usagi kiểm tra đủ size & đồ uống trước khi bưng nên không còn kẹt bếp. Shipper chỉ tới 1 người mỗi lượt và không giao được khi kho hết mì.",
+          icon: "🐼",
           badge: "Tối Ưu ⚡",
           badgeType: "manage"
         },
         {
-          title: "Sửa Lỗi Phím P Tiếp Tục Bán",
-          desc: "Bấm phím P lần thứ hai để tiếp tục ca bán không còn bị lỗi và kẹt hộp thoại Tạm dừng.",
+          title: "Giao Diện Lần 2 Gọn & Rõ Hơn",
+          desc: "Toast bưng món không còn bị toast \"dọn niêu\" đè mất, gom gọn mọi khoản thưởng trong 1 dòng. Tiêu đề bếp, tab Sảnh Bàn Ăn và thanh Giờ Vàng không còn bị cắt chữ trên điện thoại. Hóa đơn cuối ngày thêm thống kê ly nước, chuỗi max và nhiệm vụ.",
+          icon: "🎨",
+          badge: "Giao Diện Mới 🎨",
+          badgeType: "visual"
+        },
+        {
+          title: "Sửa Lỗi Quan Trọng",
+          desc: "Tải lại trang không còn quay về Ngày 1. Giờ Vàng thống nhất x1.5 doanh thu ở mọi nơi hiển thị. Gói tiết kiệm kỳ hạn được cân bằng lại (3 ngày 4.5%/ngày, 7 ngày 7%/ngày). Đồng hồ ca hiển thị đúng 2:00.",
           icon: "🐞",
           badge: "Sửa Lỗi 🛠️",
           badgeType: "manage"
         }
       ],
-      "Đại Tu Giao Diện Chuẩn Game Tiệm Nhỏ"
+      "Nhiệm Vụ Hằng Ngày & Đại Tu Logic Bán Hàng"
     );
   }
 
@@ -89,6 +75,77 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+  "1.6.0",
+        160,
+        "17/10/2026",
+        [
+          {
+            title: "Khung Cảnh Tiệm Sống Động",
+            desc: "Tiệm mì giờ là một thế giới thật sự: khách chibi bước vào từ cửa, xếp hàng ở quầy gọi món, cầm tô đi về bàn ngồi ăn xì xụp rồi mới ra về. Đầu bếp và nhân viên đứng quầy nói chuyện rôm rả, nồi niêu bốc khói, ánh sáng đổi từ sáng sớm sang hoàng hôn rồi đêm theo giờ ca bán!",
+            icon: "🏮",
+            badge: "Đại Tu Giao Diện 🎮",
+            badgeType: "hot"
+          },
+          {
+            title: "Chạm Khách Để Nấu & Bưng Món",
+            desc: "Chạm vào khách trong khung cảnh để nấu đúng món (bong bóng chuyển xanh ✓), chạm lần nữa để bưng ra. Chạm bàn bẩn 🧹 để dọn nhận tip, chạm khách đang ăn để nghe khen ngon!",
+            icon: "👆",
+            badge: "Lối Chơi Mới ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "HUD Game, Cấp Độ Tiệm & Xu Vàng Bay",
+            desc: "Thanh trạng thái kiểu game với ví xu vàng, sao đánh giá, đồng hồ ca bán. Tiệm có Cấp độ (Lv) và thanh XP, mỗi tô bán ra đều cộng kinh nghiệm, lên cấp có pháo giấy ăn mừng. Tiền vào là xu vàng bay thẳng về ví!",
+            icon: "🪙",
+            badge: "Cấp Độ Tiệm ⭐",
+            badgeType: "star"
+          },
+          {
+            title: "Dock Nút Tròn & Nút Bấm 3D",
+            desc: "Thanh điều hướng mới dạng dock gỗ cố định đáy màn hình, nút bấm 3D lún xuống khi chạm, bảng nội dung có ruy băng tiêu đề, màn hình chờ mới với mặt tiền quán vẽ tay.",
+            icon: "🕹️",
+            badge: "Giao Diện Mới 🎨",
+            badgeType: "visual"
+          },
+          {
+            title: "Đại Tu Khu Bếp Nấu",
+            desc: "Bếp mới khung gỗ ấm cúng: phiếu order giấy treo trên thanh ray inox (đung đưa khi khách mới tới), bếp niêu đặt trên quầy gỗ với tường gạch men và kệ gia vị, dock nguyên liệu dạng thùng 3D bấm lún. Nấu đúng món là phiếu đóng dấu ✓ ĐÚNG MÓN và chuông 🛎️ Bưng rung lên!",
+            icon: "🍳",
+            badge: "Bếp Mới 🔥",
+            badgeType: "hot"
+          },
+          {
+            title: "Chuỗi Phục Vụ, Doanh Thu Hôm Nay & Món Đặc Biệt Ngay Trong Bếp",
+            desc: "Thanh tiêu đề bếp đếm Chuỗi phục vụ liên tiếp (mốc x5, x10... có thông báo ăn mừng, về 0 khi khách bỏ về hoặc bị từ chối), số tô · ly · tiền bán được hôm nay, kèm lời nhắc Món đặc biệt hôm nay để nấu đúng nhận Bonus.",
+            icon: "🔥",
+            badge: "Tính Năng Mới ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Phụ Bếp, Cảnh Báo Sắp Hết Hàng & Phím Tắt",
+            desc: "Nhân viên đã thuê (Kenji, Ducky, Usagi, Shiba) hiện cạnh bếp. Thùng nguyên liệu báo cam khi còn ≤3 phần và xám khi đã hết. Trên máy tính có bảng gợi ý phím tắt 1·2·3 Bưng khách, C Làm lại, P Tạm dừng, Space Giao shipper.",
+            icon: "🧑‍🍳",
+            badge: "Tiện Ích 🛠️",
+            badgeType: "star"
+          },
+          {
+            title: "Gọn Gàng Trên Điện Thoại & Mượt Hơn",
+            desc: "Khu bếp trên điện thoại gọn hơn khoảng 1/3 (phiếu order từ ~650px còn ~220px, bỏ đồng hồ trùng với HUD). Phiếu order không còn bị dựng lại mỗi giây nên không còn mất cú chạm khi đang bấm Nấu/Bưng.",
+            icon: "📱",
+            badge: "Tối Ưu ⚡",
+            badgeType: "manage"
+          },
+          {
+            title: "Sửa Lỗi Phím P Tiếp Tục Bán",
+            desc: "Bấm phím P lần thứ hai để tiếp tục ca bán không còn bị lỗi và kẹt hộp thoại Tạm dừng.",
+            icon: "🐞",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Đại Tu Giao Diện Chuẩn Game Tiệm Nhỏ"
+      ),
       new txaversion(
         "1.5.7",
         157,

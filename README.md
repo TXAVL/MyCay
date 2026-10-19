@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.6.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-17%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.7.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-19%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
@@ -14,6 +14,11 @@
 - **Chạm khách để chơi**: chạm khách lần 1 để nấu đúng món (bong bóng chuyển xanh ✓), chạm lần 2 để bưng ra; chạm bàn bẩn 🧹 để dọn nhận tip.
 - **HUD game**: ví xu vàng, sao đánh giá, đồng hồ ca bán, avatar có vòng XP và **Cấp độ tiệm (Lv)** kèm màn hình *LÊN CẤP!* pháo giấy.
 - **Xu vàng bay về ví** mỗi khi có tiền vào, **dock nút tròn** cố định đáy màn hình, nút bấm 3D lún khi chạm, màn hình chờ với mặt tiền quán vẽ tay.
+
+### 0.1 🎯 Nhiệm Vụ Hằng Ngày & 🏆 Thành Tựu (v1.7.0)
+- **3 nhiệm vụ mỗi ngày** (bán đủ tô, giữ chuỗi, bưng thần tốc, đón khách VIP, giao shipper...), khó dần theo tuổi tiệm; xong cả 3 mở **Rương Thưởng Ngày**. Quên nhận thì cuối ca tự cộng.
+- **Thành tựu 10 nhóm nhiều bậc**, thưởng tiền & XP cấp độ tiệm; dock hiện chấm đỏ khi có thưởng chờ nhận.
+- **Logic bán hàng mới**: khách gọi kèm đồ uống, chỉ tính tiền đúng món đã gọi, thưởng *Thần tốc* khi bưng nhanh, thưởng chuỗi +5% mỗi mốc x5, nguyên liệu phụ tiêu hao thật mỗi phần bán.
 
 ### 1. 🍲 Màn Hình Loading Đầy Đủ
 - Hoạt họa nồi mì cay niêu đất sôi sùng sục, bốc khói nghi ngút.
@@ -77,6 +82,7 @@ MyCay/
     ├── app.js          # Khởi động, điều phối loading, popup đặt tên và version
     ├── game.js         # Logic tiệm mì, nấu mì 7 cấp độ, review, nhân viên
     ├── shop-scene.js   # Khung cảnh tiệm sống động: khách chibi, nhân viên, xu bay, cấp độ tiệm
+    ├── quests.js       # Nhiệm vụ hằng ngày, rương thưởng & thành tựu tiệm
     ├── txaversion.js   # Quản lý phiên bản game và thông báo cập nhật mới
     ├── filter.js       # Bộ lọc kiểm duyệt tên quán, cảnh báo đỏ tự biến mất
     └── audio.js        # Bộ âm thanh Web Audio API Lo-Fi & SFX sống động

@@ -48,7 +48,7 @@ export class txacoachmark {
       {
         target: "#chalkboard-banner",
         title: "📋 Menu Hôm Nay & Hot Combo",
-        desc: "Bảng phấn hiển thị thực đơn và Món Đặc Biệt Hôm Nay. Phục vụ đúng đơn này sẽ nhận tiền tip x2 và cộng thêm Siêu Bonus Tiền cực lớn!",
+        desc: "Bảng phấn hiển thị thực đơn và Món Đặc Biệt Hôm Nay. Phục vụ đúng đơn này sẽ nhận tiền tip x1.5 và cộng thêm Bonus Tiền!",
         mascotQuote: "Phục vụ đúng đơn Món Đặc Biệt sẽ nhận thêm một khoản tiền bonus siêu khủng luôn đó nha! 🌟🔥",
         placement: "bottom"
       },

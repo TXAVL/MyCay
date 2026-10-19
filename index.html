@@ -18,15 +18,15 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=1.6.0" />
+  <link rel="stylesheet" href="styles/main.css?v=1.7.0" />
   <!-- Lớp giao diện game (HUD, khung cảnh tiệm, dock nút tròn, nút 3D) -->
-  <link rel="stylesheet" href="styles/game-skin.css?v=1.6.0" />
+  <link rel="stylesheet" href="styles/game-skin.css?v=1.7.0" />
 
   <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
-  <script src="js/security-shield.js?v=1.6.0"></script>
+  <script src="js/security-shield.js?v=1.7.0"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -152,7 +152,7 @@
             <span class="header-reviews-sub" id="display-reviews-count">0 đánh giá</span>
           </div>
           <div class="hud-pill hud-time" title="Thời gian ca bán">
-            <span class="header-time-title" id="display-day-timer">⏱️ 4:00</span>
+            <span class="header-time-title" id="display-day-timer">⏱️ 2:00</span>
           </div>
         </div>
       </header>
@@ -191,7 +191,7 @@
 
             <!-- Dòng ghi chú chân bảng -->
             <div class="chalkboard-footer-note" id="chalkboard-footer-note">
-              Cấp độ 0 - 7 · 4 phút một ngày
+              Cấp độ 0 - 7 · 2 phút một ngày
             </div>
           </section>
 
@@ -209,7 +209,7 @@
             </div>
             <div class="special-dish-footer">
               <span class="special-dish-streak" id="display-special-streak">Điểm danh 0 ngày</span>
-              <span class="special-dish-buff">🔥 Siêu Thưởng: Tip x2 + Siêu Bonus Tiền!</span>
+              <span class="special-dish-buff">🔥 Siêu Thưởng: Tip x1.5 + Bonus Tiền!</span>
             </div>
           </section>
 
@@ -261,6 +261,10 @@
           <button class="nav-grid-btn active" data-tab="tab-kho">
             <span class="tab-btn-icon">📦</span>
             <span class="tab-btn-label">Kho</span>
+          </button>
+          <button class="nav-grid-btn" data-tab="tab-quests">
+            <span class="tab-btn-icon">🎯</span>
+            <span class="tab-btn-label">Nhiệm vụ</span>
           </button>
           <button class="nav-grid-btn" data-tab="tab-menu">
             <span class="tab-btn-icon">🍜</span>
@@ -354,7 +358,7 @@
             <div class="category-block">
               <div class="category-header-wrap">
                 <h3 class="category-heading">🍜 Mì & Nước Dùng Hầm</h3>
-                <span class="category-count-hint">Nguyên liệu cơ bản</span>
+                <span class="category-count-hint">Mỗi tô dùng 1 mì sợi · 1 nước hầm · 1 niêu</span>
               </div>
               <div id="kho-noodle-list" class="kho-cards-grid">
                 <!-- Render động các loại mì dạng thẻ bài Card Grid -->
@@ -371,6 +375,25 @@
                 <!-- Render động topping dạng thẻ bài Card Grid -->
               </div>
             </div>
+          </section>
+
+          <!-- ================= TAB NHIỆM VỤ HẰNG NGÀY & THÀNH TỰU (v1.7.0) ================= -->
+          <section id="tab-quests" class="tab-pane">
+            <div class="quest-hero">
+              <div class="quest-hero-icon">🎯</div>
+              <div class="quest-hero-text">
+                <b>Nhiệm Vụ Hôm Nay · <span id="quest-day-label">Ngày 1</span></b>
+                <small>3 nhiệm vụ đổi mới mỗi ngày, khó dần theo tuổi tiệm. Quên nhận thì cuối ca tự cộng thưởng!</small>
+              </div>
+            </div>
+            <div class="quest-list" id="quest-daily-list"></div>
+            <div class="quest-chest" id="quest-chest-box"></div>
+
+            <div class="category-header-wrap quest-ach-head">
+              <h3 class="category-heading">🏆 Thành Tựu Tiệm</h3>
+              <span class="category-count-hint" id="quest-ach-count">0 bậc</span>
+            </div>
+            <div class="quest-list" id="quest-achievement-list"></div>
           </section>
 
           <!-- ================= TAB 2: MENU (THỰC ĐƠN MÓN MỲ CAY & NƯỚC GIẢI CAY) ================= -->
@@ -686,6 +709,7 @@
                 <span class="kt-title">🍳 Bếp Nấu</span>
                 <span class="kt-streak is-zero" id="kt-streak" title="Chuỗi phục vụ liên tiếp (về 0 khi khách bỏ về hoặc bị từ chối)">🔥 Chuỗi x0</span>
                 <span class="kt-today" id="kt-today" title="Đã bán hôm nay">🍜 0 · 🧋 0 · 💰 +0đ</span>
+                <button class="kt-quest" id="kt-quest" type="button" onclick="window.game.showQuestTracker()" title="Tiến độ nhiệm vụ hôm nay">🎯 0/3</button>
               </div>
               <!-- Nhắc món đặc biệt hôm nay ngay trong bếp (nấu đúng để nhận Bonus) -->
               <div class="kt-special-chip" id="kt-special-chip"></div>
@@ -726,18 +750,18 @@
                   <div class="shift-clock-pill" id="cockpit-shift-timer-pill">
                     <span class="shift-clock-icon">⏱️</span>
                     <span class="shift-clock-label">Thời gian ca bán:</span>
-                    <span class="shift-clock-digits" id="cockpit-clock-digits">4:00</span>
+                    <span class="shift-clock-digits" id="cockpit-clock-digits">2:00</span>
                   </div>
                   <div class="shift-clock-sub" id="cockpit-shift-sub">⚡ Phục vụ & giao đơn trước khi hết giờ!</div>
                 </div>
 
                 <!-- THANH BÙNG NỔ GIỜ VÀNG FEVER RUSH (VIP FEATURE v1.5.5) -->
-                <div class="cockpit-fever-bar" id="cockpit-fever-bar" onclick="window.game.handleFeverBarClick()" title="Giờ Vàng FEVER RUSH: Phục vụ khách chuẩn để tích đầy Giờ Vàng bùng nổ x2 Doanh Thu!">
+                <div class="cockpit-fever-bar" id="cockpit-fever-bar" onclick="window.game.handleFeverBarClick()" title="Giờ Vàng FEVER RUSH: Phục vụ khách chuẩn để tích đầy Giờ Vàng bùng nổ x1.5 Doanh Thu!">
                   <div class="fever-bar-inner">
                     <div class="fever-title-row">
                       <span class="fever-fire-icon" id="fever-fire-icon">🔥</span>
-                      <span class="fever-label" id="fever-label">GIỜ VÀNG FEVER RUSH:</span>
-                      <span class="fever-status-text" id="fever-status-text">0 / 100 Điểm</span>
+                      <span class="fever-label" id="fever-label">GIỜ VÀNG</span>
+                      <span class="fever-status-text" id="fever-status-text">0/100</span>
                       <span class="fever-mult-badge" id="fever-mult-badge">x1 THƯỜNG</span>
                     </div>
                     <div class="fever-track">
@@ -1423,7 +1447,7 @@
             <span class="buff-btn-icon">🔥</span>
             <div class="buff-btn-content">
               <span class="buff-btn-title">Bật Giờ Vàng FEVER RUSH</span>
-              <span class="buff-btn-sub">x1.35 Doanh thu & bão khách 25 giây</span>
+              <span class="buff-btn-sub">x1.5 Doanh thu & bão khách 25 giây</span>
             </div>
           </button>
 
@@ -1504,6 +1528,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=1.6.0"></script>
+  <script type="module" src="js/app.js?v=1.7.0"></script>
 </body>
 </html>

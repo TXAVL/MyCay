@@ -538,20 +538,18 @@ export class ShopScene {
     const order = slot.order || {};
     const noodle = g.state.noodles[order.noodleId];
     const top = order.toppingId ? g.state.toppings[order.toppingId] : null;
-    const pot = g.currentPot || {};
-    const isMatch = Boolean(pot.noodleId &&
-      pot.noodleId === order.noodleId &&
-      (!order.size || pot.size === order.size) &&
-      pot.spicyLevel === order.spicyLevel &&
-      (!order.toppingId || (pot.toppings || []).includes(order.toppingId)));
+    const drink = order.drinkId ? g.state.drinks[order.drinkId] : null;
+    // Dùng chung luật so khớp của game (gồm size, topping, đồ uống, món hết hàng được bưng thiếu)
+    const isMatch = typeof g.isPotMatchingOrder === "function" && g.isPotMatchingOrder(order);
     const isSpecial = Boolean(slot.isSpecialCombo);
-    const sig = [order.noodleId, order.toppingId, order.spicyLevel, order.size, isMatch].join("|");
+    const sig = [order.noodleId, order.toppingId, order.drinkId, order.spicyLevel, order.size, isMatch].join("|");
 
     if (actor.bubbleSig !== sig) {
       actor.bubbleSig = sig;
       bubble.innerHTML = `
         <span class="sc-b-main">${noodle ? noodle.icon : "🍜"}</span>
         ${top ? `<span class="sc-b-top">${top.icon}</span>` : ""}
+        ${drink ? `<span class="sc-b-top">${drink.icon}</span>` : ""}
         <span class="sc-b-spicy">🌶${order.spicyLevel || 0}</span>
         ${order.size === "L" ? '<span class="sc-b-size">L</span>' : ""}
         ${isMatch ? '<span class="sc-b-ready">✓</span>' : ""}
@@ -718,7 +716,7 @@ export class ShopScene {
   // ---------- HUD CẤP ĐỘ TIỆM ----------
   static levelInfo(stats, extra = 0) {
     const s = stats || {};
-    const xp = Math.floor((s.bowlsServed || 0) * 10 + (s.drinksServed || 0) * 4 + (s.vipServed || 0) * 15 + (s.specialBowlsServed || 0) * 6 + extra * 8);
+    const xp = Math.floor((s.bowlsServed || 0) * 10 + (s.drinksServed || 0) * 4 + (s.vipServed || 0) * 15 + (s.specialBowlsServed || 0) * 6 + extra * 8 + (s.bonusXp || 0));
     const totalFor = (lv) => 60 * (lv - 1) + 20 * (lv - 1) * (lv - 2);
     let level = 1;
     while (xp >= totalFor(level + 1) && level < 99) level++;
