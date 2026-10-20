@@ -25,15 +25,8 @@ export class txaversion {
           badgeType: "hot"
         },
         {
-          title: "Chống Sửa File Sao Lưu",
-          desc: "File được mã hóa & ký số. Sửa dù 1 ký tự, game sẽ chặn và từ chối khôi phục, dữ liệu hiện tại giữ nguyên.",
-          icon: "🛡️",
-          badge: "Bảo Mật 🔒",
-          badgeType: "manage"
-        },
-        {
-          title: "Sửa Lỗi",
-          desc: "HUD hiện điểm sao trung bình chính xác (vd 4.3) thay vì chỉ làm tròn. Game không tự lưu đè lên dữ liệu vừa khôi phục.",
+          title: "Sửa Lỗi & Tối Ưu Logic",
+          desc: "HUD hiện điểm sao trung bình chính xác (vd 4.3). Dữ liệu vừa khôi phục không bị game tự lưu đè.",
           icon: "🐞",
           badge: "Sửa Lỗi 🛠️",
           badgeType: "manage"
