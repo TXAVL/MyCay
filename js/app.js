@@ -3,15 +3,16 @@
 // Kết nối UI, Sự kiện, Tab Navigation và Logic Game
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.7.0";
-import { NameValidator } from "./filter.js?v=1.7.0";
-import { SpicyNoodleGame } from "./game.js?v=1.7.0";
-import { txatheme } from "./txatheme.js?v=1.7.0";
-import { txacoachmark } from "./txacoachmark.js?v=1.7.0";
-import { txaqr } from "./txaqr.js?v=1.7.0";
-import { GameUIModal } from "./modal.js?v=1.7.0";
-import { realtimeStats } from "./realtime-stats.js?v=1.7.0";
-import { ShopScene } from "./shop-scene.js?v=1.7.0";
+import { txaversion } from "./txaversion.js?v=1.8.0";
+import { NameValidator } from "./filter.js?v=1.8.0";
+import { SpicyNoodleGame } from "./game.js?v=1.8.0";
+import { txatheme } from "./txatheme.js?v=1.8.0";
+import { txacoachmark } from "./txacoachmark.js?v=1.8.0";
+import { txaqr } from "./txaqr.js?v=1.8.0";
+import { GameUIModal } from "./modal.js?v=1.8.0";
+import { realtimeStats } from "./realtime-stats.js?v=1.8.0";
+import { ShopScene } from "./shop-scene.js?v=1.8.0";
+import { GameBackup } from "./backup.js?v=1.8.0";
 
 // Gắn biến toàn cục phục vụ Console Admin và Dashboard phân tích số liệu
 if (typeof window !== "undefined") {
@@ -39,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadingStatusText = document.getElementById("loading-status-text");
   const loadingTip = document.getElementById("loading-tip-text");
   const btnStartPlay = document.getElementById("btn-start-play");
+  const btnLoadingRestore = document.getElementById("btn-loading-restore");
 
   const btnQuickTheme = document.getElementById("btn-quick-theme");
   const btnTriggerCoachmark = document.getElementById("btn-trigger-coachmark");
@@ -133,6 +135,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (btnStartPlay) {
           btnStartPlay.style.display = "inline-flex";
+        }
+        // Chỉ gợi ý khôi phục khi máy này chưa từng có dữ liệu chơi (lần đầu vào web)
+        if (btnLoadingRestore && !GameBackup.hasLocalSave()) {
+          btnLoadingRestore.hidden = false;
         }
       }
     }
@@ -481,6 +487,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const container = document.getElementById("sakura-particles");
       if (container) container.style.display = e.target.checked ? "block" : "none";
     });
+  }
+
+  // Sao lưu & khôi phục dữ liệu bằng file .json đã mã hóa + ký số
+  const btnBackupExport = document.getElementById("btn-backup-export");
+  if (btnBackupExport) {
+    btnBackupExport.addEventListener("click", () => {
+      settingsModal.style.display = "none";
+      GameBackup.exportToFile(game, txaversion.CURRENT_VERSION.version);
+    });
+  }
+
+  const btnBackupImport = document.getElementById("btn-backup-import");
+  if (btnBackupImport) {
+    btnBackupImport.addEventListener("click", () => {
+      settingsModal.style.display = "none";
+      GameBackup.pickAndRestore();
+    });
+  }
+
+  if (btnLoadingRestore) {
+    btnLoadingRestore.addEventListener("click", () => GameBackup.pickAndRestore());
   }
 
   const btnResetData = document.getElementById("btn-reset-game-data");

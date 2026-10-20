@@ -10,64 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.7.0 - Nhiệm Vụ Hằng Ngày, Thành Tựu & Đại Tu Logic Bán Hàng)
+  // Khai báo phiên bản hiện tại của game (Bản 1.8.0 - Sao Lưu & Khôi Phục Dữ Liệu Chống Chỉnh Sửa)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.7.0",
-      170,
-      "19/10/2026",
+      "1.8.0",
+      180,
+      "20/10/2026",
       [
         {
-          title: "Nhiệm Vụ Hằng Ngày & Rương Thưởng",
-          desc: "Tab 🎯 Nhiệm vụ mới: mỗi ngày 3 nhiệm vụ ngẫu nhiên (bán đủ tô, giữ chuỗi, bưng thần tốc, đón khách VIP, giao shipper...) khó dần theo tuổi tiệm. Xong cả 3 mở Rương Thưởng Ngày. Quên bấm nhận thì cuối ca tự cộng thưởng, trong bếp có chip 🎯 xem nhanh tiến độ.",
-          icon: "🎯",
+          title: "Sao Lưu & Khôi Phục Dữ Liệu",
+          desc: "Cài đặt có thêm 💾 Sao Lưu Dữ Liệu (tải về file .json) và 📂 Khôi Phục Bản Lưu. Đổi máy, đổi trình duyệt hay lỡ xóa dữ liệu vẫn nạp lại được tiệm cũ. Trước khi khôi phục, game hiện tên tiệm, ngày, tiền, uy tín và thời điểm sao lưu để bạn xác nhận.",
+          icon: "💾",
           badge: "Tính Năng Mới ✨",
           badgeType: "hot"
         },
         {
-          title: "Thành Tựu Tiệm 10 Nhóm Nhiều Bậc",
-          desc: "Bậc Thầy Niêu Đất, Chuỗi Không Gãy, Đại Gia Mì Cay, Ngôi Sao Khu Phố, Nhà Sưu Tập Thực Khách... mỗi bậc thưởng tiền & XP cấp độ tiệm. Dock hiện chấm đỏ khi có thưởng chờ nhận.",
-          icon: "🏆",
-          badge: "Thành Tựu 🏆",
-          badgeType: "star"
-        },
-        {
-          title: "Khách Gọi Kèm Trà Sữa & Thưởng Tốc Độ",
-          desc: "Khách tại quán giờ gọi kèm đồ uống ngay trên phiếu order. Bưng khi khách còn ≥70% kiên nhẫn được Thần tốc (+25% tip, nạp Giờ Vàng nhanh hơn); mỗi mốc chuỗi x5 cộng thêm +5% doanh thu (tối đa +25%).",
-          icon: "🧋",
-          badge: "Lối Chơi Mới 🎮",
-          badgeType: "hot"
-        },
-        {
-          title: "Đại Tu Logic Bán Hàng",
-          desc: "Chỉ tính tiền đúng món khách gọi (hết cảnh pha nước khách không gọi vẫn thu tiền). Khách chỉ gọi món còn đủ hàng; món kèm hết giữa chừng thì được bưng thiếu. Nâng cấp Sốt Ớt/Shichimi không còn khiến khách chê đắt. Nguyên liệu phụ (mì sợi, nước hầm, niêu, trà, sữa) giờ thực sự tiêu hao mỗi phần bán.",
-          icon: "⚖️",
-          badge: "Cân Bằng Game 🍲",
+          title: "Chống Sửa File Sao Lưu",
+          desc: "File sao lưu được mã hóa AES-256-GCM và ký số HMAC-SHA256. Chỉ cần sửa 1 ký tự (tiền, ngày, nguyên liệu...) game sẽ hiện màn hình chặn, chỉ rõ bước kiểm tra thất bại và từ chối khôi phục; dữ liệu đang chơi được giữ nguyên.",
+          icon: "🛡️",
+          badge: "Bảo Mật 🔒",
           badgeType: "manage"
         },
         {
-          title: "Nhân Viên Thông Minh Hơn",
-          desc: "Kenji ưu tiên nấu cho khách sốt ruột nhất, Ducky pha đúng ly khách gọi (hết lỗi trừ kho 2 lần), Usagi kiểm tra đủ size & đồ uống trước khi bưng nên không còn kẹt bếp. Shipper chỉ tới 1 người mỗi lượt và không giao được khi kho hết mì.",
-          icon: "🐼",
-          badge: "Tối Ưu ⚡",
-          badgeType: "manage"
-        },
-        {
-          title: "Giao Diện Lần 2 Gọn & Rõ Hơn",
-          desc: "Toast bưng món không còn bị toast \"dọn niêu\" đè mất, gom gọn mọi khoản thưởng trong 1 dòng. Tiêu đề bếp, tab Sảnh Bàn Ăn và thanh Giờ Vàng không còn bị cắt chữ trên điện thoại. Hóa đơn cuối ngày thêm thống kê ly nước, chuỗi max và nhiệm vụ.",
-          icon: "🎨",
-          badge: "Giao Diện Mới 🎨",
+          title: "Khôi Phục Ngay Từ Màn Hình Chờ",
+          desc: "Lần đầu vào web trên máy mới, màn hình chờ có nút 📂 \"Có bản sao lưu? Khôi phục ngay\" để nạp lại tiệm mà không phải đặt tên & chơi lại từ đầu.",
+          icon: "📂",
+          badge: "Tiện Ích ⚡",
           badgeType: "visual"
-        },
-        {
-          title: "Sửa Lỗi Quan Trọng",
-          desc: "Tải lại trang không còn quay về Ngày 1. Giờ Vàng thống nhất x1.5 doanh thu ở mọi nơi hiển thị. Gói tiết kiệm kỳ hạn được cân bằng lại (3 ngày 4.5%/ngày, 7 ngày 7%/ngày). Đồng hồ ca hiển thị đúng 2:00.",
-          icon: "🐞",
-          badge: "Sửa Lỗi 🛠️",
-          badgeType: "manage"
         }
       ],
-      "Nhiệm Vụ Hằng Ngày & Đại Tu Logic Bán Hàng"
+      "Sao Lưu & Khôi Phục Dữ Liệu"
     );
   }
 
@@ -75,6 +47,63 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "1.7.0",
+        170,
+        "19/10/2026",
+        [
+          {
+            title: "Nhiệm Vụ Hằng Ngày & Rương Thưởng",
+            desc: "Tab 🎯 Nhiệm vụ mới: mỗi ngày 3 nhiệm vụ ngẫu nhiên (bán đủ tô, giữ chuỗi, bưng thần tốc, đón khách VIP, giao shipper...) khó dần theo tuổi tiệm. Xong cả 3 mở Rương Thưởng Ngày. Quên bấm nhận thì cuối ca tự cộng thưởng, trong bếp có chip 🎯 xem nhanh tiến độ.",
+            icon: "🎯",
+            badge: "Tính Năng Mới ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Thành Tựu Tiệm 10 Nhóm Nhiều Bậc",
+            desc: "Bậc Thầy Niêu Đất, Chuỗi Không Gãy, Đại Gia Mì Cay, Ngôi Sao Khu Phố, Nhà Sưu Tập Thực Khách... mỗi bậc thưởng tiền & XP cấp độ tiệm. Dock hiện chấm đỏ khi có thưởng chờ nhận.",
+            icon: "🏆",
+            badge: "Thành Tựu 🏆",
+            badgeType: "star"
+          },
+          {
+            title: "Khách Gọi Kèm Trà Sữa & Thưởng Tốc Độ",
+            desc: "Khách tại quán giờ gọi kèm đồ uống ngay trên phiếu order. Bưng khi khách còn ≥70% kiên nhẫn được Thần tốc (+25% tip, nạp Giờ Vàng nhanh hơn); mỗi mốc chuỗi x5 cộng thêm +5% doanh thu (tối đa +25%).",
+            icon: "🧋",
+            badge: "Lối Chơi Mới 🎮",
+            badgeType: "hot"
+          },
+          {
+            title: "Đại Tu Logic Bán Hàng",
+            desc: "Chỉ tính tiền đúng món khách gọi (hết cảnh pha nước khách không gọi vẫn thu tiền). Khách chỉ gọi món còn đủ hàng; món kèm hết giữa chừng thì được bưng thiếu. Nâng cấp Sốt Ớt/Shichimi không còn khiến khách chê đắt. Nguyên liệu phụ (mì sợi, nước hầm, niêu, trà, sữa) giờ thực sự tiêu hao mỗi phần bán.",
+            icon: "⚖️",
+            badge: "Cân Bằng Game 🍲",
+            badgeType: "manage"
+          },
+          {
+            title: "Nhân Viên Thông Minh Hơn",
+            desc: "Kenji ưu tiên nấu cho khách sốt ruột nhất, Ducky pha đúng ly khách gọi (hết lỗi trừ kho 2 lần), Usagi kiểm tra đủ size & đồ uống trước khi bưng nên không còn kẹt bếp. Shipper chỉ tới 1 người mỗi lượt và không giao được khi kho hết mì.",
+            icon: "🐼",
+            badge: "Tối Ưu ⚡",
+            badgeType: "manage"
+          },
+          {
+            title: "Giao Diện Lần 2 Gọn & Rõ Hơn",
+            desc: "Toast bưng món không còn bị toast \"dọn niêu\" đè mất, gom gọn mọi khoản thưởng trong 1 dòng. Tiêu đề bếp, tab Sảnh Bàn Ăn và thanh Giờ Vàng không còn bị cắt chữ trên điện thoại. Hóa đơn cuối ngày thêm thống kê ly nước, chuỗi max và nhiệm vụ.",
+            icon: "🎨",
+            badge: "Giao Diện Mới 🎨",
+            badgeType: "visual"
+          },
+          {
+            title: "Sửa Lỗi Quan Trọng",
+            desc: "Tải lại trang không còn quay về Ngày 1. Giờ Vàng thống nhất x1.5 doanh thu ở mọi nơi hiển thị. Gói tiết kiệm kỳ hạn được cân bằng lại (3 ngày 4.5%/ngày, 7 ngày 7%/ngày). Đồng hồ ca hiển thị đúng 2:00.",
+            icon: "🐞",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Nhiệm Vụ Hằng Ngày & Đại Tu Logic Bán Hàng"
+      ),
       new txaversion(
   "1.6.0",
         160,

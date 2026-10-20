@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.7.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-19%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.8.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-20%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
@@ -19,6 +19,10 @@
 - **3 nhiệm vụ mỗi ngày** (bán đủ tô, giữ chuỗi, bưng thần tốc, đón khách VIP, giao shipper...), khó dần theo tuổi tiệm; xong cả 3 mở **Rương Thưởng Ngày**. Quên nhận thì cuối ca tự cộng.
 - **Thành tựu 10 nhóm nhiều bậc**, thưởng tiền & XP cấp độ tiệm; dock hiện chấm đỏ khi có thưởng chờ nhận.
 - **Logic bán hàng mới**: khách gọi kèm đồ uống, chỉ tính tiền đúng món đã gọi, thưởng *Thần tốc* khi bưng nhanh, thưởng chuỗi +5% mỗi mốc x5, nguyên liệu phụ tiêu hao thật mỗi phần bán.
+
+### 0.2 💾 Sao Lưu & Khôi Phục Dữ Liệu (v1.8.0)
+- **Sao lưu ra file `.json`** trong Cài đặt, **khôi phục** từ file khi đổi máy/trình duyệt; lần đầu vào web có nút *"Có bản sao lưu? Khôi phục ngay"* ngay màn hình chờ.
+- **Chống chỉnh sửa file**: dữ liệu được mã hóa AES-256-GCM + ký số HMAC-SHA256 + đối chiếu mã băm SHA-256; file bị sửa sẽ bị chặn với màn hình báo rõ, dữ liệu hiện tại giữ nguyên.
 
 ### 1. 🍲 Màn Hình Loading Đầy Đủ
 - Hoạt họa nồi mì cay niêu đất sôi sùng sục, bốc khói nghi ngút.

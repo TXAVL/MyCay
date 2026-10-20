@@ -4,12 +4,12 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.7.0";
-import { txaformat } from "./txaformat.js?v=1.7.0";
-import { NameValidator } from "./filter.js?v=1.7.0";
-import { SoundManager } from "./audio.js?v=1.7.0";
-import { GameUIModal } from "./modal.js?v=1.7.0";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.7.0";
+import { txaversion } from "./txaversion.js?v=1.8.0";
+import { txaformat } from "./txaformat.js?v=1.8.0";
+import { NameValidator } from "./filter.js?v=1.8.0";
+import { SoundManager } from "./audio.js?v=1.8.0";
+import { GameUIModal } from "./modal.js?v=1.8.0";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.8.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -583,6 +583,8 @@ export class SpicyNoodleGame {
   }
 
   saveGame() {
+    // Đang khôi phục bản sao lưu -> không ghi đè dữ liệu vừa nạp trước khi tải lại trang
+    if (window.__mycayRestoring) return;
     try {
       localStorage.setItem("mycay_save_data", JSON.stringify(this.state));
     } catch (e) {
