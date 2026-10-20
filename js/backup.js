@@ -197,7 +197,7 @@ export class GameBackup {
       }
     }
 
-    // 3. Tải trực tiếp về thư mục Tải xuống
+    // 3. Tải trực tiếp qua trình duyệt (vị trí lưu do trình duyệt/thiết bị quyết định)
     const url = URL.createObjectURL(file);
     const a = document.createElement("a");
     a.href = url;
@@ -268,7 +268,7 @@ export class GameBackup {
       const where = {
         saved: "File đã được lưu vào vị trí bạn chọn.",
         shared: "File đã được chuyển tới ứng dụng bạn chọn (ví dụ: Tệp).",
-        downloaded: "File đã được tải về thư mục <b>Tải xuống (Downloads)</b> của trình duyệt."
+        downloaded: "Trình duyệt đã bắt đầu tải file. Bạn có thể mở <b>danh sách tải xuống của trình duyệt</b> để xem file và nơi lưu. Không thấy file thì bấm <b>Tải Lại</b>."
       }[result];
       this.showOverlay({
         tone: "success",
