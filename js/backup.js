@@ -332,30 +332,30 @@ export class GameBackup {
     const { aesKey, hmacKey } = await deriveKeys(salt);
     const sigOk = await crypto.subtle.verify("HMAC", hmacKey, sig, textEnc.encode(canonicalString(file)));
     if (!sigOk) {
-      fail("tampered", "Xác minh chữ ký số (HMAC-SHA256)", "Chữ ký số không khớp — file đã bị chỉnh sửa sau khi xuất.");
+      fail("tampered", "Xác minh chữ ký số", "Chữ ký số không khớp — file đã bị chỉnh sửa sau khi xuất.");
     }
-    pass("Xác minh chữ ký số (HMAC-SHA256)");
+    pass("Xác minh chữ ký số");
 
     let inner;
     try {
       const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, aesKey, cipher);
       inner = JSON.parse(textDec.decode(plain));
     } catch (e) {
-      fail("tampered", "Giải mã dữ liệu (AES-256-GCM)", "Không thể giải mã — dữ liệu đã bị can thiệp.");
+      fail("tampered", "Giải mã dữ liệu", "Không thể giải mã — dữ liệu đã bị can thiệp.");
     }
-    pass("Giải mã dữ liệu (AES-256-GCM)");
+    pass("Giải mã dữ liệu");
 
     const state = inner && inner.state;
     const hash = state ? await sha256B64(JSON.stringify(state)) : "";
     if (!state || hash !== inner.stateHash) {
-      fail("tampered", "Đối chiếu mã băm SHA-256", "Mã băm dữ liệu không khớp — dữ liệu game đã bị sửa.");
+      fail("tampered", "Đối chiếu dữ liệu", "Mã băm dữ liệu không khớp — dữ liệu game đã bị sửa.");
     }
     const expected = buildPreview(state);
     const p = file.preview;
     if (["shopName", "ownerName", "day", "money", "reputation"].some(k => p[k] !== expected[k])) {
       fail("tampered", "Đối chiếu thông tin hiển thị", "Thông tin xem trước không khớp với dữ liệu thật — file đã bị sửa.");
     }
-    pass("Đối chiếu mã băm & thông tin hiển thị");
+    pass("Đối chiếu dữ liệu");
 
     const problems = validateState(state);
     if (problems.length) {
@@ -413,7 +413,6 @@ export class GameBackup {
       icon: "📦",
       title: "File Hợp Lệ — Khôi Phục?",
       html: `
-        ${this.checksList(result.checks)}
         ${this.previewTable(result.preview, result.createdAt)}
         ${hasSave ? `<p class="tmc-bk-warn">⚠️ Tiến trình hiện tại trên máy này sẽ bị <b>thay thế hoàn toàn</b> bằng bản sao lưu.</p>` : ""}
       `,
