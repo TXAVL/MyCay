@@ -149,46 +149,144 @@ export class GameBackup {
     return file;
   }
 
+  // iPhone/iPad và bản cài như app (PWA) chặn tải file kiểu thẻ <a download> -> dùng bảng Chia sẻ / Lưu vào Tệp
+  static prefersShareSheet() {
+    const ua = navigator.userAgent || "";
+    const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && (navigator.maxTouchPoints || 0) > 1);
+    const isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+    return isIOS || isStandalone || !("download" in HTMLAnchorElement.prototype);
+  }
+
+  static canShareFile(file) {
+    try {
+      return !!(navigator.canShare && navigator.share && navigator.canShare({ files: [file] }));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Phải được gọi trực tiếp trong sự kiện bấm nút để trình duyệt cho phép tải/lưu file
+  static async saveFile(blob, filename) {
+    const file = new File([blob], filename, { type: "application/json" });
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+
+    // 1. Máy tính (Chrome/Edge): mở hộp thoại "Lưu file" để chọn nơi lưu
+    if (typeof window.showSaveFilePicker === "function" && !isMobile) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{ description: "File sao lưu Tiệm Mỳ Cay", accept: { "application/json": [".json"] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return "saved";
+      } catch (e) {
+        if (e && e.name === "AbortError") return "cancelled";
+        // Bị chặn (iframe, quyền...) -> chuyển sang cách tải thông thường
+      }
+    }
+
+    // 2. iPhone / bản cài app: bảng Chia sẻ -> "Lưu vào Tệp"
+    if (this.prefersShareSheet() && this.canShareFile(file)) {
+      try {
+        await navigator.share({ files: [file], title: "Sao lưu Tiệm Mỳ Cay" });
+        return "shared";
+      } catch (e) {
+        if (e && e.name === "AbortError") return "cancelled";
+      }
+    }
+
+    // 3. Tải trực tiếp về thư mục Tải xuống
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 30000);
+    return "downloaded";
+  }
+
   static async exportToFile(game, gameVersion) {
     if (!this.isSupported()) {
       this.showErrorScreen({ title: "Trình duyệt không hỗ trợ", message: "Trình duyệt này không hỗ trợ mã hóa an toàn (Web Crypto). Hãy dùng Chrome, Edge, Safari hoặc Firefox bản mới qua HTTPS." });
       return;
     }
+    const preparing = this.showOverlay({ tone: "info", icon: "🔐", title: "Đang Tạo File Sao Lưu...", html: "<p>Đang mã hóa và ký số dữ liệu tiệm, vui lòng đợi giây lát.</p>", buttons: [] });
+    let file, blob, filename;
     try {
       game.saveGame();
-      const file = await this.createBackup(game.state, gameVersion);
-      const blob = new Blob([JSON.stringify(file, null, 2)], { type: "application/json" });
+      file = await this.createBackup(game.state, gameVersion);
+      blob = new Blob([JSON.stringify(file, null, 2)], { type: "application/json" });
       const d = new Date();
       const pad = n => String(n).padStart(2, "0");
       const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
       const safeName = String(file.preview.shopName)
-        .normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D")
         .replace(/[^A-Za-z0-9]+/g, "") || "TiemMyCay";
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `TMC_SaoLuu_${safeName}_Ngay${file.preview.day}_${stamp}.json`;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        URL.revokeObjectURL(a.href);
-        a.remove();
-      }, 1000);
-
-      this.showOverlay({
-        tone: "success",
-        icon: "💾",
-        title: "Đã Sao Lưu Thành Công!",
-        html: `
-          <p>File sao lưu đã được tải về máy của bạn.</p>
-          ${this.previewTable(file.preview, file.createdAt)}
-          <p class="tmc-bk-hint">🔒 File đã được <b>mã hóa & ký số</b>. Hãy giữ nguyên file, <b>không mở ra chỉnh sửa</b> — nếu bị sửa, game sẽ từ chối khôi phục.</p>
-        `,
-        buttons: [{ text: "Tuyệt Vời 💖", primary: true }]
-      });
+      filename = `TMC_SaoLuu_${safeName}_Ngay${file.preview.day}_${stamp}.json`;
     } catch (e) {
+      preparing.close();
       console.error("Lỗi sao lưu:", e);
       this.showErrorScreen({ title: "Sao Lưu Thất Bại", message: "Không thể tạo file sao lưu. Vui lòng thử lại." });
+      return;
     }
+    preparing.close();
+    this.showDownloadReady(file, blob, filename);
+  }
+
+  static showDownloadReady(file, blob, filename) {
+    const useShare = this.prefersShareSheet() && this.canShareFile(new File([blob], filename, { type: "application/json" }));
+    this.showOverlay({
+      tone: "info",
+      icon: "💾",
+      title: "File Sao Lưu Đã Sẵn Sàng",
+      html: `
+        ${this.previewTable(file.preview, file.createdAt)}
+        <p class="tmc-bk-hint">📄 <b>${escapeHtml(filename)}</b> (${Math.max(1, Math.round(blob.size / 1024))} KB)</p>
+        <p class="tmc-bk-hint">${useShare ? "Bấm nút bên dưới rồi chọn <b>“Lưu vào Tệp”</b> để cất file." : "Bấm nút bên dưới để tải file về máy."}</p>
+      `,
+      buttons: [
+        { text: "Để Sau" },
+        { text: useShare ? "📤 Lưu Vào Tệp" : "⬇️ Tải File Về", primary: true, onClick: () => this.runSave(file, blob, filename) }
+      ]
+    });
+  }
+
+  static runSave(file, blob, filename) {
+    this.saveFile(blob, filename).then(result => {
+      if (result === "cancelled") {
+        this.showDownloadReady(file, blob, filename);
+        return;
+      }
+      const where = {
+        saved: "File đã được lưu vào vị trí bạn chọn.",
+        shared: "File đã được chuyển tới ứng dụng bạn chọn (ví dụ: Tệp).",
+        downloaded: "File đã được tải về thư mục <b>Tải xuống (Downloads)</b> của trình duyệt."
+      }[result];
+      this.showOverlay({
+        tone: "success",
+        icon: "✅",
+        title: "Đã Sao Lưu Thành Công!",
+        html: `
+          <p>${where}</p>
+          <p class="tmc-bk-hint">📄 ${escapeHtml(filename)}</p>
+          <p class="tmc-bk-hint">🔒 File đã được <b>mã hóa & ký số</b>. Hãy giữ nguyên file, <b>không mở ra chỉnh sửa</b> — nếu bị sửa, game sẽ từ chối khôi phục.</p>
+        `,
+        buttons: result === "downloaded"
+          ? [{ text: "Tải Lại", onClick: () => this.runSave(file, blob, filename) }, { text: "Tuyệt Vời 💖", primary: true }]
+          : [{ text: "Tuyệt Vời 💖", primary: true }]
+      });
+    }).catch(e => {
+      console.error("Lỗi lưu file sao lưu:", e);
+      this.showErrorScreen({ title: "Không Thể Lưu File", message: "Trình duyệt đã chặn việc lưu file. Hãy thử mở game bằng Chrome/Safari (không dùng trình duyệt trong Zalo/Facebook) rồi sao lưu lại." });
+    });
   }
 
   // ---------------- XÁC MINH FILE SAO LƯU ----------------
