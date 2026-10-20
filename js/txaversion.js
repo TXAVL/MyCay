@@ -18,25 +18,25 @@ export class txaversion {
       "20/10/2026",
       [
         {
-          title: "Sao Lưu & Khôi Phục Dữ Liệu",
-          desc: "Cài đặt có thêm 💾 Sao Lưu Dữ Liệu (tải về file .json) và 📂 Khôi Phục Bản Lưu. Đổi máy, đổi trình duyệt hay lỡ xóa dữ liệu vẫn nạp lại được tiệm cũ. Trước khi khôi phục, game hiện tên tiệm, ngày, tiền, uy tín và thời điểm sao lưu để bạn xác nhận.",
+          title: "Sao Lưu & Khôi Phục",
+          desc: "Cài đặt có nút 💾 Sao lưu (tải file .json) và 📂 Khôi phục. Lần đầu vào web có thể khôi phục ngay từ màn hình chờ.",
           icon: "💾",
           badge: "Tính Năng Mới ✨",
           badgeType: "hot"
         },
         {
           title: "Chống Sửa File Sao Lưu",
-          desc: "File sao lưu được mã hóa AES-256-GCM và ký số HMAC-SHA256. Chỉ cần sửa 1 ký tự (tiền, ngày, nguyên liệu...) game sẽ hiện màn hình chặn, chỉ rõ bước kiểm tra thất bại và từ chối khôi phục; dữ liệu đang chơi được giữ nguyên.",
+          desc: "File được mã hóa & ký số. Sửa dù 1 ký tự, game sẽ chặn và từ chối khôi phục, dữ liệu hiện tại giữ nguyên.",
           icon: "🛡️",
           badge: "Bảo Mật 🔒",
           badgeType: "manage"
         },
         {
-          title: "Khôi Phục Ngay Từ Màn Hình Chờ",
-          desc: "Lần đầu vào web trên máy mới, màn hình chờ có nút 📂 \"Có bản sao lưu? Khôi phục ngay\" để nạp lại tiệm mà không phải đặt tên & chơi lại từ đầu.",
-          icon: "📂",
-          badge: "Tiện Ích ⚡",
-          badgeType: "visual"
+          title: "Sửa Lỗi",
+          desc: "HUD hiện điểm sao trung bình chính xác (vd 4.3) thay vì chỉ làm tròn. Game không tự lưu đè lên dữ liệu vừa khôi phục.",
+          icon: "🐞",
+          badge: "Sửa Lỗi 🛠️",
+          badgeType: "manage"
         }
       ],
       "Sao Lưu & Khôi Phục Dữ Liệu"
