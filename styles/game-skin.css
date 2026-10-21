@@ -3952,6 +3952,17 @@
   transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
+.tmc-bk-btn.secondary {
+  background: #F4E8D7;
+  border-color: #C9AB87;
+  color: #5A3A22;
+  box-shadow: 0 3px 0 #C9AB87;
+}
+
+.tmc-bk-btn.secondary:hover {
+  background: #EBDAC4;
+}
+
 .tmc-bk-btn.primary {
   background: linear-gradient(180deg, #6EE08C 0%, #2DB45A 55%, #1E9A49 100%);
   border-color: #146B33;
@@ -3970,3 +3981,284 @@
   transform: translateY(3px);
   box-shadow: none;
 }
+
+.tmc-bk-actions.column {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tmc-bk-actions.column .tmc-bk-btn {
+  flex: none;
+  width: 100%;
+  text-align: center;
+}
+
+/* Hộp cảnh báo In-App Browser (Facebook/Messenger) */
+.tmc-bk-inapp-box {
+  background: #FFF5E6;
+  border: 2px dashed #E68A2E;
+  border-radius: 14px;
+  padding: 12px;
+  margin: 0 0 12px;
+  text-align: left;
+}
+
+.tmc-bk-inapp-badge {
+  display: inline-block;
+  background: #E68A2E;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.tmc-bk-inapp-desc {
+  font-size: 12.5px;
+  color: #6D3D14;
+  line-height: 1.45;
+  margin: 0 !important;
+}
+
+/* Thẻ xem trước rút gọn */
+.tmc-bk-preview-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #FFF3DF;
+  border: 1.5px dashed #D9B98C;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  margin-bottom: 10px;
+  color: #4A2A14;
+}
+
+/* Trạng thái sao chép */
+.tmc-bk-copy-status {
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.tmc-bk-copy-status.is-copied {
+  background: #E8F8EE;
+  color: #15803D;
+  border: 1.5px solid #A7E3B8;
+}
+
+.tmc-bk-copy-status.need-manual {
+  background: #FFF4E5;
+  color: #B45309;
+  border: 1.5px solid #FCD34D;
+}
+
+/* Vùng hiển thị & nhập mã sao lưu */
+.tmc-bk-code-wrapper,
+.tmc-bk-input-group {
+  margin: 0 0 10px;
+}
+
+.tmc-bk-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #FAF3E8;
+  border: 2px solid #D9B98C;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #3A2312;
+  word-break: break-all;
+  resize: none;
+  user-select: all;
+  -webkit-user-select: all;
+  outline: none;
+}
+
+.tmc-bk-textarea:focus {
+  border-color: #C99A62;
+  background: #FFF;
+}
+
+.tmc-bk-textarea.input {
+  background: #FFF;
+  border: 2px solid #C99A62;
+  font-size: 12px;
+  min-height: 90px;
+}
+
+.tmc-bk-code-tools,
+.tmc-bk-paste-tools {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.tmc-bk-mini-btn {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #C9AB87;
+  background: #F3E7D5;
+  color: #5A3A22;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.08s, background-color 0.12s;
+}
+
+.tmc-bk-mini-btn:hover {
+  background: #E8D7C0;
+}
+
+.tmc-bk-mini-btn:active {
+  transform: scale(0.97);
+}
+
+/* Khối hướng dẫn */
+.tmc-bk-guide {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1.5px solid #EADBCC;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #5A3A22;
+  margin: 10px 0 0;
+  text-align: left;
+}
+
+.tmc-bk-guide-title {
+  font-weight: 800;
+  color: #7A4B20;
+  margin-bottom: 4px;
+}
+
+.tmc-bk-guide p {
+  margin: 0 0 4px !important;
+}
+
+.tmc-bk-guide p:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Các lựa chọn khôi phục (File vs Mã văn bản) */
+.tmc-bk-restore-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.tmc-bk-option-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 2px solid #D9B98C;
+  background: #FFF8EE;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.tmc-bk-option-card:hover {
+  background: #FFF2DF;
+  border-color: #BFA584;
+  transform: translateY(-1px);
+}
+
+.tmc-bk-option-card.highlight {
+  border-color: #2DB45A;
+  background: #F1FDF4;
+  box-shadow: 0 4px 12px rgba(45, 180, 90, 0.12);
+}
+
+.tmc-bk-option-card .opt-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tmc-bk-option-card .opt-info b {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: #4A2A14;
+}
+
+.tmc-bk-option-card .opt-info small {
+  display: block;
+  font-size: 11.5px;
+  color: #7C5A3E;
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+/* Các bước mở trình duyệt ngoài */
+.tmc-bk-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 12px;
+  text-align: left;
+}
+
+.tmc-bk-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #FFF5E6;
+  border: 1.5px solid #EED4B6;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.tmc-bk-step .step-num {
+  background: #E58C2B;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tmc-bk-step .step-desc {
+  font-size: 12px;
+  color: #53331C;
+  line-height: 1.4;
+}
+
+.tmc-bk-copy-url-box {
+  margin-top: 10px;
+}
+
+.tmc-bk-error-msg {
+  background: #FFF1F0;
+  border: 1px solid #FFA39E;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #CF1322;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 8px;
+  text-align: center;
+}
+

@@ -149,6 +149,50 @@ export class GameBackup {
     return file;
   }
 
+  // Nhận diện trình duyệt trong ứng dụng (Facebook, Messenger, Zalo...) chặn tải file
+  static isInAppBrowser() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera || "";
+    return /FBAN|FBAV|FB_IAB|FB4A|FBIOS|Messenger|Instagram|Zalo|Line|MicroMessenger|TikTok|musical_ly|BytedanceWebview/i.test(ua);
+  }
+
+  static getInAppName() {
+    const ua = navigator.userAgent || "";
+    if (/FBAN|FBAV|FB4A|FBIOS/i.test(ua)) return "Facebook";
+    if (/Messenger|FB_IAB/i.test(ua)) return "Messenger";
+    if (/Instagram/i.test(ua)) return "Instagram";
+    if (/Zalo/i.test(ua)) return "Zalo";
+    if (/TikTok|musical_ly|Bytedance/i.test(ua)) return "TikTok";
+    return "Trình duyệt trong ứng dụng";
+  }
+
+  // Sao chép chuỗi văn bản vào bộ nhớ tạm (hỗ trợ cả Clipboard API & fallback execCommand)
+  static async copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (e) {
+        // Fallback phía dưới
+      }
+    }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.style.top = "0";
+      ta.setAttribute("readonly", "");
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand("copy");
+      ta.remove();
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // iPhone/iPad và bản cài như app (PWA) chặn tải file kiểu thẻ <a download> -> dùng bảng Chia sẻ / Lưu vào Tệp
   static prefersShareSheet() {
     const ua = navigator.userAgent || "";
@@ -218,7 +262,7 @@ export class GameBackup {
       this.showErrorScreen({ title: "Trình duyệt không hỗ trợ", message: "Trình duyệt này không hỗ trợ mã hóa an toàn (Web Crypto). Hãy dùng Chrome, Edge, Safari hoặc Firefox bản mới qua HTTPS." });
       return;
     }
-    const preparing = this.showOverlay({ tone: "info", icon: "🔐", title: "Đang Tạo File Sao Lưu...", html: "<p>Đang mã hóa và ký số dữ liệu tiệm, vui lòng đợi giây lát.</p>", buttons: [] });
+    const preparing = this.showOverlay({ tone: "info", icon: "🔐", title: "Đang Tạo Dữ Liệu Sao Lưu...", html: "<p>Đang mã hóa và ký số dữ liệu tiệm, vui lòng đợi giây lát.</p>", buttons: [] });
     let file, blob, filename;
     try {
       game.saveGame();
@@ -234,7 +278,7 @@ export class GameBackup {
     } catch (e) {
       preparing.close();
       console.error("Lỗi sao lưu:", e);
-      this.showErrorScreen({ title: "Sao Lưu Thất Bại", message: "Không thể tạo file sao lưu. Vui lòng thử lại." });
+      this.showErrorScreen({ title: "Sao Lưu Thất Bại", message: "Không thể tạo dữ liệu sao lưu. Vui lòng thử lại." });
       return;
     }
     preparing.close();
@@ -242,7 +286,51 @@ export class GameBackup {
   }
 
   static showDownloadReady(file, blob, filename) {
+    const inApp = this.isInAppBrowser();
+    const appName = this.getInAppName();
+    const codeString = JSON.stringify(file);
     const useShare = this.prefersShareSheet() && this.canShareFile(new File([blob], filename, { type: "application/json" }));
+
+    if (inApp) {
+      // Tối ưu đặc biệt khi mở bằng Facebook, Messenger, Zalo...
+      this.showOverlay({
+        tone: "info",
+        icon: "📱",
+        title: "Sao Lưu Dữ Liệu Tiệm",
+        html: `
+          ${this.previewTable(file.preview, file.createdAt)}
+          <div class="tmc-bk-inapp-box">
+            <div class="tmc-bk-inapp-badge">⚠️ Mở bằng ${escapeHtml(appName)}</div>
+            <p class="tmc-bk-inapp-desc">
+              Trình duyệt của <b>${escapeHtml(appName)} chặn tải file</b> về máy.
+              <br>Hãy chọn <b>“Sao Chép Mã Sao Lưu”</b> để dán vào Ghi chú / Tin nhắn, hoặc mở bằng Chrome / Safari để tải file.
+            </p>
+          </div>
+        `,
+        actionsClass: "column",
+        buttons: [
+          {
+            text: "📋 Sao Chép Mã Sao Lưu (Khuyên Dùng)",
+            primary: true,
+            onClick: () => this.showCopyBackupCode(file, codeString)
+          },
+          {
+            text: "⬇️ Vẫn Thử Tải File .JSON",
+            secondary: true,
+            onClick: () => this.runSave(file, blob, filename)
+          },
+          {
+            text: "🌐 Hướng Dẫn Mở Chrome / Safari",
+            secondary: true,
+            onClick: () => this.showOpenExternalGuide()
+          },
+          { text: "Để Sau" }
+        ]
+      });
+      return;
+    }
+
+    // Trình duyệt tiêu chuẩn (Chrome, Safari, Edge, Firefox...)
     this.showOverlay({
       tone: "info",
       icon: "💾",
@@ -252,11 +340,148 @@ export class GameBackup {
         <p class="tmc-bk-hint">📄 <b>${escapeHtml(filename)}</b> (${Math.max(1, Math.round(blob.size / 1024))} KB)</p>
         <p class="tmc-bk-hint">${useShare ? "Bấm nút bên dưới rồi chọn <b>“Lưu vào Tệp”</b> để cất file." : "Bấm nút bên dưới để tải file về máy."}</p>
       `,
+      actionsClass: "column",
       buttons: [
-        { text: "Để Sau" },
-        { text: useShare ? "📤 Lưu Vào Tệp" : "⬇️ Tải File Về", primary: true, onClick: () => this.runSave(file, blob, filename) }
+        {
+          text: useShare ? "📤 Lưu Vào Tệp" : "⬇️ Tải File Về Máy",
+          primary: true,
+          onClick: () => this.runSave(file, blob, filename)
+        },
+        {
+          text: "📋 Hoặc Sao Chép Mã Sao Lưu (Văn Bản)",
+          secondary: true,
+          onClick: () => this.showCopyBackupCode(file, codeString)
+        },
+        { text: "Để Sau" }
       ]
     });
+  }
+
+  // Màn hình hiển thị & sao chép Mã Sao Lưu (dạng văn bản an toàn)
+  static async showCopyBackupCode(file, codeString) {
+    const copied = await this.copyToClipboard(codeString);
+    const canShareText = !!(navigator.share && typeof navigator.share === "function");
+    const preview = file.preview || {};
+
+    const overlayObj = this.showOverlay({
+      tone: "success",
+      icon: "📋",
+      title: "Mã Sao Lưu Dữ Liệu",
+      html: `
+        <div class="tmc-bk-preview-compact">
+          <span>🏪 <b>${escapeHtml(preview.shopName || "Tiệm Mỳ Cay")}</b> (Ngày ${escapeHtml(preview.day || 1)})</span>
+          <span>🪙 <b>${escapeHtml(Math.round(preview.money || 0).toLocaleString("vi-VN"))}k</b></span>
+        </div>
+
+        <div class="tmc-bk-copy-status ${copied ? "is-copied" : "need-manual"}">
+          ${copied
+            ? "✅ <b>Đã tự động sao chép mã vào bộ nhớ tạm!</b>"
+            : "⚠️ <b>Hãy bôi đen và sao chép mã bên dưới:</b>"}
+        </div>
+
+        <div class="tmc-bk-code-wrapper">
+          <textarea id="tmc-bk-code-textarea" class="tmc-bk-textarea" readonly rows="4" spellcheck="false">${escapeHtml(codeString)}</textarea>
+          <div class="tmc-bk-code-tools">
+            <button type="button" class="tmc-bk-mini-btn" id="tmc-btn-recopy">📋 Sao Chép Lại</button>
+            ${canShareText ? `<button type="button" class="tmc-bk-mini-btn" id="tmc-btn-share-code">📤 Chia Sẻ Mã</button>` : ""}
+          </div>
+        </div>
+
+        <div class="tmc-bk-guide">
+          <div class="tmc-bk-guide-title">📌 Hướng dẫn sử dụng mã:</div>
+          <p>1. Dán mã này vào <b>Ghi chú</b> trên máy, hoặc gửi vào <b>tin nhắn Messenger/Zalo</b> cho chính mình để cất giữ.</p>
+          <p>2. Khi mở game trên <b>Chrome / Safari</b> hoặc máy khác: Bấm <b>Khôi Phục</b> ➔ chọn <b>Dán Mã Sao Lưu</b> là xong ngay!</p>
+        </div>
+      `,
+      actionsClass: "column",
+      buttons: [
+        {
+          text: "🌐 Cách Mở Bằng Chrome / Safari",
+          secondary: true,
+          onClick: () => this.showOpenExternalGuide()
+        },
+        { text: "Tuyệt Vời 💖", primary: true }
+      ]
+    });
+
+    const overlay = overlayObj.overlay;
+    const textarea = overlay.querySelector("#tmc-bk-code-textarea");
+    if (textarea) {
+      textarea.addEventListener("focus", () => textarea.select());
+      textarea.addEventListener("click", () => textarea.select());
+    }
+
+    const recopyBtn = overlay.querySelector("#tmc-btn-recopy");
+    if (recopyBtn) {
+      recopyBtn.addEventListener("click", async () => {
+        const ok = await this.copyToClipboard(codeString);
+        recopyBtn.textContent = ok ? "✅ Đã Chép!" : "❌ Lỗi Chép";
+        setTimeout(() => { recopyBtn.textContent = "📋 Sao Chép Lại"; }, 2000);
+      });
+    }
+
+    const shareBtn = overlay.querySelector("#tmc-btn-share-code");
+    if (shareBtn && canShareText) {
+      shareBtn.addEventListener("click", async () => {
+        try {
+          await navigator.share({
+            title: `Mã Sao Lưu Tiệm Mỳ Cay - ${preview.shopName || "Tiệm"} (Ngày ${preview.day || 1})`,
+            text: codeString
+          });
+        } catch (e) {
+          if (e && e.name !== "AbortError") {
+            console.warn("Không thể chia sẻ mã:", e);
+          }
+        }
+      });
+    }
+  }
+
+  // Hướng dẫn mở game bằng trình duyệt hệ thống (Chrome/Safari) từ Facebook/Messenger
+  static showOpenExternalGuide() {
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+    const appName = this.getInAppName();
+    const gameUrl = location.href.split("#")[0];
+
+    const overlayObj = this.showOverlay({
+      tone: "info",
+      icon: "🌐",
+      title: "Chơi Trên Trình Duyệt Ngoài",
+      html: `
+        <p class="tmc-bk-lead">Mở bằng Chrome hoặc Safari giúp tải file sao lưu mượt mà và không lo mất tiến trình khi thoát ứng dụng ${escapeHtml(appName)}.</p>
+        <div class="tmc-bk-steps">
+          <div class="tmc-bk-step">
+            <div class="step-num">1</div>
+            <div class="step-desc">Bấm vào biểu tượng <b>ba chấm (⋯)</b> ở góc trên cùng bên phải màn hình ${escapeHtml(appName)}.</div>
+          </div>
+          <div class="tmc-bk-step">
+            <div class="step-num">2</div>
+            <div class="step-desc">Chọn <b>${isIOS ? "“Mở trong Safari” (hoặc Trình duyệt mặc định)" : "“Mở bằng trình duyệt hệ thống” (Chrome)"}</b>.</div>
+          </div>
+          <div class="tmc-bk-step">
+            <div class="step-num">3</div>
+            <div class="step-desc">Vào game ở trình duyệt mới, chọn <b>Khôi Phục</b> và dán <b>Mã Sao Lưu</b> để tiếp tục chơi!</div>
+          </div>
+        </div>
+        <div class="tmc-bk-copy-url-box">
+          <button type="button" class="tmc-bk-btn secondary" id="tmc-btn-copy-game-url" style="width: 100%;">
+            🔗 Sao Chép Link Game
+          </button>
+        </div>
+      `,
+      buttons: [
+        { text: "Đã Hiểu ✨", primary: true }
+      ]
+    });
+
+    const copyUrlBtn = overlayObj.overlay.querySelector("#tmc-btn-copy-game-url");
+    if (copyUrlBtn) {
+      copyUrlBtn.addEventListener("click", async () => {
+        const ok = await this.copyToClipboard(gameUrl);
+        copyUrlBtn.textContent = ok ? "✅ Đã Sao Chép Link Game!" : "❌ Lỗi sao chép";
+        setTimeout(() => { copyUrlBtn.textContent = "🔗 Sao Chép Link Game"; }, 2500);
+      });
+    }
   }
 
   static runSave(file, blob, filename) {
@@ -265,31 +490,62 @@ export class GameBackup {
         this.showDownloadReady(file, blob, filename);
         return;
       }
+      const inApp = this.isInAppBrowser();
       const where = {
         saved: "File đã được lưu vào vị trí bạn chọn.",
         shared: "File đã được chuyển tới ứng dụng bạn chọn (ví dụ: Tệp).",
-        downloaded: "Trình duyệt đã bắt đầu tải file. Bạn có thể mở <b>danh sách tải xuống của trình duyệt</b> để xem file và nơi lưu. Không thấy file thì bấm <b>Tải Lại</b>."
+        downloaded: "Trình duyệt đã gửi lệnh tải file về máy."
       }[result];
+
       this.showOverlay({
         tone: "success",
         icon: "✅",
-        title: "Đã Sao Lưu Thành Công!",
+        title: "Đã Lưu Dữ Liệu!",
         html: `
           <p>${where}</p>
           <p class="tmc-bk-hint">📄 ${escapeHtml(filename)}</p>
-          <p class="tmc-bk-hint">🔒 File đã được <b>mã hóa & ký số</b>. Hãy giữ nguyên file, <b>không mở ra chỉnh sửa</b> — nếu bị sửa, game sẽ từ chối khôi phục.</p>
+          <p class="tmc-bk-hint">🔒 Dữ liệu đã được <b>mã hóa & ký số</b> an toàn.</p>
+          ${inApp ? `
+            <div class="tmc-bk-warn inapp" style="margin-top: 10px;">
+              ⚠️ Nếu bạn đang ở trong Facebook/Messenger mà không thấy file xuất hiện trong máy, hãy bấm <b>Sao Chép Mã Sao Lưu</b> để cất giữ chắc chắn!
+            </div>
+          ` : ""}
         `,
-        buttons: result === "downloaded"
-          ? [{ text: "Tải Lại", onClick: () => this.runSave(file, blob, filename) }, { text: "Tuyệt Vời 💖", primary: true }]
-          : [{ text: "Tuyệt Vời 💖", primary: true }]
+        actionsClass: inApp ? "column" : "",
+        buttons: inApp
+          ? [
+              { text: "📋 Sao Chép Mã Sao Lưu Ngay", primary: true, onClick: () => this.showCopyBackupCode(file, JSON.stringify(file)) },
+              { text: "Xong ✨", secondary: true }
+            ]
+          : (result === "downloaded"
+              ? [{ text: "Tải Lại", onClick: () => this.runSave(file, blob, filename) }, { text: "Tuyệt Vời 💖", primary: true }]
+              : [{ text: "Tuyệt Vời 💖", primary: true }])
       });
     }).catch(e => {
       console.error("Lỗi lưu file sao lưu:", e);
-      this.showErrorScreen({ title: "Không Thể Lưu File", message: "Trình duyệt đã chặn việc lưu file. Hãy thử mở game bằng Chrome/Safari (không dùng trình duyệt trong Zalo/Facebook) rồi sao lưu lại." });
+      const inApp = this.isInAppBrowser();
+      const appName = this.getInAppName();
+      this.showOverlay({
+        tone: "danger",
+        icon: "⚠️",
+        title: "Không Thể Lưu File",
+        html: `
+          <p>${inApp ? `Trình duyệt <b>${escapeHtml(appName)}</b> đã chặn tải file về thiết bị.` : "Trình duyệt đã chặn việc tải hoặc lưu file."}</p>
+          <div class="tmc-bk-warn inapp">
+            🛡️ <b>Đừng lo!</b> Dữ liệu tiệm chưa bị mất. Bạn hoàn toàn có thể <b>Sao Chép Mã Sao Lưu</b> dạng văn bản để cất giữ và khôi phục bất cứ lúc nào!
+          </div>
+        `,
+        actionsClass: "column",
+        buttons: [
+          { text: "📋 Sao Chép Mã Sao Lưu Ngay", primary: true, onClick: () => this.showCopyBackupCode(file, JSON.stringify(file)) },
+          { text: "🌐 Hướng Dẫn Mở Chrome/Safari", secondary: true, onClick: () => this.showOpenExternalGuide() },
+          { text: "Để Sau" }
+        ]
+      });
     });
   }
 
-  // ---------------- XÁC MINH FILE SAO LƯU ----------------
+  // ---------------- XÁC MINH DỮ LIỆU SAO LƯU ----------------
   static async verifyBackup(rawText) {
     const checks = [];
     const pass = label => checks.push({ ok: true, label });
@@ -299,22 +555,35 @@ export class GameBackup {
     };
 
     let file;
+    let cleanText = String(rawText || "").trim();
+    // Bỏ cú pháp markdown code block nếu người dùng copy kèm ```json ... ```
+    cleanText = cleanText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+
     try {
-      file = JSON.parse(rawText);
+      file = JSON.parse(cleanText);
     } catch (e) {
-      fail("format", "Đọc cấu trúc JSON", "File không phải JSON hợp lệ hoặc đã bị hỏng nội dung.");
+      // Hỗ trợ trích xuất khối JSON {...} nếu người dùng vô tình dán kèm chữ xung quanh
+      const jsonMatch = cleanText.match(/(\{[\s\S]*\})/);
+      if (jsonMatch) {
+        try {
+          file = JSON.parse(jsonMatch[1]);
+        } catch (e2) {}
+      }
+      if (!file) {
+        fail("format", "Đọc cấu trúc JSON", "Dữ liệu không phải mã JSON hợp lệ hoặc đã bị thiếu/hỏng nội dung.");
+      }
     }
     pass("Đọc cấu trúc JSON");
 
     if (!file || typeof file !== "object" || file.format !== BACKUP_FORMAT) {
-      fail("format", "Nhận diện file sao lưu Tiệm Mỳ Cay", "Đây không phải file sao lưu của Tiệm Mỳ Cay.");
+      fail("format", "Nhận diện file sao lưu Tiệm Mỳ Cay", "Đây không phải dữ liệu sao lưu của Tiệm Mỳ Cay.");
     }
     if (typeof file.v !== "number" || file.v > BACKUP_VERSION) {
-      fail("unsupported", "Phiên bản định dạng sao lưu", "File sao lưu được tạo từ phiên bản game mới hơn. Hãy cập nhật game rồi thử lại.");
+      fail("unsupported", "Phiên bản định dạng sao lưu", "Dữ liệu sao lưu được tạo từ phiên bản game mới hơn. Hãy cập nhật game rồi thử lại.");
     }
     const required = ["gameVersion", "createdAt", "salt", "iv", "data", "sig"];
     if (required.some(k => typeof file[k] !== "string") || !file.preview || typeof file.preview !== "object") {
-      fail("tampered", "Đầy đủ các trường bắt buộc", "File sao lưu bị thiếu hoặc sai trường dữ liệu — có dấu hiệu đã bị chỉnh sửa.");
+      fail("tampered", "Đầy đủ các trường bắt buộc", "Dữ liệu sao lưu bị thiếu hoặc sai trường dữ liệu — có dấu hiệu đã bị chỉnh sửa.");
     }
     pass("Nhận diện file sao lưu Tiệm Mỳ Cay");
 
@@ -366,12 +635,82 @@ export class GameBackup {
     return { state, preview: expected, createdAt: file.createdAt, gameVersion: file.gameVersion, checks };
   }
 
-  // ---------------- NHẬP FILE & KHÔI PHỤC ----------------
-  static pickAndRestore() {
+  // ---------------- KHÔI PHỤC TIẾN TRÌNH ----------------
+  // Menu lựa chọn: Tải file .json hoặc Dán mã sao lưu văn bản
+  static showRestoreModal() {
     if (!this.isSupported()) {
-      this.showErrorScreen({ title: "Trình duyệt không hỗ trợ", message: "Trình duyệt này không hỗ trợ giải mã an toàn (Web Crypto). Hãy dùng trình duyệt bản mới qua HTTPS." });
+      this.showErrorScreen({
+        title: "Trình duyệt không hỗ trợ",
+        message: "Trình duyệt này không hỗ trợ giải mã an toàn (Web Crypto). Hãy dùng Chrome, Edge, Safari hoặc Firefox bản mới qua HTTPS."
+      });
       return;
     }
+
+    const inApp = this.isInAppBrowser();
+    const appName = this.getInAppName();
+
+    this.showOverlay({
+      tone: "info",
+      icon: "📦",
+      title: "Khôi Phục Bản Lưu Tiệm",
+      html: `
+        <p class="tmc-bk-lead">Chọn phương thức bạn muốn nạp lại tiến trình game:</p>
+        <div class="tmc-bk-restore-options">
+          <button type="button" class="tmc-bk-option-card ${inApp ? "" : "highlight"}" id="tmc-opt-restore-file">
+            <span class="opt-icon">📁</span>
+            <div class="opt-info">
+              <b>Tải Lên File .json</b>
+              <small>Dùng khi bạn đã tải file .json về thiết bị</small>
+            </div>
+          </button>
+          <button type="button" class="tmc-bk-option-card ${inApp ? "highlight" : ""}" id="tmc-opt-restore-code">
+            <span class="opt-icon">📋</span>
+            <div class="opt-info">
+              <b>Dán Mã Sao Lưu (Văn Bản)</b>
+              <small>Khuyên dùng cho ${escapeHtml(appName)}, Ghi chú, Zalo</small>
+            </div>
+          </button>
+        </div>
+        ${inApp ? `
+          <p class="tmc-bk-hint" style="margin-top: 10px;">
+            💡 Đang mở trong ${escapeHtml(appName)}: Hãy chọn <b>Dán Mã Sao Lưu</b> để khôi phục nhanh nhất!
+          </p>
+        ` : ""}
+      `,
+      buttons: [
+        { text: "Đóng" }
+      ]
+    });
+
+    const overlay = document.getElementById("tmc-backup-overlay");
+    if (!overlay) return;
+
+    const fileOpt = overlay.querySelector("#tmc-opt-restore-file");
+    if (fileOpt) {
+      fileOpt.addEventListener("click", () => {
+        if (window.game && window.game.sound) window.game.sound.playButtonClick();
+        overlay.remove();
+        this.pickFileAndRestore();
+      });
+    }
+
+    const codeOpt = overlay.querySelector("#tmc-opt-restore-code");
+    if (codeOpt) {
+      codeOpt.addEventListener("click", () => {
+        if (window.game && window.game.sound) window.game.sound.playButtonClick();
+        overlay.remove();
+        this.showPasteRestoreModal();
+      });
+    }
+  }
+
+  // Phương thức gọi tương thích ngược
+  static pickAndRestore() {
+    return this.showRestoreModal();
+  }
+
+  // Cách 1: Chọn file .json truyền thống
+  static pickFileAndRestore() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json,application/json";
@@ -406,12 +745,127 @@ export class GameBackup {
     input.click();
   }
 
+  // Cách 2: Dán mã sao lưu (cho người dùng Facebook, Messenger, Zalo, Ghi chú)
+  static showPasteRestoreModal() {
+    const overlayObj = this.showOverlay({
+      tone: "info",
+      icon: "📋",
+      title: "Dán Mã Sao Lưu",
+      html: `
+        <p>Dán chuỗi mã sao lưu bạn đã lưu từ Facebook, Messenger, Ghi chú hoặc tin nhắn vào bên dưới:</p>
+        <div class="tmc-bk-input-group">
+          <textarea id="tmc-paste-textarea" class="tmc-bk-textarea input" rows="5" placeholder="Dán mã sao lưu (chứa TMC-BACKUP) vào đây..." spellcheck="false"></textarea>
+          <div class="tmc-bk-paste-tools">
+            <button type="button" class="tmc-bk-mini-btn" id="tmc-btn-clipboard-paste">📋 Dán Từ Bộ Nhớ Tạm</button>
+            <button type="button" class="tmc-bk-mini-btn" id="tmc-btn-clear-paste">Xóa</button>
+          </div>
+        </div>
+        <p class="tmc-bk-hint">🔒 Dữ liệu sẽ được giải mã và kiểm tra chữ ký số tự động.</p>
+        <div id="tmc-paste-error" class="tmc-bk-error-msg" style="display: none;"></div>
+      `,
+      actionsClass: "column",
+      buttons: [
+        {
+          text: "🔍 Xác Minh & Khôi Phục Ngay",
+          primary: true,
+          closeModal: false,
+          onClick: () => this.handlePasteRestoreSubmit(overlayObj)
+        },
+        {
+          text: "⬅️ Quay Lại",
+          onClick: () => this.showRestoreModal()
+        }
+      ]
+    });
+
+    const overlay = overlayObj.overlay;
+    const textarea = overlay.querySelector("#tmc-paste-textarea");
+    const pasteBtn = overlay.querySelector("#tmc-btn-clipboard-paste");
+    const clearBtn = overlay.querySelector("#tmc-btn-clear-paste");
+    const errBox = overlay.querySelector("#tmc-paste-error");
+
+    if (textarea) textarea.focus();
+
+    if (pasteBtn && textarea) {
+      pasteBtn.addEventListener("click", async () => {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+              textarea.value = text;
+              if (errBox) errBox.style.display = "none";
+              return;
+            }
+          } catch (e) {
+            // Có thể bị chặn quyền đọc clipboard
+          }
+        }
+        alert("Vui lòng nhấn giữ ngón tay vào ô nhập rồi chọn 'Dán' (Paste).");
+      });
+    }
+
+    if (clearBtn && textarea) {
+      clearBtn.addEventListener("click", () => {
+        textarea.value = "";
+        if (errBox) errBox.style.display = "none";
+        textarea.focus();
+      });
+    }
+  }
+
+  static async handlePasteRestoreSubmit(overlayObj) {
+    const overlay = overlayObj.overlay;
+    const textarea = overlay.querySelector("#tmc-paste-textarea");
+    const errBox = overlay.querySelector("#tmc-paste-error");
+    if (!textarea) return;
+
+    let text = textarea.value.trim();
+    if (!text) {
+      if (errBox) {
+        errBox.textContent = "Vui lòng dán mã sao lưu vào ô phía trên.";
+        errBox.style.display = "block";
+      }
+      return;
+    }
+
+    // Làm sạch chuỗi: bỏ markdown code block nếu người dùng copy từ chat/ghi chú
+    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+
+    overlayObj.close();
+    const loading = this.showOverlay({
+      tone: "info",
+      icon: "🔍",
+      title: "Đang Xác Minh Mã Sao Lưu...",
+      html: "<p>Đang kiểm tra chữ ký số và giải mã dữ liệu tiệm, vui lòng đợi giây lát.</p>",
+      buttons: []
+    });
+
+    try {
+      const result = await this.verifyBackup(text);
+      loading.close();
+      this.confirmRestore(result);
+    } catch (e) {
+      loading.close();
+      if (e instanceof VerifyError) {
+        console.warn("[Backup] Từ chối khôi phục:", e.kind, e.message);
+        if (e.kind === "tampered" || e.kind === "invalid") this.showTamperScreen(e);
+        else this.showErrorScreen({ title: "Không Thể Khôi Phục", message: e.message, checks: e.checks });
+      } else {
+        console.error("Lỗi khôi phục:", e);
+        this.showErrorScreen({
+          title: "Không Thể Khôi Phục",
+          message: "Mã sao lưu không đúng định dạng hoặc đã bị thiếu/sai ký tự. Vui lòng kiểm tra và sao chép lại toàn bộ mã."
+        });
+      }
+    }
+  }
+
   static confirmRestore(result) {
     const hasSave = this.hasLocalSave();
     this.showOverlay({
       tone: "info",
       icon: "📦",
-      title: "File Hợp Lệ — Khôi Phục?",
+      title: "Dữ Liệu Hợp Lệ — Khôi Phục?",
       html: `
         ${this.previewTable(result.preview, result.createdAt)}
         ${hasSave ? `<p class="tmc-bk-warn">⚠️ Tiến trình hiện tại trên máy này sẽ bị <b>thay thế hoàn toàn</b> bằng bản sao lưu.</p>` : ""}
@@ -471,13 +925,13 @@ export class GameBackup {
     this.showOverlay({
       tone: "danger",
       icon: "⛔",
-      title: "PHÁT HIỆN FILE SAO LƯU BỊ CHỈNH SỬA",
+      title: "PHÁT HIỆN DỮ LIỆU BỊ CHỈNH SỬA",
       blocking: true,
       html: `
         <p class="tmc-bk-lead"><b>Khôi phục thất bại.</b> ${escapeHtml(err.message)}</p>
         ${this.checksList(err.checks)}
-        <p>File sao lưu được mã hóa và ký số khi xuất. Mọi thay đổi nội dung — tiền, ngày, nguyên liệu, thông tin tiệm hay bất kỳ ký tự nào — đều bị phát hiện.</p>
-        <p class="tmc-bk-warn">🛡️ Dữ liệu game hiện tại của bạn <b>không bị thay đổi</b>. Hãy dùng đúng file gốc đã xuất từ game.</p>
+        <p>Dữ liệu sao lưu được mã hóa và ký số khi xuất. Mọi thay đổi nội dung — tiền, ngày, nguyên liệu, thông tin tiệm hay bất kỳ ký tự nào — đều bị phát hiện.</p>
+        <p class="tmc-bk-warn">🛡️ Dữ liệu game hiện tại của bạn <b>không bị thay đổi</b>. Hãy dùng đúng mã hoặc file gốc đã xuất từ game.</p>
       `,
       buttons: [{ text: "Đã Hiểu", danger: true }]
     });
@@ -493,7 +947,7 @@ export class GameBackup {
     });
   }
 
-  static showOverlay({ tone = "info", icon = "💾", title = "", html = "", buttons = [], blocking = false }) {
+  static showOverlay({ tone = "info", icon = "💾", title = "", html = "", buttons = [], blocking = false, actionsClass = "" }) {
     const old = document.getElementById("tmc-backup-overlay");
     if (old) old.remove();
 
@@ -507,7 +961,7 @@ export class GameBackup {
         <div class="tmc-bk-icon">${icon}</div>
         <h3 class="tmc-bk-title">${escapeHtml(title)}</h3>
         <div class="tmc-bk-body">${html}</div>
-        ${buttons.length ? `<div class="tmc-bk-actions"></div>` : ""}
+        ${buttons.length ? `<div class="tmc-bk-actions${actionsClass ? " " + actionsClass : ""}"></div>` : ""}
       </div>
     `;
     const close = () => overlay.remove();
@@ -515,11 +969,11 @@ export class GameBackup {
     buttons.forEach(b => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = `tmc-bk-btn${b.primary ? " primary" : ""}${b.danger ? " danger" : ""}`;
+      btn.className = `tmc-bk-btn${b.primary ? " primary" : ""}${b.danger ? " danger" : ""}${b.secondary ? " secondary" : ""}`;
       btn.textContent = b.text;
       btn.addEventListener("click", () => {
         if (window.game && window.game.sound) window.game.sound.playButtonClick();
-        close();
+        if (b.closeModal !== false) close();
         if (b.onClick) b.onClick();
       });
       actions.appendChild(btn);
@@ -528,6 +982,6 @@ export class GameBackup {
     if (tone === "danger" && window.game && window.game.sound && window.game.sound.playButtonClick) {
       window.game.sound.playButtonClick();
     }
-    return { close };
+    return { close, overlay };
   }
 }

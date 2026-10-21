@@ -4,12 +4,12 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.8.0";
-import { txaformat } from "./txaformat.js?v=1.8.0";
-import { NameValidator } from "./filter.js?v=1.8.0";
-import { SoundManager } from "./audio.js?v=1.8.0";
-import { GameUIModal } from "./modal.js?v=1.8.0";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.8.0";
+import { txaversion } from "./txaversion.js?v=1.8.1";
+import { txaformat } from "./txaformat.js?v=1.8.1";
+import { NameValidator } from "./filter.js?v=1.8.1";
+import { SoundManager } from "./audio.js?v=1.8.1";
+import { GameUIModal } from "./modal.js?v=1.8.1";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.8.1";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu

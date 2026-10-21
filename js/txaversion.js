@@ -10,29 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.8.0 - Sao Lưu & Khôi Phục Dữ Liệu Chống Chỉnh Sửa)
+  // Khai báo phiên bản hiện tại của game (Bản 1.8.1 - Hỗ Trợ Sao Lưu Facebook & Messenger)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.8.0",
-      180,
-      "20/10/2026",
+      "1.8.1",
+      181,
+      "21/10/2026",
       [
         {
-          title: "Sao Lưu & Khôi Phục",
-          desc: "Cài đặt có nút 💾 Sao lưu (tải file .json) và 📂 Khôi phục. Lần đầu vào web có thể khôi phục ngay từ màn hình chờ.",
-          icon: "💾",
+          title: "Sao Lưu Cho Facebook & Messenger",
+          desc: "Tự động nhận diện Facebook / Messenger. Bổ sung nút 📋 Sao Chép Mã Sao Lưu và 📤 Chia Sẻ Mã để cất giữ dữ liệu an toàn mà không bị chặn tải file.",
+          icon: "📱",
           badge: "Tính Năng Mới ✨",
           badgeType: "hot"
         },
         {
-          title: "Sửa Lỗi & Tối Ưu Logic",
-          desc: "HUD hiện điểm sao trung bình chính xác (vd 4.3). Dữ liệu vừa khôi phục không bị game tự lưu đè.",
-          icon: "🐞",
-          badge: "Sửa Lỗi 🛠️",
+          title: "Khôi Phục Bằng Mã Dán",
+          desc: "Menu khôi phục mới: chọn giữa 📁 Tải file .json hoặc 📋 Dán Mã Sao Lưu (hỗ trợ nút tự động đọc bộ nhớ tạm). Xác minh chữ ký số và giải mã bảo mật 100%.",
+          icon: "📋",
+          badge: "Cải Tiến ⚡",
+          badgeType: "hot"
+        },
+        {
+          title: "Hướng Dẫn Mở Trình Duyệt Ngoài",
+          desc: "Thêm hướng dẫn mở game bằng Chrome/Safari từ Facebook/Messenger kèm nút 🔗 Sao Chép Link Game để chơi mượt mà và không lo mất tiến trình.",
+          icon: "🌐",
+          badge: "Tiện Ích 🧭",
           badgeType: "manage"
         }
       ],
-      "Sao Lưu & Khôi Phục Dữ Liệu"
+      "Sao Lưu & Khôi Phục Đa Nền Tảng"
     );
   }
 
@@ -40,6 +47,28 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "1.8.0",
+        180,
+        "20/10/2026",
+        [
+          {
+            title: "Sao Lưu & Khôi Phục",
+            desc: "Cài đặt có nút 💾 Sao lưu (tải file .json) và 📂 Khôi phục. Lần đầu vào web có thể khôi phục ngay từ màn hình chờ.",
+            icon: "💾",
+            badge: "Tính Năng Mới ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Sửa Lỗi & Tối Ưu Logic",
+            desc: "HUD hiện điểm sao trung bình chính xác (vd 4.3). Dữ liệu vừa khôi phục không bị game tự lưu đè.",
+            icon: "🐞",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Sao Lưu & Khôi Phục Dữ Liệu"
+      ),
       new txaversion(
         "1.7.0",
         170,
