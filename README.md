@@ -15,18 +15,6 @@
 - **HUD game**: ví xu vàng, sao đánh giá, đồng hồ ca bán, avatar có vòng XP và **Cấp độ tiệm (Lv)** kèm màn hình *LÊN CẤP!* pháo giấy.
 - **Xu vàng bay về ví** mỗi khi có tiền vào, **dock nút tròn** cố định đáy màn hình, nút bấm 3D lún khi chạm, màn hình chờ với mặt tiền quán vẽ tay.
 
-### 0.1 🎯 Nhiệm Vụ Hằng Ngày & 🏆 Thành Tựu (v1.7.0)
-- **3 nhiệm vụ mỗi ngày** (bán đủ tô, giữ chuỗi, bưng thần tốc, đón khách VIP, giao shipper...), khó dần theo tuổi tiệm; xong cả 3 mở **Rương Thưởng Ngày**. Quên nhận thì cuối ca tự cộng.
-- **Thành tựu 10 nhóm nhiều bậc**, thưởng tiền & XP cấp độ tiệm; dock hiện chấm đỏ khi có thưởng chờ nhận.
-- **Logic bán hàng mới**: khách gọi kèm đồ uống, chỉ tính tiền đúng món đã gọi, thưởng *Thần tốc* khi bưng nhanh, thưởng chuỗi +5% mỗi mốc x5, nguyên liệu phụ tiêu hao thật mỗi phần bán.
-
-### 0.2 💾 Sao Lưu & Khôi Phục Dữ Liệu (v1.8.0)
-- **Sao lưu ra file `.json`** trong Cài đặt, **khôi phục** từ file khi đổi máy/trình duyệt; lần đầu vào web có nút *"Có bản sao lưu? Khôi phục ngay"* ngay màn hình chờ.
-- **Chống chỉnh sửa file**: dữ liệu được mã hóa AES-256-GCM + ký số HMAC-SHA256 + đối chiếu mã băm SHA-256; file bị sửa sẽ bị chặn với màn hình báo rõ, dữ liệu hiện tại giữ nguyên.
-
-### 0.3 🛠️ Sửa Lỗi & Tối Ưu (v1.8.1)
-- **Sửa lỗi sao lưu trên Facebook & Messenger**: khắc phục tình trạng trình duyệt in-app chặn tải file; hỗ trợ sao chép Mã Sao Lưu (văn bản) và dán mã khôi phục để bảo toàn tiến trình; bổ sung hướng dẫn mở bằng Chrome/Safari.
-
 ### 1. 🍲 Màn Hình Loading Đầy Đủ
 - Hoạt họa nồi mì cay niêu đất sôi sùng sục, bốc khói nghi ngút.
 - Thanh tiến trình tải mượt mà từ 0% đến 100% kèm các mẹo/câu đùa tiệm mì anime ngộ nghĩnh.
