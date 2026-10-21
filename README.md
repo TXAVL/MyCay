@@ -24,10 +24,8 @@
 - **Sao lưu ra file `.json`** trong Cài đặt, **khôi phục** từ file khi đổi máy/trình duyệt; lần đầu vào web có nút *"Có bản sao lưu? Khôi phục ngay"* ngay màn hình chờ.
 - **Chống chỉnh sửa file**: dữ liệu được mã hóa AES-256-GCM + ký số HMAC-SHA256 + đối chiếu mã băm SHA-256; file bị sửa sẽ bị chặn với màn hình báo rõ, dữ liệu hiện tại giữ nguyên.
 
-### 0.3 📱 Sao Lưu & Khôi Phục Đa Nền Tảng (v1.8.1)
-- **Hỗ trợ Facebook / Messenger In-App Browser**: tự động nhận diện trình duyệt trong ứng dụng bị chặn tải file, cung cấp giải pháp **Sao Chép Mã Sao Lưu (Văn Bản)** và **Chia Sẻ Mã** (`navigator.share`) cất giữ an toàn vào Ghi chú / Tin nhắn.
-- **Khôi phục bằng Mã Dán (Text Paste)**: menu khôi phục mới cho phép chọn giữa *Tải File .json* hoặc *Dán Mã Sao Lưu* (hỗ trợ nút tự động đọc clipboard), trích xuất và xác minh mã bảo mật 100%.
-- **Hướng dẫn mở trình duyệt ngoài**: hỗ trợ người chơi chuyển từ Facebook/Messenger sang Chrome/Safari mượt mà kèm nút *Sao Chép Link Game*.
+### 0.3 🛠️ Sửa Lỗi & Tối Ưu (v1.8.1)
+- **Sửa lỗi sao lưu trên Facebook & Messenger**: khắc phục tình trạng trình duyệt in-app chặn tải file; hỗ trợ sao chép Mã Sao Lưu (văn bản) và dán mã khôi phục để bảo toàn tiến trình; bổ sung hướng dẫn mở bằng Chrome/Safari.
 
 ### 1. 🍲 Màn Hình Loading Đầy Đủ
 - Hoạt họa nồi mì cay niêu đất sôi sùng sục, bốc khói nghi ngút.

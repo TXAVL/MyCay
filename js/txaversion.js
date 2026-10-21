@@ -10,7 +10,7 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.8.1 - Hỗ Trợ Sao Lưu Facebook & Messenger)
+  // Khai báo phiên bản hiện tại của game (Bản 1.8.1 - Sửa Lỗi & Tối Ưu)
   static get CURRENT_VERSION() {
     return new txaversion(
       "1.8.1",
@@ -18,28 +18,14 @@ export class txaversion {
       "21/10/2026",
       [
         {
-          title: "Sao Lưu Cho Facebook & Messenger",
-          desc: "Tự động nhận diện Facebook / Messenger. Bổ sung nút 📋 Sao Chép Mã Sao Lưu và 📤 Chia Sẻ Mã để cất giữ dữ liệu an toàn mà không bị chặn tải file.",
-          icon: "📱",
-          badge: "Tính Năng Mới ✨",
-          badgeType: "hot"
-        },
-        {
-          title: "Khôi Phục Bằng Mã Dán",
-          desc: "Menu khôi phục mới: chọn giữa 📁 Tải file .json hoặc 📋 Dán Mã Sao Lưu (hỗ trợ nút tự động đọc bộ nhớ tạm). Xác minh chữ ký số và giải mã bảo mật 100%.",
-          icon: "📋",
-          badge: "Cải Tiến ⚡",
-          badgeType: "hot"
-        },
-        {
-          title: "Hướng Dẫn Mở Trình Duyệt Ngoài",
-          desc: "Thêm hướng dẫn mở game bằng Chrome/Safari từ Facebook/Messenger kèm nút 🔗 Sao Chép Link Game để chơi mượt mà và không lo mất tiến trình.",
-          icon: "🌐",
-          badge: "Tiện Ích 🧭",
+          title: "Sửa Lỗi & Tối Ưu",
+          desc: "Sửa lỗi không tải được file sao lưu trên Facebook và Messenger browser. Bổ sung tính năng sao chép mã sao lưu và dán mã khôi phục; thêm hướng dẫn mở bằng Chrome/Safari.",
+          icon: "🛠️",
+          badge: "Sửa Lỗi 🛠️",
           badgeType: "manage"
         }
       ],
-      "Sao Lưu & Khôi Phục Đa Nền Tảng"
+      "Sửa Lỗi & Tối Ưu"
     );
   }
 
