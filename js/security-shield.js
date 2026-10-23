@@ -512,6 +512,15 @@ class SecurityShield {
   handleViolationAttempt(reason) {
     if (this.isAdminDevMode || this.isMobileOrTablet()) return; // BYPASS CHO ADMIN & MOBILE
 
+    // Mở DevTools/phím tắt bị chặn cũng là một dấu hiệu nghi vấn cho Đoàn kiểm tra
+    try {
+      const flags = JSON.parse(localStorage.getItem("mycay_audit_flags") || "{}");
+      if (!flags.devtools) {
+        flags.devtools = Date.now();
+        localStorage.setItem("mycay_audit_flags", JSON.stringify(flags));
+      }
+    } catch (e) {}
+
     if (this.isPermanentBan) {
       this.renderPermanentBanModal();
       return;

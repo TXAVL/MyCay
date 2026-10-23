@@ -4,6 +4,8 @@
 // Bất kỳ thay đổi nào (dù chỉ 1 ký tự) trong file đều khiến chữ ký sai -> chặn khôi phục.
 // ==========================================================
 
+import { GameIntegrity } from "./integrity.js?v=1.9.1";
+
 const SAVE_KEY = "mycay_save_data";
 const BACKUP_FORMAT = "TMC-BACKUP";
 const GAME_NAME = "Tiệm Mỳ Cay";
@@ -917,7 +919,9 @@ export class GameBackup {
           state.offline.minutesUsedToday = curOff.minutesUsedToday || 0;
         }
       }
-      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+      const rawRestored = JSON.stringify(state);
+      localStorage.setItem(SAVE_KEY, rawRestored);
+      GameIntegrity.sign(rawRestored);
       localStorage.setItem("mycay_first_name_set", "true");
       localStorage.setItem("mycay_coachmark_seen", "true");
     } catch (e) {

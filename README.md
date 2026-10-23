@@ -1,6 +1,6 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.9.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.9.1-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
 [![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-23%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
@@ -61,6 +61,7 @@
 - Tối đa **8 giờ bán offline mỗi ngày thực tế**; quán đóng sớm vì hết hàng thì không mất phần hạn mức còn lại.
 - Lúc quay lại, **Bảng Báo Cáo** liệt kê thời gian, từng món đã bán, doanh thu, tiền boa, hoa hồng Quản Lý (10%), mặt bằng & điện nước (miễn phí nếu có Sổ Đỏ Flagship); lợi nhuận ròng được cộng thẳng vào két.
 - Chống gian lận: chỉnh đồng hồ máy hay khôi phục bản sao lưu cũ không nhận thêm doanh thu offline.
+- **Đoàn Kiểm Tra Liên Ngành (v1.9.1)**: bản lưu có chữ ký; sửa tay dữ liệu, chỉ số bất khả thi hay mở DevTools sẽ bị ghi nhận nghi vấn. Khi sang ngày mới, người bị nghi vấn có xác suất rất thấp (3-12%) bị đoàn kiểm tra ghé thăm, tịch thu tiệm và xoá dữ liệu. Người chơi bình thường không bao giờ bị ảnh hưởng.
 
 ### 6. 🏦 Ngân Hàng Tiết Kiệm Mì Cay: Hạn Mức Tiền Gửi & Sổ Đỏ Flagship Vĩnh Viễn
 - **Hạn mức tiền gửi an toàn**: Ngân hàng thiết lập hạn mức tiền gửi mở rộng dần theo số lượng đánh giá 5⭐ (+1M/đánh giá 5⭐).

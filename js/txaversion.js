@@ -10,43 +10,22 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.9.0 - Cày Danh Tiếng, Doanh Thu Offline & Sổ Đỏ Flagship)
+  // Khai báo phiên bản hiện tại của game (Bản 1.9.1 - Đoàn Kiểm Tra Liên Ngành)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.9.0",
-      190,
+      "1.9.1",
+      191,
       "23/10/2026",
       [
         {
-          title: "Tab Đánh Giá Mới",
-          desc: "Đánh giá có tab riêng, đủ 1-5 sao. Khách đọc kỹ lời bạn trả lời và đáp lại đúng ý.",
-          icon: "💬",
+          title: "Đoàn Kiểm Tra Liên Ngành",
+          desc: "Chơi gian lận (sửa dữ liệu, chỉ số bất thường) có thể bị đoàn kiểm tra ghé thăm, tịch thu cả tiệm. Tỉ lệ rất thấp, chơi thật thì không lo.",
+          icon: "👮",
           badge: "Mới ✨",
           badgeType: "hot"
-        },
-        {
-          title: "Doanh Thu Offline",
-          desc: "Từ Ngày 30, quán tự bán khi bạn vắng mặt (tối đa 8 giờ/ngày).",
-          icon: "📊",
-          badge: "Mới ✨",
-          badgeType: "hot"
-        },
-        {
-          title: "Danh Tiếng & Mặt Bằng",
-          desc: "Danh tiếng lên tới 1000⭐. Có thể mua đứt mặt bằng để miễn tiền thuê.",
-          icon: "🏛️",
-          badge: "Nâng Cấp 🌟",
-          badgeType: "star"
-        },
-        {
-          title: "Sửa Lỗi & Tối Ưu",
-          desc: "Sửa lỗi khôi phục sao lưu và một số lỗi nhỏ khác.",
-          icon: "🛠️",
-          badge: "Sửa Lỗi 🛠️",
-          badgeType: "manage"
         }
       ],
-      "Tab Đánh Giá & Doanh Thu Offline"
+      "Đoàn Kiểm Tra Liên Ngành"
     );
   }
 
@@ -54,6 +33,17 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "1.9.0",
+        190,
+        "23/10/2026",
+        [
+          { title: "Tab Đánh Giá Mới", desc: "Đánh giá có tab riêng, đủ 1-5 sao. Khách đọc kỹ lời bạn trả lời và đáp lại đúng ý.", icon: "💬", badge: "Mới ✨", badgeType: "hot" },
+          { title: "Doanh Thu Offline", desc: "Từ Ngày 30, quán tự bán khi bạn vắng mặt (tối đa 8 giờ/ngày).", icon: "📊", badge: "Mới ✨", badgeType: "hot" },
+          { title: "Danh Tiếng & Mặt Bằng", desc: "Danh tiếng lên tới 1000⭐. Có thể mua đứt mặt bằng để miễn tiền thuê.", icon: "🏛️", badge: "Nâng Cấp 🌟", badgeType: "star" }
+        ],
+        "Tab Đánh Giá & Doanh Thu Offline"
+      ),
       new txaversion(
         "1.8.1",
         181,

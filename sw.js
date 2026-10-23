@@ -1,47 +1,49 @@
-// Service Worker cho Tiệm Mỳ Cay & Trà Sữa Boba v1.9.0
+// Service Worker cho Tiệm Mỳ Cay & Trà Sữa Boba v1.9.1
 // Hỗ trợ chơi game 100% Offline không cần mạng sau lần tải đầu tiên
 // Khắc phục triệt để lỗi "Response served by service worker has redirections" & lỗi WebKit Offline trên Safari iOS
 
-const CACHE_NAME = "mycay-pwa-v1.9.0";
+const CACHE_NAME = "mycay-pwa-v1.9.1";
 
 const PRECACHE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./styles/main.css",
-  "./styles/main.css?v=1.9.0",
+  "./styles/main.css?v=1.9.1",
   "./styles/game-skin.css",
-  "./styles/game-skin.css?v=1.9.0",
+  "./styles/game-skin.css?v=1.9.1",
   "./js/app.js",
-  "./js/app.js?v=1.9.0",
+  "./js/app.js?v=1.9.1",
   "./js/game.js",
-  "./js/game.js?v=1.9.0",
+  "./js/game.js?v=1.9.1",
   "./js/audio.js",
-  "./js/audio.js?v=1.9.0",
+  "./js/audio.js?v=1.9.1",
   "./js/modal.js",
-  "./js/modal.js?v=1.9.0",
+  "./js/modal.js?v=1.9.1",
   "./js/shop-scene.js",
-  "./js/shop-scene.js?v=1.9.0",
+  "./js/shop-scene.js?v=1.9.1",
   "./js/reviews.js",
-  "./js/reviews.js?v=1.9.0",
+  "./js/reviews.js?v=1.9.1",
   "./js/backup.js",
-  "./js/backup.js?v=1.9.0",
+  "./js/backup.js?v=1.9.1",
+  "./js/integrity.js",
+  "./js/integrity.js?v=1.9.1",
   "./js/quests.js",
-  "./js/quests.js?v=1.9.0",
+  "./js/quests.js?v=1.9.1",
   "./js/street.js",
   "./js/txacoachmark.js",
   "./js/txaformat.js",
-  "./js/txaformat.js?v=1.9.0",
+  "./js/txaformat.js?v=1.9.1",
   "./js/txaqr.js",
   "./js/txatheme.js",
   "./js/txaversion.js",
-  "./js/txaversion.js?v=1.9.0",
+  "./js/txaversion.js?v=1.9.1",
   "./js/filter.js",
-  "./js/filter.js?v=1.9.0",
+  "./js/filter.js?v=1.9.1",
   "./js/realtime-stats.js",
-  "./js/realtime-stats.js?v=1.9.0",
+  "./js/realtime-stats.js?v=1.9.1",
   "./js/security-shield.js",
-  "./js/security-shield.js?v=1.9.0",
+  "./js/security-shield.js?v=1.9.1",
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
   "./assets/favicon.png",
   "./assets/icon-192.png",
@@ -236,7 +238,7 @@ self.addEventListener("fetch", (event) => {
   // 2. CÁC TÀI NGUYÊN TĨNH KHÁC (CSS, JS, ẢNH, FONTS, CDN):
   event.respondWith(
     (async () => {
-      // Tìm trong cache trước (kèm ignoreSearch: true để bắt trúng query ?v=1.9.0)
+      // Tìm trong cache trước (kèm ignoreSearch: true để bắt trúng query ?v=1.9.1)
       const cached = await caches.match(req, { ignoreSearch: true });
       if (cached) {
         // Cập nhật ngầm nếu có mạng

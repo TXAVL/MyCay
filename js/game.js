@@ -4,13 +4,14 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.9.0";
-import { txaformat } from "./txaformat.js?v=1.9.0";
-import { NameValidator } from "./filter.js?v=1.9.0";
-import { SoundManager } from "./audio.js?v=1.9.0";
-import { GameUIModal } from "./modal.js?v=1.9.0";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.9.0";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona } from "./reviews.js?v=1.9.0";
+import { txaversion } from "./txaversion.js?v=1.9.1";
+import { txaformat } from "./txaformat.js?v=1.9.1";
+import { NameValidator } from "./filter.js?v=1.9.1";
+import { SoundManager } from "./audio.js?v=1.9.1";
+import { GameUIModal } from "./modal.js?v=1.9.1";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.9.1";
+import { GameIntegrity } from "./integrity.js?v=1.9.1";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona } from "./reviews.js?v=1.9.1";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -612,7 +613,9 @@ export class SpicyNoodleGame {
     try {
       // Mốc hoạt động chỉ tiến, không lùi (chống chỉnh đồng hồ để nhận doanh thu offline nhiều lần)
       this.state.lastActiveTime = Math.max(Number(this.state.lastActiveTime) || 0, Date.now());
-      localStorage.setItem("mycay_save_data", JSON.stringify(this.state));
+      const raw = JSON.stringify(this.state);
+      localStorage.setItem("mycay_save_data", raw);
+      GameIntegrity.sign(raw);
     } catch (e) {
       console.warn("Không lưu được game:", e);
     }
@@ -872,6 +875,9 @@ export class SpicyNoodleGame {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        // Chữ ký không khớp = bản lưu bị sửa tay ngoài game
+        if (GameIntegrity.isSaveTampered(saved)) GameIntegrity.addFlag("save_edited");
+        GameIntegrity.scanState(parsed);
         // Deep merge noodles, toppings, drinks, supplies, upgrades, staff, stats
         if (parsed.noodles) {
           for (const k in this.state.noodles) {
@@ -6342,10 +6348,50 @@ export class SpicyNoodleGame {
 
     this.showDaySummaryModal(activeStaffNames);
     this.state.day += 1;
+    this.pendingAudit = GameIntegrity.rollAudit();
     this.ensureDailyQuests();
     this.rollDailySpecialCombo(true); // Chuẩn bị Món Đặc Biệt mới cho ngày tiếp theo ở bảng chuẩn bị
     this.saveGame();
     this.renderAll();
+    if (this.pendingAudit) {
+      this.pendingAudit = false;
+      setTimeout(() => this.startInspection(), 1500);
+    }
+  }
+
+  // Đoàn kiểm tra liên ngành: hội thoại 2 bước, rồi tịch thu & xoá dữ liệu
+  startInspection() {
+    if (document.getElementById("inspection-overlay")) return;
+    const overlay = document.createElement("div");
+    overlay.id = "inspection-overlay";
+    overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(20,12,8,.92);display:flex;align-items:center;justify-content:center;padding:16px;";
+    const box = document.createElement("div");
+    box.style.cssText = "max-width:380px;width:100%;background:#f5e3c0;border:4px solid #8a5a2b;border-radius:10px;padding:20px;text-align:center;color:#3a2412;font-family:inherit;line-height:1.55;";
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    const owner = this.state.ownerName || "Chủ tiệm";
+    const steps = [
+      { icon: "👮", head: "Đoàn kiểm tra liên ngành", text: `Chào ${owner}, chúng tôi là đoàn kiểm tra liên ngành. Chúng tôi nhận được đơn tố cáo anh/chị có dấu hiệu gian lận số liệu, can thiệp dữ liệu trò chơi.` },
+      { icon: "🔒", head: "TIỆM BỊ NIÊM PHONG", text: "Toàn bộ tài sản bị tịch thu, tiệm bị niêm phong.<br>Mọi dữ liệu bị xoá, quay về Ngày 1.<br><br>Đoàn kiểm tra ghét những người gian dối.<br>Chơi thật mới vui nhé!" }
+    ];
+    let i = 0;
+    const render = () => {
+      const st = steps[i];
+      box.innerHTML = `<div style="font-size:48px">${st.icon}</div><h3 style="margin:6px 0 10px;color:#a3281d">${st.head}</h3><p style="margin:0 0 16px">${st.text}</p><button id="inspection-next" style="padding:8px 22px;border:0;border-radius:8px;background:#a3281d;color:#fff;font-weight:700;cursor:pointer">${i < steps.length - 1 ? "Tiếp ▼" : "Đã Hiểu"}</button>`;
+      box.querySelector("#inspection-next").onclick = () => {
+        if (i < steps.length - 1) { i++; render(); return; }
+        this.confiscateAndReset();
+      };
+    };
+    render();
+    if (this.sound && this.sound.playReviewChime) this.sound.playReviewChime();
+  }
+
+  confiscateAndReset() {
+    window.__mycayRestoring = true; // chặn lưu đè trước khi tải lại
+    ["mycay_save_data", "mycay_seen_version", "mycay_coachmark_seen", "mycay_first_name_set"].forEach(k => localStorage.removeItem(k));
+    GameIntegrity.clearFlags();
+    location.reload();
   }
 
   showDaySummaryModal(activeStaffNames = []) {
