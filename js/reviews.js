@@ -376,7 +376,24 @@ export function composeCustomerResponse(analysis, review) {
     lines.push(pick([
       `"${q.rude}"? Bán hàng mà nói chuyện với khách vậy hả? Chụp màn hình lại rồi đó.`,
       `Quán dùng chữ "${q.rude}" với khách luôn hả trời. Không biết ai là khách ai là chủ nữa.`,
-      `Đọc tới chữ "${q.rude}" là đủ hiểu cái nết của quán rồi.`
+      `Đọc tới chữ "${q.rude}" là đủ hiểu cái nết của quán rồi.`,
+      `"${q.rude}" hả? Mì thì cay cấp 3 mà cái miệng chủ quán cay cấp 7 luôn á.`,
+      `Ủa alo, em trả tiền ăn mì chứ có trả tiền để nghe quán "${q.rude}" đâu?`,
+      `Chủ quán chửi khách "${q.rude}" công khai luôn, gan dữ. Để em ghim bài cho cả khu phố đọc.`,
+      `Bán hàng mà mở miệng ra là "${q.rude}", chắc quán tưởng mình độc quyền mì cay cả thành phố.`,
+      `"${q.rude}"? Nước dùng thì nhạt mà cái nết thì đậm đặc ghê ha.`,
+      `Khách góp ý thì quán đáp "${q.rude}". Vậy là hiểu vì sao quán vắng rồi đó.`,
+      `Quán nói "${q.rude}" với khách thì sớm muộn cũng tự ăn mì một mình thôi.`,
+      `Câu "${q.rude}" này em lưu lại rồi, gửi lên group review ăn uống cho mọi người cùng thưởng thức.`
+    ]));
+    // Khách nổi đóa thì nói thêm một câu cho bõ tức
+    lines.push(pick([
+      "Thái độ phục vụ vậy thì đầu bếp có nấu ngon cỡ nào cũng vứt.",
+      "Đi ăn mất tiền mà còn bị chửi, lần đầu em gặp luôn đó.",
+      "Quán khỏi lo, em không bao giờ quay lại để nghe chửi nữa đâu.",
+      "Mọi người đọc mà né quán này ra giùm, chủ quán chửi khách công khai đó.",
+      "Phục vụ chậm còn chịu được, chứ chửi khách thì hết cứu.",
+      "Cái nết này mà mở quán ăn thì dẹp sớm cho khỏi lỗ."
     ]));
   } else if (i.blame) {
     lines.push(pick([
@@ -465,7 +482,14 @@ export function composeCustomerResponse(analysis, review) {
     pleased: stars <= 3 ? ["Em cho quán thêm cơ hội.", "Thôi em bớt giận rồi."] : ["Lần sau ghé tiếp nha.", "Giữ phong độ nha quán."],
     neutral: stars <= 3 ? ["Để lần sau em xem sao.", "Ừm, em ghi nhận."] : ["Ok quán.", "Ừm, cảm ơn quán."],
     annoyed: ["Trả lời vậy em thấy chưa ổn.", "Em hơi thất vọng với cách rep này."],
-    furious: ["1 sao không bàn cãi.", "Bóc phốt luôn cho mọi người biết."]
+    furious: [
+      "1 sao không bàn cãi.",
+      "Bóc phốt luôn cho mọi người biết.",
+      "1 sao, thêm được 0 sao em cũng cho.",
+      "Hẹn gặp quán trên mấy group bóc phốt nha.",
+      "Xóa app đặt món của quán luôn, khỏi thương lượng.",
+      "Chúc quán buôn may bán đắt... ở kiếp khác."
+    ]
   };
   lines.push(pick(closers[tier]));
 
