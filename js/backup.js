@@ -6,7 +6,8 @@
 
 const SAVE_KEY = "mycay_save_data";
 const BACKUP_FORMAT = "TMC-BACKUP";
-const BACKUP_VERSION = 1;
+const GAME_NAME = "Tiệm Mỳ Cay";
+const BACKUP_VERSION = 2;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const PBKDF2_ROUNDS = 120000;
 
@@ -66,19 +67,23 @@ async function deriveKeys(salt) {
 function buildPreview(state) {
   return {
     shopName: String(state.shopName || "Tiệm Mỳ Cay"),
-    ownerName: String(state.ownerName || ""),
-    day: Number(state.day) || 1,
-    money: Number(state.money) || 0,
-    reputation: Number(state.reputation) || 0
+    day: Number(state.day) || 1
   };
 }
 
 // Chuỗi chuẩn hóa để ký: thứ tự trường cố định, đổi thứ tự/thêm bớt khóa đều làm sai chữ ký
 function canonicalString(file) {
   const p = file.preview || {};
+  if (file.v === 1) {
+    return [
+      file.format, file.v, file.gameVersion, file.createdAt,
+      p.shopName, p.ownerName, p.day, p.money, p.reputation,
+      file.salt, file.iv, file.data
+    ].map(v => String(v)).join("|");
+  }
   return [
-    file.format, file.v, file.gameVersion, file.createdAt,
-    p.shopName, p.ownerName, p.day, p.money, p.reputation,
+    file.format, file.v, file.game, file.gameVersion, file.createdAt,
+    p.shopName, p.day,
     file.salt, file.iv, file.data
   ].map(v => String(v)).join("|");
 }
@@ -90,11 +95,13 @@ function validateState(state) {
   const isNum = v => typeof v === "number" && Number.isFinite(v);
   if (!isNum(state.money) || state.money < -1e7 || state.money > 1e13) problems.push("Số tiền không hợp lệ");
   if (!isNum(state.day) || state.day < 1 || state.day > 1e6) problems.push("Số ngày không hợp lệ");
-  if (!isNum(state.reputation) || state.reputation < 0 || state.reputation > 100) problems.push("Điểm uy tín không hợp lệ");
+  if (!isNum(state.reputation) || state.reputation < 0 || state.reputation > 1e6) problems.push("Điểm uy tín không hợp lệ");
   ["noodles", "toppings", "drinks", "supplies", "upgrades", "staff", "stats"].forEach(k => {
     if (state[k] != null && (typeof state[k] !== "object" || Array.isArray(state[k]))) problems.push(`Mục "${k}" sai cấu trúc`);
   });
   if (state.reviews != null && !Array.isArray(state.reviews)) problems.push("Danh sách đánh giá sai cấu trúc");
+  if (state.ownerAvatar != null && typeof state.ownerAvatar !== "string") problems.push("Ảnh đại diện chủ quán không hợp lệ");
+  if (state.ownerName != null && typeof state.ownerName !== "string") problems.push("Tên chủ quán không hợp lệ");
   return problems;
 }
 
@@ -135,6 +142,7 @@ export class GameBackup {
 
     const file = {
       format: BACKUP_FORMAT,
+      game: GAME_NAME,
       v: BACKUP_VERSION,
       gameVersion: String(gameVersion || ""),
       createdAt: new Date().toISOString(),
@@ -282,10 +290,10 @@ export class GameBackup {
       return;
     }
     preparing.close();
-    this.showDownloadReady(file, blob, filename);
+    this.showDownloadReady(file, blob, filename, game.state);
   }
 
-  static showDownloadReady(file, blob, filename) {
+  static showDownloadReady(file, blob, filename, state = null) {
     const inApp = this.isInAppBrowser();
     const appName = this.getInAppName();
     const codeString = JSON.stringify(file);
@@ -298,7 +306,7 @@ export class GameBackup {
         icon: "📱",
         title: "Sao Lưu Dữ Liệu Tiệm",
         html: `
-          ${this.previewTable(file.preview, file.createdAt)}
+          ${this.previewTable(file.preview, file.createdAt, state)}
           <div class="tmc-bk-inapp-box">
             <div class="tmc-bk-inapp-badge">⚠️ Mở bằng ${escapeHtml(appName)}</div>
             <p class="tmc-bk-inapp-desc">
@@ -312,7 +320,7 @@ export class GameBackup {
           {
             text: "📋 Sao Chép Mã Sao Lưu (Khuyên Dùng)",
             primary: true,
-            onClick: () => this.showCopyBackupCode(file, codeString)
+            onClick: () => this.showCopyBackupCode(file, codeString, state)
           },
           {
             text: "⬇️ Vẫn Thử Tải File .JSON",
@@ -336,7 +344,7 @@ export class GameBackup {
       icon: "💾",
       title: "File Sao Lưu Đã Sẵn Sàng",
       html: `
-        ${this.previewTable(file.preview, file.createdAt)}
+        ${this.previewTable(file.preview, file.createdAt, state)}
         <p class="tmc-bk-hint">📄 <b>${escapeHtml(filename)}</b> (${Math.max(1, Math.round(blob.size / 1024))} KB)</p>
         <p class="tmc-bk-hint">${useShare ? "Bấm nút bên dưới rồi chọn <b>“Lưu vào Tệp”</b> để cất file." : "Bấm nút bên dưới để tải file về máy."}</p>
       `,
@@ -350,7 +358,7 @@ export class GameBackup {
         {
           text: "📋 Hoặc Sao Chép Mã Sao Lưu (Văn Bản)",
           secondary: true,
-          onClick: () => this.showCopyBackupCode(file, codeString)
+          onClick: () => this.showCopyBackupCode(file, codeString, state)
         },
         { text: "Để Sau" }
       ]
@@ -358,10 +366,10 @@ export class GameBackup {
   }
 
   // Màn hình hiển thị & sao chép Mã Sao Lưu (dạng văn bản an toàn)
-  static async showCopyBackupCode(file, codeString) {
+  static async showCopyBackupCode(file, codeString, state = null) {
     const copied = await this.copyToClipboard(codeString);
-    const canShareText = !!(navigator.share && typeof navigator.share === "function");
     const preview = file.preview || {};
+    const s = state || preview;
 
     const overlayObj = this.showOverlay({
       tone: "success",
@@ -370,7 +378,7 @@ export class GameBackup {
       html: `
         <div class="tmc-bk-preview-compact">
           <span>🏪 <b>${escapeHtml(preview.shopName || "Tiệm Mỳ Cay")}</b> (Ngày ${escapeHtml(preview.day || 1)})</span>
-          <span>🪙 <b>${escapeHtml(Math.round(preview.money || 0).toLocaleString("vi-VN"))}k</b></span>
+          ${s.money != null ? `<span>🪙 <b>${escapeHtml(Math.round(s.money || 0).toLocaleString("vi-VN"))}k</b></span>` : ""}
         </div>
 
         <div class="tmc-bk-copy-status ${copied ? "is-copied" : "need-manual"}">
@@ -575,7 +583,7 @@ export class GameBackup {
     }
     pass("Đọc cấu trúc JSON");
 
-    if (!file || typeof file !== "object" || file.format !== BACKUP_FORMAT) {
+    if (!file || typeof file !== "object" || file.format !== BACKUP_FORMAT || (file.v >= 2 && file.game !== GAME_NAME)) {
       fail("format", "Nhận diện file sao lưu Tiệm Mỳ Cay", "Đây không phải dữ liệu sao lưu của Tiệm Mỳ Cay.");
     }
     if (typeof file.v !== "number" || file.v > BACKUP_VERSION) {
@@ -619,10 +627,23 @@ export class GameBackup {
     if (!state || hash !== inner.stateHash) {
       fail("tampered", "Đối chiếu dữ liệu", "Mã băm dữ liệu không khớp — dữ liệu game đã bị sửa.");
     }
-    const expected = buildPreview(state);
-    const p = file.preview;
-    if (["shopName", "ownerName", "day", "money", "reputation"].some(k => p[k] !== expected[k])) {
-      fail("tampered", "Đối chiếu thông tin hiển thị", "Thông tin xem trước không khớp với dữ liệu thật — file đã bị sửa.");
+    const p = file.preview || {};
+    if (file.v === 1) {
+      const expectedV1 = {
+        shopName: String(state.shopName || "Tiệm Mỳ Cay"),
+        ownerName: String(state.ownerName || ""),
+        day: Number(state.day) || 1,
+        money: Number(state.money) || 0,
+        reputation: Number(state.reputation) || 0
+      };
+      if (["shopName", "ownerName", "day", "money", "reputation"].some(k => p[k] !== expectedV1[k])) {
+        fail("tampered", "Đối chiếu thông tin hiển thị", "Thông tin xem trước không khớp với dữ liệu thật — file đã bị sửa.");
+      }
+    } else {
+      const expectedV2 = buildPreview(state);
+      if (["shopName", "day"].some(k => p[k] !== expectedV2[k])) {
+        fail("tampered", "Đối chiếu thông tin hiển thị", "Thông tin xem trước không khớp với dữ liệu thật — file đã bị sửa.");
+      }
     }
     pass("Đối chiếu dữ liệu");
 
@@ -632,7 +653,7 @@ export class GameBackup {
     }
     pass("Kiểm tra hợp lệ dữ liệu game");
 
-    return { state, preview: expected, createdAt: file.createdAt, gameVersion: file.gameVersion, checks };
+    return { state, preview: buildPreview(state), createdAt: file.createdAt, gameVersion: file.gameVersion, checks };
   }
 
   // ---------------- KHÔI PHỤC TIẾN TRÌNH ----------------
@@ -867,7 +888,7 @@ export class GameBackup {
       icon: "📦",
       title: "Dữ Liệu Hợp Lệ — Khôi Phục?",
       html: `
-        ${this.previewTable(result.preview, result.createdAt)}
+        ${this.previewTable(result.preview, result.createdAt, result.state)}
         ${hasSave ? `<p class="tmc-bk-warn">⚠️ Tiến trình hiện tại trên máy này sẽ bị <b>thay thế hoàn toàn</b> bằng bản sao lưu.</p>` : ""}
       `,
       buttons: [
@@ -881,6 +902,21 @@ export class GameBackup {
     try {
       // Chặn mọi lần tự lưu của game đang chạy ghi đè lên bản vừa khôi phục
       window.__mycayRestoring = true;
+      // Không tính doanh thu offline cho khoảng thời gian từ lúc sao lưu tới lúc khôi phục,
+      // và giữ hạn mức offline đã dùng hôm nay trên máy này (chống khôi phục lặp lại để nhận thưởng)
+      let current = null;
+      try {
+        current = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+      } catch (e) {}
+      state.lastActiveTime = Math.max(Date.now(), Number(current && current.lastActiveTime) || 0);
+      const curOff = current && current.offline;
+      if (curOff && curOff.capDate) {
+        state.offline = Object.assign({}, state.offline || {});
+        if (state.offline.capDate !== curOff.capDate || (state.offline.minutesUsedToday || 0) < (curOff.minutesUsedToday || 0)) {
+          state.offline.capDate = curOff.capDate;
+          state.offline.minutesUsedToday = curOff.minutesUsedToday || 0;
+        }
+      }
       localStorage.setItem(SAVE_KEY, JSON.stringify(state));
       localStorage.setItem("mycay_first_name_set", "true");
       localStorage.setItem("mycay_coachmark_seen", "true");
@@ -900,16 +936,29 @@ export class GameBackup {
   }
 
   // ---------------- GIAO DIỆN ----------------
-  static previewTable(p, createdAt) {
+  static previewTable(p, createdAt, state = null) {
+    const s = state || p || {};
     const date = createdAt ? new Date(createdAt) : null;
     const dateText = date && !isNaN(date) ? date.toLocaleString("vi-VN") : "—";
+    const shop = s.shopName || (p && p.shopName) || "Tiệm Mỳ Cay";
+    const day = s.day != null ? s.day : (p && p.day);
+    const ownerName = s.ownerName || (p && p.ownerName);
+    const money = s.money != null ? s.money : (p && p.money);
+    const rep = s.reputation != null ? s.reputation : (p && p.reputation);
+    const avatar = s.ownerAvatar || "assets/cust_cat.png";
+
     return `
       <div class="tmc-bk-preview">
-        <div><span>🏪 Tên tiệm</span><b>${escapeHtml(p.shopName)}</b></div>
-        ${p.ownerName ? `<div><span>👤 Chủ tiệm</span><b>${escapeHtml(p.ownerName)}</b></div>` : ""}
-        <div><span>📅 Ngày kinh doanh</span><b>Ngày ${escapeHtml(p.day)}</b></div>
-        <div><span>🪙 Tiền</span><b>${escapeHtml(Math.round(p.money).toLocaleString("vi-VN"))}k</b></div>
-        <div><span>⭐ Uy tín</span><b>${escapeHtml(Math.round(p.reputation))}</b></div>
+        <div style="display:flex;align-items:center;gap:10px;grid-column:1/-1;margin-bottom:4px;">
+          <img src="${escapeHtml(avatar)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #D97706;background:#FFF;" onerror="this.src='assets/cust_cat.png'" />
+          <div>
+            <div style="font-weight:800;font-size:14px;color:var(--text-title);">🏪 ${escapeHtml(shop)}</div>
+            ${ownerName ? `<div style="font-size:12px;color:var(--text-muted);">👤 Chủ tiệm: <b>${escapeHtml(ownerName)}</b></div>` : ""}
+          </div>
+        </div>
+        <div><span>📅 Ngày kinh doanh</span><b>Ngày ${escapeHtml(day || 1)}</b></div>
+        ${money != null ? `<div><span>🪙 Tiền</span><b>${escapeHtml(Math.round(money).toLocaleString("vi-VN"))}k</b></div>` : ""}
+        ${rep != null ? `<div><span>⭐ Uy tín</span><b>${escapeHtml(Math.round(rep))}</b></div>` : ""}
         <div><span>🕒 Thời điểm sao lưu</span><b>${escapeHtml(dateText)}</b></div>
       </div>
     `;

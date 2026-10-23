@@ -4,12 +4,12 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.8.1";
-import { txaformat } from "./txaformat.js?v=1.8.1";
-import { NameValidator } from "./filter.js?v=1.8.1";
-import { SoundManager } from "./audio.js?v=1.8.1";
-import { GameUIModal } from "./modal.js?v=1.8.1";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.8.1";
+import { txaversion } from "./txaversion.js?v=1.9.0";
+import { txaformat } from "./txaformat.js?v=1.9.0";
+import { NameValidator } from "./filter.js?v=1.9.0";
+import { SoundManager } from "./audio.js?v=1.9.0";
+import { GameUIModal } from "./modal.js?v=1.9.0";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=1.9.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -19,6 +19,17 @@ const MAX_REVIEWS = 60; // Giữ 60 đánh giá gần nhất: sao trung bình ph
 // Nguyên liệu phụ tiêu hao mỗi phần bán ra (thiếu thì vẫn bán được nhưng món kém ngon: -giá, -sao)
 const BOWL_SUPPLIES = ["mi_soi", "nuoc_ham", "nieu_dat"];
 const DRINK_SUPPLIES = ["tra_den", "sua_tuoi_nguyenkem"];
+
+// Doanh thu offline: mở khóa từ Ngày 30, tính tối đa 8 giờ mỗi ngày thực tế
+const OFFLINE_UNLOCK_DAY = 30;
+const OFFLINE_MIN_MINUTES = 3;
+const OFFLINE_DAILY_CAP_MIN = 480;
+const OFFLINE_EFFICIENCY = 0.6;
+const OFFLINE_MANAGER_COMMISSION = 0.1;
+
+function escapeOfflineHtml(str) {
+  return String(str == null ? "" : str).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
 
 export class SpicyNoodleGame {
   constructor() {
@@ -35,6 +46,17 @@ export class SpicyNoodleGame {
       dayPhase: "prep", // "prep" (Chuẩn bị) | "open" (Đang mở cửa bán)
       money: 400, // Đơn vị k = 1.000đ (400k = 400.000đ)
       reputation: 30, // Điểm uy tín ⭐
+      lastActiveTime: Date.now(), // Thời điểm hoạt động cuối cùng để tính doanh thu offline
+      offline: {
+        minutesUsedToday: 0,
+        capDate: "", // Ngày thực tế (YYYY-MM-DD) đang tính trần 8 giờ
+        totalOfflineProfit: 0,
+        totalOfflineBowls: 0,
+        totalShifts: 0,
+        lastReport: null,
+        history: []
+      },
+      ownedFlagship: false, // Bất động sản Trụ sở Flagship (Sổ đỏ vĩnh viễn miễn phí mặt bằng 0đ/ngày)
       todayEarnings: 0,
       todayBowlsSold: 0,
       todayDrinksSold: 0,
@@ -502,6 +524,7 @@ export class SpicyNoodleGame {
     this.initTables();
     this.renderAll();
     this.initPedestrianSimulation();
+    this.initOfflineTracking();
   }
 
   // Khởi tạo mô phỏng dòng người đi bộ và khách hàng tấp nập dạo phố
@@ -586,6 +609,8 @@ export class SpicyNoodleGame {
     // Đang khôi phục bản sao lưu -> không ghi đè dữ liệu vừa nạp trước khi tải lại trang
     if (window.__mycayRestoring) return;
     try {
+      // Mốc hoạt động chỉ tiến, không lùi (chống chỉnh đồng hồ để nhận doanh thu offline nhiều lần)
+      this.state.lastActiveTime = Math.max(Number(this.state.lastActiveTime) || 0, Date.now());
       localStorage.setItem("mycay_save_data", JSON.stringify(this.state));
     } catch (e) {
       console.warn("Không lưu được game:", e);
@@ -894,9 +919,11 @@ export class SpicyNoodleGame {
         if (parsed.achievements && typeof parsed.achievements === "object") this.state.achievements = parsed.achievements;
         if (typeof parsed.money === "number") this.state.money = parsed.money;
         if (typeof parsed.reputation === "number") this.state.reputation = parsed.reputation;
+        if (typeof parsed.lastActiveTime === "number") this.state.lastActiveTime = parsed.lastActiveTime;
+        if (parsed.offline && typeof parsed.offline === "object") this.state.offline = parsed.offline;
+        if (typeof parsed.ownedFlagship === "boolean") this.state.ownedFlagship = parsed.ownedFlagship;
         if (Array.isArray(parsed.reviews)) {
-          // Lọc bỏ các review mẫu seed cũ để đảm bảo quán mới mở chưa có review rác
-          this.state.reviews = parsed.reviews.filter(r => !r.id || !String(r.id).startsWith("seed_")).slice(0, MAX_REVIEWS);
+          this.state.reviews = parsed.reviews.slice(0, MAX_REVIEWS);
         }
         if (parsed.unlockedCustomers && typeof parsed.unlockedCustomers === "object") {
           this.state.unlockedCustomers = parsed.unlockedCustomers;
@@ -945,6 +972,306 @@ export class SpicyNoodleGame {
     // Luôn đảm bảo khi nạp trang web, tiệm mỳ bắt đầu ở chế độ chuẩn bị an toàn
     this.state.dayPhase = "prep";
     if (!this.state.shopName) this.state.shopName = "Tiệm Mỳ Cay";
+    if (!Array.isArray(this.state.reviews)) this.state.reviews = [];
+
+    // Kiểm tra & trao thưởng doanh thu offline khi người chơi quay lại tiệm
+    this.checkOfflineEarnings();
+  }
+
+  // Mở modal hướng dẫn chi tiết cách cày điểm Danh Tiếng
+  openReputationGuide() {
+    GameUIModal.alert({
+      title: "BÍ KÍP CÀY ĐIỂM DANH TIẾNG ⭐",
+      icon: "👑",
+      message: `
+        <div style="text-align: left; font-size: 12.5px; line-height: 1.5; color: var(--text-main); display: flex; flex-direction: column; gap: 8px;">
+          <div style="background: rgba(245, 158, 11, 0.12); padding: 8px 10px; border-radius: 8px; border-left: 3px solid #F59E0B;">
+            <b>⭐ Điểm hiện tại:</b> <span style="font-weight: 800; color: #D97706; font-size: 14px;">${this.state.reputation || 30} ⭐ Danh tiếng</span>
+          </div>
+          <div><b>1. 🍜 Phục vụ nhanh & đúng món:</b> Khách hài lòng chấm 4★ - 5★ cộng ngay <b>+1 đến +3 ⭐</b> Danh tiếng mỗi tô! (Khách chờ lâu bỏ về bị trừ -4 ⭐).</div>
+          <div><b>2. 💌 Phản hồi Sổ Tay Đánh Giá (Tab 4):</b> Chủ tiệm gửi phản hồi tử tế hoặc đền voucher xoa dịu khách sẽ được cộng ngay <b>+2 đến +4 ⭐</b> Danh tiếng!</div>
+          <div><b>3. 🎯 Hoàn thành Nhiệm Vụ Hằng Ngày (Tab 8):</b> Mỗi nhiệm vụ hoàn thành đem lại XP và rương danh tiếng.</div>
+          <div><b>4. 🏮 Nâng cấp Đèn Lồng Đỏ (Tab 4):</b> Nâng điểm decor kéo khách đông đúc và nâng tầm uy tín quán khắp khu phố.</div>
+        </div>
+      `,
+      btnText: "Đã Hiểu 💖"
+    });
+  }
+
+  // ==========================================================
+  // DOANH THU OFFLINE (MỞ KHÓA TỪ NGÀY 30)
+  // Quản Lý Ca Trực bán hàng thật khi người chơi vắng mặt: dùng đúng menu, giá bán & tồn kho,
+  // trừ nguyên liệu phụ, giới hạn 8 giờ mỗi ngày thực tế và bỏ qua khi đồng hồ máy bị chỉnh lùi.
+  // ==========================================================
+  ensureOfflineState() {
+    this.state.offline = Object.assign({
+      minutesUsedToday: 0,
+      capDate: "",
+      totalOfflineProfit: 0,
+      totalOfflineBowls: 0,
+      totalShifts: 0,
+      lastReport: null,
+      history: []
+    }, this.state.offline || {});
+    if (!Array.isArray(this.state.offline.history)) this.state.offline.history = [];
+    return this.state.offline;
+  }
+
+  localDateKey(ts) {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  // Tiền mặt bằng & điện nước của 1 ngày kinh doanh (cùng công thức với hóa đơn cuối ngày)
+  getDailyRentCost() {
+    if (this.state.ownedFlagship) return 0;
+    let rent = this.state.day === 1 ? 0 : Math.min(180, 25 + (this.state.day - 1) * 12);
+    if (this.state.staff.torto && rent > 0) rent = Math.round(rent * 0.5);
+    return rent;
+  }
+
+  // Mô phỏng ca bán offline: trả về số liệu và trừ kho trực tiếp vào state
+  simulateOfflineSales(minutes) {
+    const st = this.state;
+    const staff = st.staff || {};
+    const tables = (st.upgrades && st.upgrades.tableCount) || 3;
+    // Công suất tô/giờ của Quản Lý Ca Trực (thấp hơn khi chủ tiệm tự đứng bếp)
+    const baseRate = 8 + tables * 3 + (staff.kenji ? 6 : 0) + (staff.usagi ? 4 : 0) + (staff.shiba ? 2 : 0) + (staff.mochi ? 2 : 0);
+    const repFactor = 0.8 + Math.min(1000, Math.max(0, st.reputation || 0)) / 2000;
+    const capacity = Math.floor(baseRate * OFFLINE_EFFICIENCY * repFactor * (minutes / 60));
+
+    const menuNoodles = Object.values(st.noodles).filter(n => n.unlocked && n.inMenu);
+    const menuDrinks = Object.values(st.drinks).filter(d => d.unlocked && d.inMenu);
+    const drinkRate = staff.ducky ? 0.5 : 0.35;
+    const supplyOk = ids => ids.every(id => !st.supplies[id] || st.supplies[id].stock > 0);
+
+    const soldNoodles = {};
+    const soldDrinks = {};
+    let bowls = 0;
+    let drinks = 0;
+    let revenue = 0;
+    let drinkAcc = 0;
+    let stopReason = "";
+
+    for (let i = 0; i < capacity; i++) {
+      // Ưu tiên món còn nhiều hàng nhất để kho tiêu hao đều
+      const noodle = menuNoodles.filter(n => n.stock > 0).sort((x, y) => y.stock - x.stock)[0];
+      if (!noodle) {
+        stopReason = "Hết mì trong kho";
+        break;
+      }
+      if (!supplyOk(BOWL_SUPPLIES)) {
+        const lack = BOWL_SUPPLIES.map(id => st.supplies[id]).find(sup => sup && sup.stock <= 0);
+        stopReason = `Hết ${lack ? lack.name : "nguyên liệu phụ"}`;
+        break;
+      }
+      noodle.stock -= 1;
+      BOWL_SUPPLIES.forEach(id => { if (st.supplies[id]) st.supplies[id].stock -= 1; });
+      revenue += noodle.price || noodle.basePrice || 0;
+      soldNoodles[noodle.name] = (soldNoodles[noodle.name] || 0) + 1;
+      bowls += 1;
+
+      drinkAcc += drinkRate;
+      if (drinkAcc >= 1) {
+        drinkAcc -= 1;
+        const drink = menuDrinks.filter(d => d.stock > 0).sort((x, y) => y.stock - x.stock)[0];
+        if (drink && supplyOk(DRINK_SUPPLIES)) {
+          drink.stock -= 1;
+          DRINK_SUPPLIES.forEach(id => { if (st.supplies[id]) st.supplies[id].stock -= 1; });
+          revenue += drink.price || drink.basePrice || 0;
+          soldDrinks[drink.name] = (soldDrinks[drink.name] || 0) + 1;
+          drinks += 1;
+        }
+      }
+    }
+
+    const tips = Math.round(revenue * 0.06 * (staff.mochi ? 1.35 : 1));
+    const commission = Math.round((revenue + tips) * OFFLINE_MANAGER_COMMISSION);
+    // Chỉ tính mặt bằng & điện nước cho khoảng thời gian quán thực sự mở bán
+    const openMinutes = stopReason ? (capacity > 0 ? Math.ceil(minutes * (bowls / capacity)) : 0) : minutes;
+    const utilities = bowls > 0 ? Math.round(this.getDailyRentCost() * (openMinutes / OFFLINE_DAILY_CAP_MIN)) : 0;
+    const netProfit = Math.max(0, revenue + tips - commission - utilities);
+
+    return { capacity, openMinutes, bowls, drinks, revenue, tips, commission, utilities, netProfit, soldNoodles, soldDrinks, stopReason };
+  }
+
+  checkOfflineEarnings() {
+    const now = Date.now();
+    const off = this.ensureOfflineState();
+    const last = Number(this.state.lastActiveTime) || 0;
+
+    // Đồng hồ máy đang lùi so với lần hoạt động cuối (từng tua giờ lên trước) -> giữ nguyên mốc,
+    // phải chờ thời gian thật vượt qua mốc đó mới được tính tiếp
+    if (last && now < last) {
+      console.warn("[Offline] Đồng hồ thiết bị lùi so với lần chơi trước, tạm dừng doanh thu offline.");
+      return null;
+    }
+    this.state.lastActiveTime = now;
+
+    if (!last || !this.state.day || this.state.day < OFFLINE_UNLOCK_DAY) return null;
+
+    const elapsedMinutes = Math.floor((now - last) / 60000);
+    if (elapsedMinutes < OFFLINE_MIN_MINUTES) return null;
+
+    const today = this.localDateKey(now);
+    if (off.capDate !== today) {
+      off.capDate = today;
+      off.minutesUsedToday = 0;
+    }
+    const remaining = Math.max(0, OFFLINE_DAILY_CAP_MIN - off.minutesUsedToday);
+    const minutes = Math.min(elapsedMinutes, remaining);
+
+    const result = minutes > 0
+      ? this.simulateOfflineSales(minutes)
+      : { capacity: 0, bowls: 0, drinks: 0, revenue: 0, tips: 0, commission: 0, utilities: 0, netProfit: 0, soldNoodles: {}, soldDrinks: {}, stopReason: "" };
+
+    // Chỉ trừ hạn mức cho thời gian quán thực sự mở bán (đóng sớm vì hết hàng thì không mất phần còn lại)
+    off.minutesUsedToday += result.openMinutes || 0;
+    this.state.money += result.netProfit;
+    this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + result.netProfit;
+    this.state.stats.bowlsServed = (this.state.stats.bowlsServed || 0) + result.bowls;
+    this.state.stats.drinksServed = (this.state.stats.drinksServed || 0) + result.drinks;
+    this.state.stats.tipsEarned = (this.state.stats.tipsEarned || 0) + result.tips;
+    off.totalOfflineProfit += result.netProfit;
+    off.totalOfflineBowls += result.bowls;
+    if (result.bowls > 0) off.totalShifts += 1;
+
+    const report = Object.assign({ at: now, elapsedMinutes, minutes, usedToday: off.minutesUsedToday }, result);
+    off.lastReport = report;
+    off.history.unshift({ at: now, minutes: result.openMinutes || 0, bowls: result.bowls, netProfit: result.netProfit });
+    if (off.history.length > 10) off.history.length = 10;
+
+    // Lưu ngay để tải lại trang không nhận thưởng thêm lần nữa
+    this.saveGame();
+    setTimeout(() => this.showOfflineRevenueModal(report), 800);
+    return report;
+  }
+
+  // Theo dõi thời điểm hoạt động: ẩn tab lâu rồi quay lại cũng được tính doanh thu offline
+  initOfflineTracking() {
+    if (this.offlineTrackingReady) return;
+    this.offlineTrackingReady = true;
+
+    setInterval(() => {
+      if (document.visibilityState === "visible") this.saveGame();
+    }, 30000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        this.saveGame();
+      } else if (this.state.dayPhase === "prep") {
+        if (this.checkOfflineEarnings()) this.renderAll();
+      } else {
+        // Đang trong ca bán: game vẫn chạy nền nên chỉ cập nhật mốc thời gian
+        this.saveGame();
+      }
+    });
+    window.addEventListener("pagehide", () => this.saveGame());
+  }
+
+  formatOfflineDuration(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return h > 0 ? `${h} giờ ${m} phút` : `${m} phút`;
+  }
+
+  showOfflineRevenueModal(r) {
+    const existing = document.getElementById("offline-revenue-modal");
+    if (existing) existing.remove();
+
+    const vnd = v => txaformat.formatVND(v);
+    const capText = this.formatOfflineDuration(OFFLINE_DAILY_CAP_MIN);
+    const itemList = Object.entries(Object.assign({}, r.soldNoodles, r.soldDrinks))
+      .map(([name, qty]) => `<div class="offline-report-row"><span class="offline-row-label">• ${escapeOfflineHtml(name)}</span><span class="offline-row-value">x${qty}</span></div>`)
+      .join("");
+
+    let notice = "";
+    if (r.minutes === 0) {
+      notice = `Đã dùng hết ${capText} bán offline hôm nay. Quản Lý Ca Trực nghỉ, quán đóng cửa tới ngày mai.`;
+    } else if (r.bowls === 0) {
+      notice = `Quán không bán được tô nào: ${escapeOfflineHtml(r.stopReason || "kho trống")}. Hãy nhập thêm hàng trước khi rời tiệm!`;
+    } else if (r.stopReason) {
+      notice = `Quán phải đóng sớm vì ${escapeOfflineHtml(r.stopReason.toLowerCase())}. Nhập thêm hàng để lần sau bán được lâu hơn!`;
+    } else if (r.minutes < r.elapsedMinutes) {
+      notice = `Bạn vắng ${this.formatOfflineDuration(r.elapsedMinutes)}, nhưng mỗi ngày chỉ được tính tối đa ${capText} bán offline.`;
+    }
+
+    const overlay = document.createElement("div");
+    overlay.id = "offline-revenue-modal";
+    overlay.className = "offline-report-overlay";
+    overlay.innerHTML = `
+      <div class="offline-report-card anime-bounce-in">
+        <div class="offline-report-header">
+          <div class="offline-manager-avatars">🍜 🦊</div>
+          <h2 class="offline-report-title">BÁO CÁO DOANH THU OFFLINE</h2>
+          <div class="offline-report-sub">Quản Lý Ca Trực đã thay bạn bán hàng trong lúc vắng mặt.</div>
+        </div>
+
+        <div class="offline-report-table-box">
+          <div class="offline-report-row">
+            <span class="offline-row-label">⏱️ Thời gian vắng mặt:</span>
+            <span class="offline-row-value">${this.formatOfflineDuration(r.elapsedMinutes)}</span>
+          </div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">🏪 Thời gian quán mở bán:</span>
+            <span class="offline-row-value">${this.formatOfflineDuration(r.openMinutes || 0)}</span>
+          </div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">🗓️ Đã dùng hôm nay:</span>
+            <span class="offline-row-value">${this.formatOfflineDuration(r.usedToday)} / ${capText}</span>
+          </div>
+          <div class="offline-row-divider"></div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">🍜 Tô mì đã bán:</span>
+            <span class="offline-row-value">${r.bowls} tô</span>
+          </div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">🧋 Ly nước đã bán:</span>
+            <span class="offline-row-value">${r.drinks} ly</span>
+          </div>
+          ${itemList}
+          <div class="offline-row-divider"></div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">🟢 Doanh thu bán hàng:</span>
+            <span class="offline-row-value text-green">+${vnd(r.revenue)}</span>
+          </div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">💖 Tiền boa thực khách:</span>
+            <span class="offline-row-value text-green">+${vnd(r.tips)}</span>
+          </div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">🔴 Hoa hồng Quản Lý (${Math.round(OFFLINE_MANAGER_COMMISSION * 100)}%):</span>
+            <span class="offline-row-value text-red">-${vnd(r.commission)}</span>
+          </div>
+          <div class="offline-report-row">
+            <span class="offline-row-label">🔴 Mặt bằng & điện nước:</span>
+            <span class="offline-row-value ${r.utilities ? "text-red" : ""}">${this.state.ownedFlagship ? "0đ (Sổ Đỏ Flagship 🏛️)" : `-${vnd(r.utilities)}`}</span>
+          </div>
+        </div>
+
+        ${notice ? `<div class="offline-report-notice">⚠️ ${notice}</div>` : ""}
+
+        <div class="offline-green-card">
+          <div class="offline-green-badge">${r.netProfit > 0 ? "✅ ĐÃ CỘNG VÀO KÉT QUÁN" : "KHÔNG CÓ LỢI NHUẬN"}</div>
+          <div class="offline-green-amount">+${vnd(r.netProfit)}</div>
+          <div class="offline-green-sub">Nguyên liệu đã bán được trừ trực tiếp trong kho.</div>
+        </div>
+
+        <button class="btn-offline-confirm" id="btn-close-offline-report">Đã Hiểu 💖</button>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    if (this.sound && r.netProfit > 0) this.sound.playCoinChime();
+
+    const btnClose = overlay.querySelector("#btn-close-offline-report");
+    if (btnClose) {
+      btnClose.onclick = () => {
+        overlay.classList.add("fade-out");
+        setTimeout(() => overlay.remove(), 250);
+        this.renderAll();
+      };
+    }
   }
 
   resetGame() {
@@ -1065,6 +1392,12 @@ export class SpicyNoodleGame {
       moneyEl.textContent = txaformat.formatVND(this.state.money);
     }
 
+    // Điểm Danh Tiếng uy tín của tiệm ⭐
+    const repEl = document.getElementById("display-reputation");
+    if (repEl) {
+      repEl.textContent = `${this.state.reputation || 30} ⭐`;
+    }
+
     // Tính điểm đánh giá sao chuẩn xác từ reviews
     const hasReviews = this.state.reviews && this.state.reviews.length > 0;
     if (hasReviews) {
@@ -1076,8 +1409,8 @@ export class SpicyNoodleGame {
       if (starsEl) starsEl.innerHTML = `<b class="hud-star-num">${avgExact.toFixed(1)}</b>${starString}`;
       if (reviewsEl) reviewsEl.textContent = `${this.state.reviews.length} đánh giá`;
     } else {
-      if (starsEl) starsEl.innerHTML = '<b class="hud-star-num">0.0</b>☆☆☆☆☆';
-      if (reviewsEl) reviewsEl.textContent = "Chưa có đánh giá";
+      if (starsEl) starsEl.innerHTML = '<b class="hud-star-num">5.0</b>★★★★★';
+      if (reviewsEl) reviewsEl.textContent = "Khai trương";
     }
 
     // Cập nhật số lượng khách đang ngồi ăn trực tiếp tại các bàn
@@ -1738,6 +2071,23 @@ export class SpicyNoodleGame {
     const listEl = document.getElementById("staff-list");
     if (!listEl) return;
 
+    // Render banner hướng dẫn cày Danh Tiếng
+    const bannerWrap = document.getElementById("staff-reputation-banner-wrap");
+    if (bannerWrap) {
+      bannerWrap.innerHTML = `
+        <div class="staff-rep-banner" onclick="window.game.openReputationGuide()" title="Bấm để xem bí kíp cày điểm Danh Tiếng">
+          <div class="staff-rep-banner-left">
+            <span class="staff-rep-banner-icon">⭐</span>
+            <div>
+              <div class="staff-rep-banner-title">Danh Tiếng Quán: <b style="color: #D97706;">${this.state.reputation || 30} ⭐</b></div>
+              <div class="staff-rep-banner-sub">Cần đủ điểm để ký hợp đồng nhân sự. Bấm xem mẹo cày điểm! 💡</div>
+            </div>
+          </div>
+          <button class="btn-rep-guide-action" type="button">Cách Cày ⭐</button>
+        </div>
+      `;
+    }
+
     const staffConfig = [
       { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Chào đón khách nồng hậu & tăng +25% tiền tip", cost: 450, dailyWage: 35, minDay: 2, minRep: 25, icon: "🐱" },
       { key: "usagi", name: "Thỏ Usagi (Bưng bê niêu đất)", desc: "Tự động bưng mì nóng hổi ra bàn khi nấu xong", cost: 850, dailyWage: 45, minDay: 4, minRep: 50, icon: "🐰" },
@@ -1773,7 +2123,7 @@ export class SpicyNoodleGame {
           </div>
           <div>
             ${isHired ? `<span class="staff-badge-working">✨ Đang làm việc</span>` : (
-              !isUnlocked ? `<span class="staff-lock-badge">🔒 Ngày ${st.minDay} · ${st.minRep}⭐</span>` : `
+              !isUnlocked ? `<span class="staff-lock-badge" onclick="window.game.openReputationGuide()" style="cursor: pointer;" title="Bấm xem cách cày điểm">🔒 Ngày ${st.minDay} · ${st.minRep}⭐</span>` : `
               <button class="btn-menu-action btn-buy-lock" onclick="window.game.hireStaff('${st.key}', ${st.cost}, ${st.minDay}, ${st.minRep})">
                 <span class="btn-price-top">${st.cost}k</span>
                 <span class="btn-action-sub">Ký Hợp Đồng</span>
@@ -1791,7 +2141,7 @@ export class SpicyNoodleGame {
       return;
     }
     if ((this.state.reputation || 0) < minRep) {
-      GameUIModal.showToast(`Tiệm cần đạt tối thiểu ${minRep}⭐ Danh tiếng để chiêu mộ nhân sự này!`, "warning", "⭐");
+      GameUIModal.showToast(`Tiệm cần đạt tối thiểu ${minRep}⭐ Danh tiếng (hiện có: ${this.state.reputation || 30}⭐)! Hãy phục vụ khách 5★ và vào Tab 4 trả lời đánh giá để cày điểm nhé!`, "warning", "⭐", 3500);
       return;
     }
     if (this.state.money < cost) {
@@ -2394,6 +2744,45 @@ export class SpicyNoodleGame {
       totalEarnedDisplay.textContent = `Tổng lãi nhận: +${txaformat.formatVND(this.state.bank.totalInterestEarned || 0)} 🪙`;
     }
 
+    // Cập nhật hạn mức tiền gửi tại Ngân Hàng Tiết Kiệm Mì Cay
+    const maxDepositLimit = this.getBankDepositLimit();
+    const limitDisplay = document.getElementById("bank-max-deposit-limit-text");
+    if (limitDisplay) {
+      limitDisplay.textContent = txaformat.formatVND(maxDepositLimit);
+    }
+
+    // Hiển thị Thẻ Bất Động Sản Mặt Bằng Flagship (Sổ Đỏ Vĩnh Viễn)
+    const flagshipContainer = document.getElementById("flagship-real-estate-container");
+    if (flagshipContainer) {
+      const isOwned = Boolean(this.state.ownedFlagship);
+      flagshipContainer.innerHTML = `
+        <div class="flagship-estate-card">
+          <div class="flagship-estate-sub">🏢 BẤT ĐỘNG SẢN & MẶT BẰNG FLAGSHIP</div>
+          <div class="flagship-estate-title">
+            <span>Mặt Bằng Trụ Sở Anime Flagship</span>
+          </div>
+          ${isOwned ? `
+            <div class="flagship-status-pill">
+              <span>✅ ĐÃ SỞ HỮU SỔ ĐỎ CHÍNH CHỦ</span>
+            </div>
+            <div class="flagship-estate-desc">
+              🎉 Bạn đã mua đứt toàn bộ mặt bằng tòa nhà trụ sở! Quán được <b>miễn phí 100% chi phí thuê mặt bằng và điện nước vận hành trọn đời</b>.
+            </div>
+          ` : `
+            <div class="flagship-status-pill pending">
+              <span>⏳ ĐANG THUÊ HÀNG NGÀY</span>
+            </div>
+            <div class="flagship-estate-desc">
+              Sở hữu sổ đỏ vĩnh viễn mặt bằng đắc địa tại ngã tư anime. <b>Miễn phí hoàn toàn 100% tiền thuê nhà và phí điện nước mỗi ngày</b> từ ngày mua trở đi!
+            </div>
+            <button class="btn-buy-flagship" onclick="window.game.buyFlagshipRealEstate()">
+              🏛️ Mua Đứt Mặt Bằng (${txaformat.formatVND(50000)})
+            </button>
+          `}
+        </div>
+      `;
+    }
+
     const tortoActive = !!this.state.staff.torto;
     const currentPlan = this.state.bank.activePlan || "flexi";
 
@@ -2524,9 +2913,45 @@ export class SpicyNoodleGame {
     }
   }
 
+  getBankDepositLimit() {
+    // Hạn mức tiền gửi tại Ngân Hàng Tiết Kiệm Mì Cay
+    // Hạn mức cơ sở: 50.000k (50 triệu VNĐ)
+    // Mỗi đánh giá 5 sao ⭐ tích lũy được trong quán mở rộng thêm +1.000k (1 triệu VNĐ) hạn mức
+    const fiveStarCount = (this.state.reviews || []).filter(r => r.stars === 5).length;
+    return 50000 + (fiveStarCount * 1000);
+  }
+
+  buyFlagshipRealEstate() {
+    if (this.state.ownedFlagship) {
+      GameUIModal.showToast("🏛️ Bạn đã sở hữu Sổ Đỏ Vĩnh Viễn của Mặt Bằng Flagship này rồi!", "info", "📜");
+      return;
+    }
+
+    const price = 50000; // 50.000k = 50 triệu VNĐ
+    if ((this.state.money || 0) < price) {
+      GameUIModal.showToast(`Bạn chưa đủ tiền mặt! Cần ${txaformat.formatVND(price)} (hiện có ${txaformat.formatVND(this.state.money || 0)}) để mua đứt mặt bằng!`, "warning", "💸", 3500);
+      return;
+    }
+
+    this.state.money -= price;
+    this.state.ownedFlagship = true;
+    this.sound.playUpgradeFanfare();
+    GameUIModal.showToast("🎉 CHÚC MỪNG! BẠN ĐÃ MUA ĐỨT MẶT BẰNG & NHẬN SỔ ĐỎ FLAGSHIP VĨNH VIỄN! MIỄN PHÍ TIỀN THUÊ TRỌN ĐỜI!", "success", "🏛️", 5000);
+    this.saveGame();
+    this.renderHeader();
+    this.renderBankTab();
+  }
+
   depositToBank(amount) {
     if (this.state.dayPhase === "open") {
       GameUIModal.showToast("Quán đang trong ca bán bận rộn! Hãy gửi tiền sau giờ đóng cửa nhé!", "info", "⏱️");
+      return;
+    }
+
+    const maxLimit = this.getBankDepositLimit();
+    const currentSavings = this.state.bank.savings || 0;
+    if (currentSavings >= maxLimit) {
+      GameUIModal.showToast(`🛡️ Sổ tiết kiệm đã chạm trần hạn mức ${txaformat.formatVND(maxLimit)}! Hãy phục vụ thêm khách 5★ để mở rộng hạn mức!`, "warning", "⚠️", 3500);
       return;
     }
 
@@ -2540,6 +2965,11 @@ export class SpicyNoodleGame {
     if (val <= 0 || this.state.money < val) {
       GameUIModal.showToast("Ví tiền mặt của bạn không đủ để gửi tiết kiệm số tiền này!", "warning", "⚠️");
       return;
+    }
+
+    if (currentSavings + val > maxLimit) {
+      val = maxLimit - currentSavings;
+      GameUIModal.showToast(`🛡️ Đã điều chỉnh tiền gửi về hạn mức tối đa cho phép: ${txaformat.formatVND(val)} (Trần: ${txaformat.formatVND(maxLimit)})`, "info", "🏦", 3000);
     }
 
     this.state.money -= val;
@@ -2660,7 +3090,7 @@ export class SpicyNoodleGame {
     rev.ownerReply = "Dạ Bếp Trưởng chân thành xin lỗi bạn nhiều! Tiệm xin phép gửi tặng bạn Voucher giảm giá 20% và đền bù 1 ly Trà Sữa Trân Châu full topping mát lạnh vào lần sau nhé! Mong bạn luôn vui vẻ và thứ lỗi cho quán ạ! 🧋💖";
     rev.customerFeedback = "Khách cảm động: Ôi chủ tiệm chu đáo và xử lý khiếu nại quá chuyên nghiệp! Em xóa tan mọi ấm ức liền, đổi ngay lên 5 sao cho quán! Sẽ rủ hội bạn ghé ủng hộ tiệm hoài hoài luôn ạ! 🥰✨🍜";
 
-    this.state.reputation = Math.min(100, (this.state.reputation || 30) + 3);
+    this.state.reputation = Math.min(1000, (this.state.reputation || 30) + 3);
 
     if (this.sound) {
       this.sound.playCoinChime();
@@ -2849,73 +3279,84 @@ export class SpicyNoodleGame {
     rev.replied = true;
     rev.ownerReply = replyText;
 
-    // Phản hồi phản ứng thực tế của khách hàng (Interactive customer comeback với cảm xúc chân thực)
-    const isHostile = /đ[j|i|ụ]t|cút|biến|ngu|chó|đm|vcl|vđ|đéo|mày|tao|chửi|kệ/i.test(replyText);
-    const isApology = /xin lỗi|bù|tặng|thông cảm|cải thiện|khắc phục|chân thành|sơ suất|mong bạn|ghi nhận/i.test(replyText);
-    const isHumorous = /haha|hihi|hehe|kkk|vui|dễ thương|iu|yêu|bắt đền|ahihi|hài/i.test(replyText);
+    // Phân tích văn phong chủ quán
+    const isHostile = /đ[j|i|ụ]t|cút|biến|ngu|chó|đm|vcl|vđ|đéo|mày|tao|chửi|kệ|xé|lồn|buồi|cặc|mẹ|bố|đừng ăn|chê|hãm|không ăn thì|ai mượn|tự nấu/i.test(replyText);
+    const isApology = /xin lỗi|bù|tặng|thông cảm|cải thiện|khắc phục|chân thành|sơ suất|mong bạn|ghi nhận|ạ|em xin|tiệm xin lỗi/i.test(replyText);
+    const isHumorous = /haha|hihi|hehe|kkk|vui|dễ thương|iu|yêu|bắt đền|ahihi|hài|múa mì/i.test(replyText);
     const isExplanation = /đông|quá tải|bếp|cháy hàng|hết bàn|chờ lâu|giờ cao điểm/i.test(replyText);
     const isCurious = /hả|sao|văn phong|gì|thế|ủa/i.test(replyText);
 
     if (isHostile) {
-      // Chủ quán văng tục / phản hồi thô lỗ -> Khách phẫn nộ đòi bóc phốt
+      // Chủ quán văng tục / phản hồi thô lỗ -> Khách cà khịa lại cực gắt (Chuẩn ảnh feedback Issue #6)
       const hostileReplies = [
-        "Ủa chủ quán chửi khách luôn hả trời?! Thái độ côn đồ vậy, chụp màn hình bóc phốt lên mạng ngay! 😡💥 (-3 ⭐ Uy tín)",
-        "Khách góp ý thật lòng mà chủ tiệm văng tục chửi bới? Tẩy chay tiệm vĩnh viễn, mọi người né quán này ra nhé! 🚫 (-3 ⭐ Uy tín)",
-        "Thái độ bán hàng kiểu vô học thế này thì sớm muộn cũng sập tiệm thôi! Quá coi thường khách hàng! 💢 (-3 ⭐ Uy tín)"
+        "Không biết ai là khách ai là chủ luôn á. Bán hàng kiểu này khuyên thật nên giải nghệ sớm! 🙄 (-3 ⭐)",
+        "Ủa rồi ai là thượng đế? Trả lời khách sồn sồn như đỉa phải vôi, sợ quán xỉu luôn! 💅 (-3 ⭐)",
+        "Bán mì cay mà tính tình cay cú hơn cả ớt hiểm cấp 7 vậy chủ quán?! Nhường quán đệ nhất xéo xắt luôn á! 🌶️😂 (-3 ⭐)",
+        "Ăn tô mì trả tiền đàng hoàng chứ có xin xỏ đâu mà chủ quán sồn sồn lên vậy? Quê giùm luôn á! 🤡 (-3 ⭐)",
+        "Quán mở ra để bán đồ ăn hay để combat tay đôi với khách vậy? Chụp màn hình bóc phốt liền tay! 📸💥 (-3 ⭐)",
+        "Không biết ai là khách ai là chủ luôn á. Bỏ tiền đi ăn mà tưởng đi thỉnh kinh bị chửi tơi bời! 1 sao vĩnh viễn! 🚫 (-3 ⭐)",
+        "Phục vụ thì chậm như rùa bò mà cái mồm thì nhanh như chớp. 1 sao vĩnh viễn không nói nhiều! 🚫 (-3 ⭐)"
       ];
       rev.customerFeedback = hostileReplies[Math.floor(Math.random() * hostileReplies.length)];
       rev.stars = Math.max(1, (rev.stars || 1) - 1);
-      this.state.reputation = Math.max(5, this.state.reputation - 5);
-      GameUIModal.showToast("Chủ tiệm phản hồi thô lỗ! Khách phẫn nộ đòi bóc phốt (-3 ⭐ Uy tín)!", "warning", "💥");
+      this.state.reputation = Math.max(5, (this.state.reputation || 30) - 5);
+      GameUIModal.showToast("Chủ tiệm phản hồi thô lỗ! Khách cà khịa lại cực gắt (-5 ⭐ Danh tiếng)!", "warning", "💥");
     } else if (rev.stars <= 2) {
       if (isApology) {
         const apologyReplies = [
-          "Dạ không sao đâu ạ, thấy chủ quán chân thành lắng nghe là em vui rồi. Em sẽ quay lại ủng hộ tiệm tiếp ạ! 🥰 (+1 ⭐ Hòa giải)",
-          "Chủ tiệm phản hồi tử tế thế này thì em giận sao được nữa nè! Lần tới nhớ làm tô mì thật ngon cho em nha! 💖 (+1 ⭐ Hòa giải)",
-          "Dạ cảm ơn tiệm đã quan tâm đến trải nghiệm của khách! Em xóa giận rồi, tiệm cố lên nhé! ✨ (+1 ⭐ Hòa giải)"
+          "Thấy chủ quán nhận lỗi chân thành, thôi thì trừ bớt một nửa ấm ức. Lần sau làm ẩu nữa là em khịa tiếp đó nha! 😌✨ (+1 ⭐ Hòa giải)",
+          "Tưởng chủ tiệm tính cãi tay đôi, ai dè xin lỗi ngọt sớt. Được rồi em xóa giận 1 nốt nhạc, nhớ lần tới đền tô mì thật ngon cho em nha! 💖 (+1 ⭐ Hòa giải)",
+          "Dạ thôi em tạm tha, chủ quán biết điều vậy là vui rồi. Chúc tiệm cải thiện tốt nhé! 🍲 (+1 ⭐ Hòa giải)",
+          "Chủ tiệm phản hồi tử tế thế này thì em giận sao được nữa nè! Lần tới nhớ bưng đúng món cho em nha! 💖 (+1 ⭐ Hòa giải)"
         ];
         rev.customerFeedback = apologyReplies[Math.floor(Math.random() * apologyReplies.length)];
         rev.stars = Math.min(5, rev.stars + 1);
-        this.state.reputation = Math.min(100, this.state.reputation + 4);
+        this.state.reputation = Math.min(1000, this.state.reputation + 4);
         GameUIModal.showToast("Lời xin lỗi chân thành đã xoa dịu khách! Khách tăng +1 ⭐ hòa giải!", "success", "💖");
       } else if (isHumorous) {
-        rev.customerFeedback = "Haha chủ quán rep lầy lội và dễ thương ghê! Thôi em bỏ qua nhé, hôm nào rủ bạn qua ăn tiếp! 😆 (+5k Tip)";
+        const humorousReplies = [
+          "Haha chủ tiệm lầy lội y chang mấy đứa bạn em! Thôi em cười trừ chứ giận gì nổi nữa trời! 😆 (+5k Tip)",
+          "Chủ quán duyên dáng vậy thì trừ sao làm sao đặng. Thôi gửi thêm cái tim, mai em lại ghé bắt đền niêu mì siêu cay nè! 💖 (+5k Tip)",
+          "Đang bực mình mà đọc câu rep của chủ quán cười xỉu. Thôi bỏ qua hết, nể độ hài hước của tiệm đấy nhé! 🤣 (+5k Tip)"
+        ];
+        rev.customerFeedback = humorousReplies[Math.floor(Math.random() * humorousReplies.length)];
         this.state.money += 5;
         this.state.todayTips += 5;
-        this.state.reputation = Math.min(100, this.state.reputation + 2);
-        GameUIModal.showToast("Sự hài hước đã làm khách vui vẻ bỏ qua! (+5k Tip)", "coin", "🪙");
+        this.state.reputation = Math.min(1000, this.state.reputation + 3);
+        GameUIModal.showToast("Sự hài hước đã làm khách vui vẻ bỏ qua! (+5k Tip · +3 ⭐ Danh tiếng)", "coin", "🪙");
       } else if (isExplanation) {
         rev.customerFeedback = "Dạ em hiểu lúc đó quán đông nghẹt rồi, buôn bán vất vả mà. Lần tới em sẽ lựa giờ vắng hơn ghé ủng hộ nhé! 👍";
-        this.state.reputation = Math.min(100, this.state.reputation + 2);
-        GameUIModal.showToast("Khách đã thấu hiểu cho giờ cao điểm của quán!", "info", "💌");
+        this.state.reputation = Math.min(1000, this.state.reputation + 2);
+        GameUIModal.showToast("Khách đã thấu hiểu cho giờ cao điểm của quán! (+2 ⭐)", "info", "💌");
       } else if (isCurious) {
         rev.customerFeedback = "Dạ em nhận xét trải nghiệm thực tế hôm đi ăn á chủ tiệm ơi! Mong quán tiếp thu để ngày càng đông khách nha! 🍜";
-        this.state.reputation = Math.min(100, this.state.reputation + 1);
-        GameUIModal.showToast("Khách đã chia sẻ chân thành với bạn!", "info", "💌");
+        this.state.reputation = Math.min(1000, this.state.reputation + 1);
+        GameUIModal.showToast("Khách đã chia sẻ chân thành với bạn! (+1 ⭐)", "info", "💌");
       } else {
-        const neutralReplies = [
-          "Dạ em đã đọc phản hồi rồi, hy vọng lần tới ghé lại sẽ thấy sự thay đổi tích cực từ quán ạ! ✨",
-          "Cảm ơn tiệm đã đọc feedback, chúc tiệm buôn may bán đắt và cải thiện chất lượng nhé! 🍜",
-          "Ghi nhận lời của chủ quán, em sẽ rủ bạn bè ghé thử lại xem sao nhé! 👍",
-          "Dạ mong tiệm nói được làm được, hoàn thiện tốc độ phục vụ trong các ca bán tới nha tiệm!"
+        // Phản hồi cùn / bao biện / qua loa -> Khách khịa nhẹ
+        const sarcasticReplies = [
+          "Nói câu nghe huề vốn ghê, mong quán sửa cái nết trước khi sửa công thức nấu mì nhé! 🙃",
+          "Lý do lý trấu hoài, đồ ăn dở với chậm thì nhận đi cho mau tiến bộ chủ quán ơi! 🥱",
+          "Thôi tiệm tự nấu tự ăn tự chấm 5 sao đi chứ ai hầu nổi cái nết phục vụ này! 💁‍♀️",
+          "Dạ em ghi nhận tiệm đã đọc tin, nhưng lần sau mà còn làm sai nữa là em cho 1 sao không gỡ đâu á! 😤"
         ];
-        rev.customerFeedback = neutralReplies[Math.floor(Math.random() * neutralReplies.length)];
-        this.state.reputation = Math.min(100, this.state.reputation + 1);
-        GameUIModal.showToast("Khách đã ghi nhận phản hồi của bạn!", "info", "💌");
+        rev.customerFeedback = sarcasticReplies[Math.floor(Math.random() * sarcasticReplies.length)];
+        this.state.reputation = Math.min(1000, this.state.reputation + 1);
+        GameUIModal.showToast("Khách đã đọc phản hồi và khịa lại nhẹ nhàng!", "info", "💌");
       }
     } else if (rev.stars === 3) {
       if (isApology || isHumorous) {
         const midNiceReplies = [
-          "Dạ tiệm nấu nhanh hơn xíu là 10 điểm không có nhưng luôn á! Em gửi thêm 5k tip nha ✨ (+5k Tip)",
-          "Cảm ơn tiệm đã lắng nghe ý kiến! Em thích thái độ cầu thị này, lần sau em sẽ tiếp tục ủng hộ! 👍 (+5k Tip)",
-          "Chủ quán dễ thương xỉu! Lần tới ghé em sẽ thử mì cấp cao hơn xem sao nè! 🍜 (+5k Tip)"
+          "Nói chuyện dễ thương vậy thì lần sau em ghé tiếp. Nhớ nấu nhanh hơn chút nha chứ em đói em quạu á! 🍜 (+5k Tip)",
+          "Chủ tiệm tiếp thu tốt ghê! Tặng tiệm 5k tip động viên nè, ráng phát huy nhé! 👍 (+5k Tip)",
+          "Haha nghe chủ quán dỗ ngọt quá chừng! Lần tới ghé em sẽ thử mì cấp cao hơn xem sao nè! ✨ (+5k Tip)"
         ];
         rev.customerFeedback = midNiceReplies[Math.floor(Math.random() * midNiceReplies.length)];
       } else {
         const midReplies = [
-          "Dạ tiệm nấu nhanh hơn xíu là 10 điểm không có nhưng luôn á! Lần sau em ghé lại nè ✨ (+5k Tip)",
-          "Cảm ơn tiệm đã lắng nghe ý kiến! Em thích thái độ cầu thị này, lần sau em sẽ tiếp tục ủng hộ! 👍 (+5k Tip)",
-          "Dạ em cảm ơn chủ quán phản hồi nha! Hy vọng lần tới ghé tiệm sẽ không phải chờ lâu nữa nè! 🍜 (+5k Tip)"
+          "Dạ tiệm nấu nhanh hơn xíu là 10 điểm không có nhưng luôn á! Nhớ rút kinh nghiệm nha tiệm! 🍜 (+5k Tip)",
+          "Em lướt hết series TikTok mới có mì ăn, hy vọng lần tới tiệm nhanh nhẹn hơn tí xíu nhé! 📱 (+5k Tip)",
+          "Ghi nhận lời chủ quán, bữa sau ghé mà còn bắt chờ lâu là em trừ tiếp 1 sao nữa đó! 😜 (+5k Tip)"
         ];
         rev.customerFeedback = midReplies[Math.floor(Math.random() * midReplies.length)];
       }
@@ -2923,8 +3364,8 @@ export class SpicyNoodleGame {
       this.state.todayTips += 5;
       this.state.stats.tipsEarned += 5;
       this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + 5;
-      this.state.reputation = Math.min(100, this.state.reputation + 3);
-      GameUIModal.showToast("Khách gửi thêm +5k tiền tip động viên tiệm!", "coin", "🪙");
+      this.state.reputation = Math.min(1000, this.state.reputation + 3);
+      GameUIModal.showToast("Khách gửi thêm +5k tip động viên! (+3 ⭐ Danh tiếng)", "coin", "🪙");
     } else {
       const positiveReplies = [
         "Mì ngon đỉnh chóp luôn tiệm ơi! Em sẽ rủ cả hội bạn thân và đồng nghiệp ghé ăn ủng hộ tiệm dài dài! Yêu quán nhiều! 💖 (+8k Tip)",
@@ -2937,8 +3378,8 @@ export class SpicyNoodleGame {
       this.state.todayTips += 8;
       this.state.stats.tipsEarned += 8;
       this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + 8;
-      this.state.reputation = Math.min(100, this.state.reputation + 4);
-      GameUIModal.showToast("Khách khen nức nở và gửi tặng +8k tip! (+4 ⭐ Uy tín)", "coin", "✨");
+      this.state.reputation = Math.min(1000, this.state.reputation + 4);
+      GameUIModal.showToast("Khách khen nức nở và gửi tặng +8k tip! (+4 ⭐ Danh tiếng)", "coin", "✨");
     }
 
     this.sound.playReviewChime();
@@ -4162,9 +4603,9 @@ export class SpicyNoodleGame {
       stars = Math.min(5, stars + 1);
       if (stars === 5) {
         const viralComments = [
-          `Xem TikTok thấy quán viral rần rần nên ghé thử, quả thực mì cay & trà sữa boba ngon đỉnh nóc kịch trần! 🦉💖 5 sao!`,
-          `Check-in tiệm theo review của Cú Mèo Owl, không gian cực chill, mì ngon trà sữa béo ngậy, bão like liền! ⭐⭐⭐⭐⭐`,
-          `Món ăn chất lượng, trà sữa chuẩn vị tiệm boba anime! Đúng là quán hot trend nhất khu phố! 🌟🧋`
+          `Xem TikTok thấy quán viral rần rần nên ghé thử, quả thực mì ${noodle.name} cấp ${order.spicyLevel} nước dùng sôi sùng sục cay ngon đỉnh nóc kịch trần! 🦉💖 5 sao!`,
+          `Check-in tiệm theo review của Cú Mèo Owl, không gian cực chill, niêu ${noodle.name} đậm đà thơm phức bão like liền! ⭐⭐⭐⭐⭐`,
+          `Món ăn chất lượng, mì cay chuẩn vị 7 cấp độ! Đúng là quán hot trend nhất khu phố! 🌟🍜`
         ];
         comment = viralComments[Math.floor(Math.random() * viralComments.length)];
       }
@@ -4200,12 +4641,22 @@ export class SpicyNoodleGame {
         : `Gọi kèm ${missingDrink ? (order.drinkName || "đồ uống") : (order.toppingName || "topping")} mà quán báo hết, tiếc ghê! Mì thì vẫn ổn. 🙂`;
     }
 
-    if (stars === 5) this.state.reputation = Math.min(100, this.state.reputation + 2);
-    else if (stars === 4) this.state.reputation = Math.min(100, this.state.reputation + 1);
-    else if (stars <= 2) this.state.reputation = Math.max(5, this.state.reputation - 2);
+    if (stars === 5) {
+      this.state.reputation = Math.min(1000, (this.state.reputation || 30) + 2);
+      GameUIModal.showToast(`⭐ Khách tặng 5★! +2 Điểm danh tiếng (hiện có: ${this.state.reputation}⭐)`, "success", "⭐", 2500);
+    } else if (stars === 4) {
+      this.state.reputation = Math.min(1000, (this.state.reputation || 30) + 1);
+    } else if (stars <= 2) {
+      this.state.reputation = Math.max(5, (this.state.reputation || 30) - 2);
+    }
 
     const foodieBadges = ["Foodie Sành Ăn", "Mê Ăn Cay Cấp 7", "Khách Quen Ruột", "Tín Đồ Mì Cay", "Chuyên Gia Đánh Giá"];
     const randomBadge = foodieBadges[Math.floor(Math.random() * foodieBadges.length)];
+
+    const toppingNames = (pot.toppings || [])
+      .map(tid => this.state.toppings[tid] ? this.state.toppings[tid].name : null)
+      .filter(Boolean);
+    const toppingAttached = toppingNames.length ? ` + ${toppingNames.join(", ")}` : (order.toppingName ? ` + ${order.toppingName}` : "");
 
     this.addReview({
       id: Date.now() + Math.random().toString(36).substr(2, 4),
@@ -4215,7 +4666,7 @@ export class SpicyNoodleGame {
       comment: comment,
       date: `Ngày ${this.state.day}`,
       foodieBadge: randomBadge,
-      foodAttached: `${noodle.name} (Cấp ${order.spicyLevel})${servedDrink ? ` + ${servedDrink.name}` : ""}`,
+      foodAttached: `${noodle.name} (Cấp ${order.spicyLevel})${toppingAttached}${servedDrink ? ` + ${servedDrink.name}` : ""}`,
       isOnline: false,
       replied: false,
       ownerReply: null,
@@ -5527,20 +5978,66 @@ export class SpicyNoodleGame {
 
     const highCommentsPacked = [
       `Giao siêu nhanh bằng ${app}! Quán ép màng nắp niêu cực kỳ kỹ không đổ một giọt nước dùng, mở ra mì vẫn còn bốc khói nghi ngút! Đỉnh chóp 5 sao! 🍲✨`,
-      `Shipper ${shipperName} giao tận cửa còn nóng hôi hổi. Trà sữa boba dẻo thơm, đóng gói thùng giữ nhiệt cẩn thận 10/10! Sẽ ủng hộ tiệm dài dài! 🧋🛵`,
+      `Shipper ${shipperName} giao tận cửa còn nóng hôi hổi. Mì cay ngon đậm vị, nước dùng chuẩn cay 7 cấp độ, đóng gói thùng giữ nhiệt cẩn thận 10/10! Sẽ ủng hộ tiệm dài dài! 🍜🛵`,
       `Mì cay đặt online mà giòn dai ngon y chang ăn tại quán. Thích nhất cách quán niêm phong màng nắp niêu chống tràn. Rất chu đáo! 💖`,
-      `Nước mì đậm đà cay xé lưỡi, trân châu mềm dẻo. ${shipperName} giao nhanh 15 phút là tới, shipper rất lịch sự! Cho quán 5 sao! ⭐⭐⭐⭐⭐`
+      `Nước mì đậm đà cay xé lưỡi, topping ngập tràn ăn cực đã. ${shipperName} giao nhanh 15 phút là tới, shipper rất lịch sự! Cho quán 5 sao! ⭐⭐⭐⭐⭐`
     ];
 
     const standardComments = [
       `Đồ ăn giao nhanh, nước mì vừa vị, shipper nhiệt tình. Lần sau sẽ thử cấp độ cay cao hơn! 🍜`,
-      `Giao qua ${app} kịp giờ cơm trưa. Mì cay ngon vừa miệng, trà sữa thanh mát. 🧋`,
+      `Giao qua ${app} kịp giờ cơm trưa. Mì cay ngon vừa miệng, nước dùng chua cay đậm đà. 🍲`,
       `Đóng gói tạm ổn, mì vẫn còn ấm. Nước dùng chua cay đậm đà đúng gu mình. 🌶️`
     ];
 
-    const stars = isPacked ? 5 : (Math.random() < 0.8 ? 5 : 4);
-    const commentPool = isPacked ? highCommentsPacked : standardComments;
-    const comment = commentPool[Math.floor(Math.random() * commentPool.length)];
+    let stars = 5;
+    let comment = "";
+
+    if (isPacked) {
+      // Đã ép màng & thùng giữ nhiệt: chủ yếu 5 sao (85%) hoặc 4 sao (15%)
+      if (Math.random() < 0.85) {
+        stars = 5;
+        comment = highCommentsPacked[Math.floor(Math.random() * highCommentsPacked.length)];
+      } else {
+        stars = 4;
+        comment = standardComments[Math.floor(Math.random() * standardComments.length)];
+      }
+    } else {
+      // Chưa ép màng: có tỷ lệ nhận đánh giá 1-2★ hoặc 3★ do nguội, tràn nước hoặc shipper trễ
+      const roll = Math.random();
+      if (roll < 0.45) {
+        stars = 5;
+        comment = highCommentsPacked[Math.floor(Math.random() * highCommentsPacked.length)];
+      } else if (roll < 0.72) {
+        stars = 4;
+        comment = standardComments[Math.floor(Math.random() * standardComments.length)];
+      } else if (roll < 0.86) {
+        stars = 3;
+        const comments3 = [
+          `Nước mì hơi mặn một chút, trân châu boba ăn hơi sượng. Quán nên nêm nếm lại cho chuẩn vị hơn nhé! 🍜`,
+          `Giao qua ${app} hơi lâu, mở ra mì nguội bớt rồi. Ăn tạm được chứ không xuất sắc như mong đợi. 😐`,
+          `Mì thì ngon nhưng quên cho muỗng đũa ăn kèm, mình phải chạy sang phòng bên cạnh mượn! Quán nhớ để ý hơn nha. 🥢`,
+          `Trà sữa hơi ngọt khé cổ, mì cay cấp 3 mà không thấy cay mấy. Cần nêm đậm vị hơn! 🧋`
+        ];
+        comment = comments3[Math.floor(Math.random() * comments3.length)];
+      } else if (roll < 0.94) {
+        stars = 2;
+        const comments2 = [
+          `Thất vọng ghê! Không ép màng nắp niêu nên nước dùng sánh đổ ra ngoài túi bóng, mì bị nguội ngắt trương phềnh! 👎`,
+          `Shipper ${shipperName} giao trễ 40 phút mà không gọi trước, bấm chuông quăng bịch đồ ăn trước cổng rồi phóng đi! Bực mình! 😤`,
+          `Quán làm ăn tắc trách, đã ghi chú rõ ràng không hành không ớt ngọt mà mở ra ngập ngụa cả hộp! Ăn sao nổi! 💢`,
+          `Mì nguội ngắt như để từ hôm qua, nước lèo lợ lợ dầu mỡ. 2 sao cho sự thất vọng này! 🚫`
+        ];
+        comment = comments2[Math.floor(Math.random() * comments2.length)];
+      } else {
+        stars = 1;
+        const comments1 = [
+          `Tệ hại thật sự! Trà sữa bị bục nắp đổ ướt sũng cả hộp mì, shipper cãi nhau tay đôi với khách! Quán buôn bán kiểu gì vậy?! 😡🚫`,
+          `Chờ gần 1 tiếng đồng hồ, mì bưng tới đã trương sình đóng váng dầu, không ăn nổi một miếng nào phải vứt sọt rác! 1 sao! 🤮`,
+          `Đặt mì hải sản thập cẩm mà bới mãi chỉ thấy vài cọng bắp cải với một mẩu xúc xích teo tóp! Treo đầu dê bán thịt chó à?! Quá tệ! 🤬`
+        ];
+        comment = comments1[Math.floor(Math.random() * comments1.length)];
+      }
+    }
 
     const customerNames = [
       "Quỳnh Anh Foodie", "Hoàng Long Review", "Thảo Vy Mê Trà Sữa", "Minh Trí Coder",
@@ -5904,8 +6401,11 @@ export class SpicyNoodleGame {
 
     // 2. Chi phí mặt bằng & điện nước vận hành (từ Ngày 2 trở đi để game có độ thử thách thực tế)
     let rentCost = this.state.day === 1 ? 0 : Math.min(180, 25 + (this.state.day - 1) * 12);
-    // Cụ Rùa Torto (Kế toán trưởng): Giảm 50% tiền thuê mặt bằng
-    if (this.state.staff.torto && rentCost > 0) {
+    // Nếu đã mua đứt Mặt Bằng Flagship (Sổ Đỏ Vĩnh Viễn) -> Miễn phí hoàn toàn tiền thuê mặt bằng!
+    if (this.state.ownedFlagship) {
+      rentCost = 0;
+    } else if (this.state.staff.torto && rentCost > 0) {
+      // Cụ Rùa Torto (Kế toán trưởng): Giảm 50% tiền thuê mặt bằng
       rentCost = Math.round(rentCost * 0.5);
     }
     this.state.todayRentCost = rentCost;
@@ -6044,7 +6544,12 @@ export class SpicyNoodleGame {
           <div class="receipt-divider-dash"></div>
 
           <div class="receipt-section-title">CHI PHÍ VẬN HÀNH</div>
-          ${rentCost > 0 ? `
+          ${this.state.ownedFlagship ? `
+            <div class="receipt-row">
+              <span>🏛️ Thuê mặt bằng & điện nước:</span>
+              <span class="receipt-val-free" style="color:#059669; font-weight:800;">0đ (Sổ Đỏ Flagship Vĩnh Viễn 📜)</span>
+            </div>
+          ` : (rentCost > 0 ? `
             <div class="receipt-row">
               <span>⚡ Điện nước & mặt bằng${this.state.staff.torto ? ' (Giảm 50% 🐢)' : ''}:</span>
               <strong class="receipt-val-red">-${txaformat.formatVND(rentCost)}</strong>
@@ -6054,7 +6559,7 @@ export class SpicyNoodleGame {
               <span>⚡ Mặt bằng:</span>
               <span class="receipt-val-free">Miễn phí khai trương ✨</span>
             </div>
-          `}
+          `)}
           ${staffWages > 0 ? `
             <div class="receipt-row">
               <span>👥 Lương nhân viên (${activeStaffNames.length} bạn):</span>

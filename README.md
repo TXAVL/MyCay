@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.8.1-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-21%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v1.9.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-23%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
@@ -25,32 +25,56 @@
 - Bộ lọc thông minh ngăn chặn các từ ngữ thô tục, bậy bạ, phản cảm hoặc ký tự rác.
 - **Cảnh báo đỏ sinh động** với hiệu ứng rung nhẹ (`anime-shake`), **tự động biến mất** hoặc chuyển sang trạng thái xanh hợp lệ ngay khi người chơi gõ tên tử tế và đúng quy định (từ 3 - 25 ký tự).
 
-### 3. ⭐ Hệ Thống Đánh Giá & Phản Hồi Thực Khách (Review System)
-- Khách sau khi dùng bữa sẽ để lại đánh giá (số sao 1-5 ⭐, nhận xét món mì và độ cay).
+### 3. ⭐ Hệ Thống Đánh Giá & AI Thực Khách Phản Hồi (Review & Comeback)
+- Khách sau khi dùng bữa hoặc nhận đơn shipper sẽ để lại đánh giá (đa dạng 1-5 ⭐, nhận xét chân thực từ chất lượng, độ cay đến thái độ đóng gói/giao hàng).
 - **Chủ quán phản hồi:**
   - Có các nút **Gợi ý trả lời nhanh** siêu ngọt ngào và hiếu khách.
   - Hoặc **tự gõ phản hồi thủ công** vào ô nhập văn bản theo ý thích.
-- **Khách hàng feedback lại ngay lập tức**: Khi chủ quán nhấn gửi phản hồi, khách hàng sẽ gửi lại tin nhắn cảm ơn / khen ngợi tức thì, kèm tặng thêm tiền Tip 🪙 và cộng điểm Danh tiếng ⭐ cho quán.
+- **AI Khách hàng phản hồi & Cà khịa cực gắt**:
+  - Khi chủ quán chân thành xin lỗi hoặc giải thích vui tính: khách vui vẻ tặng thêm tip 🪙 và cộng điểm Danh tiếng ⭐.
+  - Khi chủ quán phản hồi cộc lốc / thái độ thách thức ("kệ", "không ăn thì biến"...): khách hàng sẽ **cà khịa lại cực gắt** (*"Không biết ai là khách ai là chủ luôn á. Bán hàng kiểu này khuyên thật nên giải nghệ sớm! 🙄"*), trừ điểm danh tiếng nặng nề!
 
-### 4. 🛠️ Nâng Cấp Tiệm & 🐾 Thuê Nhân Viên
+### 4. 🛠️ Nâng Cấp Tiệm & 🐾 Thuê Nhân Viên Cao Cấp
 - **Nâng cấp cửa hàng**:
   - *Nồi Niêu Đất Giữ Nhiệt*: Tăng 25% tốc độ nấu mì chín.
   - *Thêm Bàn Gỗ Ấm Cúng*: Tăng số bàn đón khách (lên đến 6 bàn).
   - *Đèn Lồng Hoa Anh Đào Decor*: Thu hút khách ghé quán nhanh hơn.
   - *Bí Truyền Sốt Ớt 7 Cấp Độ*: Tăng giá bán mỗi tô mì.
-  - *Hệ Thống Điều Hòa*: Khách kiên nhẫn chờ món lâu hơn.
-- **Thuê nhân viên anime**:
-  - *Bé Mèo Mochi (Tiếp Tân)*: Chào khách meo meo, tăng 25% tiền tip.
-  - *Gấu Trúc Kenji (Phụ Bếp)*: Tự động chuẩn bị nguyên liệu nhanh x2.
-  - *Cô Thỏ Usagi (Phục Vụ)*: Tự động dọn dẹp bàn ăn sạch bóng siêu tốc.
-  - *Hồ Ly Shiro (Quản Lý)*: Thu hút khách VIP và tăng điểm uy tín.
+  - *Hệ Thống Điều Hòa Daikin*: Khách kiên nhẫn chờ món lâu hơn.
+- **Thuê nhân viên anime & Mốc Danh Tiếng**:
+  - *Bé Mèo Mochi (Tiếp Tân - 0⭐)*: Chào khách meo meo, tăng 25% tiền tip.
+  - *Cô Thỏ Usagi (Phục Vụ - 30⭐)*: Tự động dọn dẹp bàn ăn sạch bóng siêu tốc.
+  - *Cún Shiba (Phụ Bếp - 60⭐)*: Tự động nấu nước dùng và chuẩn bị topping.
+  - *Gấu Kenji (Đầu Bếp - 120⭐)*: Nấu mì tự động cho khách sốt ruột nhất.
+  - *Hồ Ly Shiro (Thu Ngân & Quản Lý - 165⭐)*: Tự động giao đơn shipper và hút khách VIP.
+  - *Vịt Ducky (Pha Chế - 220⭐)*: Tự động pha chế đồ uống boba chuẩn xác.
+  - *Cú Mèo Owl (Marketing - 290⭐)*: Viral mạng xã hội, buff bão đánh giá 5 sao.
+  - *Nai Fawn (Thủ Kho - 380⭐)*: Giảm 30% giá nhập sỉ và thưởng giao hàng.
+  - *Cụ Rùa Torto (Kế Toán Trưởng - 480⭐)*: Giảm 50% tiền thuê nhà, x2 lãi ngân hàng và sinh lãi két sắt 5%/đêm.
+  - *Bạch Hổ Tora (Đội Trưởng An Ninh - 600⭐)*: Giữ trật tự, xóa sổ quỵt tiền và tăng 35% tốc độ kiên nhẫn.
+  - *Thần Long Ryu (Linh Thú Huyền Thoại - 800⭐)*: Kích hoạt mưa vàng và năng lượng FEVER RUSH cực đại.
 
-### 5. ⚙️ Cài Đặt Game Đầy Đủ
+### 5. 📊 Báo Cáo Doanh Thu Ngoại Tuyến (Mở Khóa Từ Ngày 30)
+- Khi tiệm mì đạt từ **Ngày 30 trở lên**, mỗi khi người chơi vắng mặt (đóng trình duyệt hoặc ẩn tab từ 3 phút), Quản Lý Ca Trực sẽ thay bạn bán hàng.
+- Bán **đúng món trong menu, theo giá bạn đặt và tồn kho thật**: mỗi tô trừ mì, mì sợi, nước hầm, niêu đất; khách gọi kèm đồ uống. Hết hàng thì quán đóng cửa sớm.
+- Tốc độ bán phụ thuộc số bàn, nhân viên (Kenji, Usagi, Shiba, Mochi) và điểm danh tiếng.
+- Tối đa **8 giờ bán offline mỗi ngày thực tế**; quán đóng sớm vì hết hàng thì không mất phần hạn mức còn lại.
+- Lúc quay lại, **Bảng Báo Cáo** liệt kê thời gian, từng món đã bán, doanh thu, tiền boa, hoa hồng Quản Lý (10%), mặt bằng & điện nước (miễn phí nếu có Sổ Đỏ Flagship); lợi nhuận ròng được cộng thẳng vào két.
+- Chống gian lận: chỉnh đồng hồ máy hay khôi phục bản sao lưu cũ không nhận thêm doanh thu offline.
+
+### 6. 🏦 Ngân Hàng Tiết Kiệm Mì Cay: Hạn Mức Tiền Gửi & Sổ Đỏ Flagship Vĩnh Viễn
+- **Hạn mức tiền gửi an toàn**: Ngân hàng thiết lập hạn mức tiền gửi mở rộng dần theo số lượng đánh giá 5⭐ (+1M/đánh giá 5⭐).
+- **Bất Động Sản Mặt Bằng Flagship**: Cho phép tiệm mua đứt mặt bằng trụ sở (50M).
+  - Cấp **Sổ Đỏ Vĩnh Viễn** chính chủ.
+  - **Miễn phí 100% vĩnh viễn tiền thuê nhà và phí điện nước vận hành** mỗi ngày!
+
+### 7. ⚙️ Cài Đặt Game Đầy Đủ
 - Điều chỉnh âm lượng nhạc nền Lo-Fi ấm áp (tạo trực tiếp bằng Web Audio API, không lo thiếu file hay lỗi bản quyền).
 - Tùy chỉnh âm lượng SFX tiếng xèo xèo, chuông cửa, tiền xu ting ting.
 - Tùy chọn tốc độ trò chơi: 1x (Cozy), 1.5x (Nhanh), 2x (Siêu tốc).
 - Bật / tắt hiệu ứng cánh hoa anh đào rơi.
 - Xem lại lịch sử các bản cập nhật.
+- Sao lưu và khôi phục dữ liệu game an toàn.
 - Xóa dữ liệu và chơi lại từ đầu an toàn.
 
 ---

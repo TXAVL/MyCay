@@ -4264,3 +4264,11 @@
   text-align: center;
 }
 
+/* Tối ưu tỉ lệ nhân vật chibi và avatar thực khách trên mobile */
+@media (max-width: 600px) {
+  .sc-actor {
+    --head: clamp(18px, 5.2cqw, 36px);
+  }
+}
+
+

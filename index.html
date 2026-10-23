@@ -18,15 +18,15 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=1.8.1" />
+  <link rel="stylesheet" href="styles/main.css?v=1.9.0" />
   <!-- Lớp giao diện game (HUD, khung cảnh tiệm, dock nút tròn, nút 3D) -->
-  <link rel="stylesheet" href="styles/game-skin.css?v=1.8.1" />
+  <link rel="stylesheet" href="styles/game-skin.css?v=1.9.0" />
 
   <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
-  <script src="js/security-shield.js?v=1.8.1"></script>
+  <script src="js/security-shield.js?v=1.9.0"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -152,9 +152,12 @@
             <span class="hud-coin-icon" aria-hidden="true"></span>
             <span class="header-money-val" id="display-money">400.000đ</span>
           </div>
-          <div class="hud-pill hud-star" title="Đánh giá trung bình của thực khách">
+          <div class="hud-pill hud-star" id="hud-star-pill" onclick="window.game.openReputationGuide()" style="cursor: pointer;" title="Đánh giá & Danh tiếng của quán (Bấm để xem hướng dẫn)">
             <span class="header-stars-row" id="display-stars">★★★★☆</span>
             <span class="header-reviews-sub" id="display-reviews-count">0 đánh giá</span>
+          </div>
+          <div class="hud-pill hud-rep" id="hud-rep-pill" onclick="window.game.openReputationGuide()" style="cursor: pointer;" title="⭐ Điểm Danh Tiếng của tiệm (Bấm để xem cách cày điểm)">
+            <span class="header-rep-val" id="display-reputation">30 ⭐</span>
           </div>
           <div class="hud-pill hud-time" title="Thời gian ca bán">
             <span class="header-time-title" id="display-day-timer">⏱️ 2:00</span>
@@ -454,6 +457,7 @@
             <p class="tab-description-hint">
               Các trợ thủ anime đắc lực giúp bạn chào đón khách, nấu mì nhanh thoăn thoắt, bưng bê và dọn dẹp sạch bóng!
             </p>
+            <div id="staff-reputation-banner-wrap"></div>
             <div id="staff-list" class="staff-items-list">
               <!-- Render động: Mèo Mochi, Gấu Kenji, Thỏ Usagi, Cún Shiba, Cáo Shiro -->
             </div>
@@ -520,8 +524,8 @@
 
             <!-- Thống kê mở rộng chi tiết -->
             <div class="summary-stats-cards" style="margin-top: -6px;">
-              <div class="stat-card">
-                <span class="stat-label">Điểm Uy Tín</span>
+              <div class="stat-card" onclick="window.game.openReputationGuide()" style="cursor: pointer;" title="Bấm để xem bí kíp cày Danh tiếng ⭐">
+                <span class="stat-label">Điểm Danh Tiếng 💡</span>
                 <span id="sum-reputation" class="stat-num">30 ⭐</span>
               </div>
               <div class="stat-card">
@@ -562,12 +566,21 @@
                 <div class="bank-interest-sub" id="bank-interest-sub">
                   📈 Lãi suất ban đêm: <strong class="text-green">+2.5%/ngày</strong>
                 </div>
+                <div class="bank-deposit-limit-banner" id="bank-deposit-limit-banner" style="margin-top: 8px; font-size: 11px; background: rgba(0,0,0,0.15); border-radius: 10px; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; border: 1px dashed rgba(255,255,255,0.2);">
+                  <span>🛡️ Hạn mức gửi: <strong id="bank-max-deposit-limit-text" style="color: #FDE68A;">50.000.000đ</strong></span>
+                  <span style="color: #6EE7B7; font-size: 10.5px;">+1M/đánh giá 5⭐</span>
+                </div>
               </div>
 
               <div class="bank-card-footer">
                 <span class="bank-owner-name" id="bank-card-owner">CHỦ SỔ: BẾP TRƯỞNG MÈO</span>
                 <span class="bank-interest-total" id="bank-total-earned">Tổng lãi nhận: +0đ 🪙</span>
               </div>
+            </div>
+
+            <!-- BẤT ĐỘNG SẢN MẶT BẰNG FLAGSHIP (SỔ ĐỎ CHÍNH CHỦ) -->
+            <div id="flagship-real-estate-container">
+              <!-- Render động thẻ Bất Động Sản Flagship -->
             </div>
 
             <!-- Giao dịch gửi / rút tiền mặt -->
@@ -1078,6 +1091,30 @@
               <img src="assets/cust_shiba.png" alt="Cún Shiba" />
               <span>Shiba Phó</span>
             </div>
+            <div class="owner-avatar-opt" data-avatar="assets/cust_fox.png" data-name="Cáo Kaito Trưởng Bản">
+              <img src="assets/cust_fox.png" alt="Cáo Kaito" />
+              <span>Cáo Kaito</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/cust_panda.png" data-name="Panda Master Chef">
+              <img src="assets/cust_panda.png" alt="Gấu Trúc Panda" />
+              <span>Panda Sư</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/cust_tiger.png" data-name="Hổ Lửa Cấp 7">
+              <img src="assets/cust_tiger.png" alt="Hổ Lửa" />
+              <span>Hổ Cấp 7</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/cust_hamster.png" data-name="Hamster Mimi Bé Bếp">
+              <img src="assets/cust_hamster.png" alt="Hamster Mimi" />
+              <span>Hamster Mimi</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/staff_kenji.png" data-name="Bếp Sư Kenji Nước Dùng">
+              <img src="assets/staff_kenji.png" alt="Bếp Sư Kenji" />
+              <span>Kenji Sư Phụ</span>
+            </div>
+            <div class="owner-avatar-opt" data-avatar="assets/staff_owl.png" data-name="Cú Mèo Tri Thức Quán">
+              <img src="assets/staff_owl.png" alt="Cú Mèo Tri Thức" />
+              <span>Cú Mèo Sư</span>
+            </div>
           </div>
         </div>
 
@@ -1541,6 +1578,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=1.8.1"></script>
+  <script type="module" src="js/app.js?v=1.9.0"></script>
 </body>
 </html>

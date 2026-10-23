@@ -10,22 +10,43 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.8.1 - Sửa Lỗi & Tối Ưu)
+  // Khai báo phiên bản hiện tại của game (Bản 1.9.0 - Cày Danh Tiếng, Doanh Thu Offline & Sổ Đỏ Flagship)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.8.1",
-      181,
-      "21/10/2026",
+      "1.9.0",
+      190,
+      "23/10/2026",
       [
         {
-          title: "Sửa Lỗi & Tối Ưu",
-          desc: "Sửa lỗi không tải được file sao lưu trên Facebook và Messenger browser. Bổ sung tính năng sao chép mã sao lưu và dán mã khôi phục; thêm hướng dẫn mở bằng Chrome/Safari.",
-          icon: "🛠️",
-          badge: "Sửa Lỗi 🛠️",
+          title: "Cày Điểm Danh Tiếng & Hướng Dẫn Chi Tiết",
+          desc: "Hiển thị điểm Danh Tiếng ⭐ ngay trên thanh HUD đỉnh đầu và Sổ Nhân Viên. Mở trần uy tín lên 1000⭐ (không còn bị chặn ở 100⭐), giúp tiệm chiêu mộ toàn bộ nhân sự cao cấp (Rồng Ryu 800⭐, Bạch Hổ Tora 600⭐). Tích hợp cẩm nang 4 bí quyết cày danh tiếng nhanh chóng.",
+          icon: "⭐",
+          badge: "Nâng Cấp VIP 🌟",
+          badgeType: "hot"
+        },
+        {
+          title: "Báo Cáo Doanh Thu Offline (Mở Khóa Từ Ngày 30)",
+          desc: "Từ Ngày 30, khi bạn vắng mặt, Quản Lý Ca Trực bán hàng theo đúng menu, giá và tồn kho thật (tối đa 8 giờ/ngày). Quay lại sẽ nhận báo cáo từng món đã bán, tiền boa, hoa hồng 10% và lợi nhuận cộng thẳng vào két.",
+          icon: "📊",
+          badge: "Tính Năng Mới ✨",
+          badgeType: "hot"
+        },
+        {
+          title: "Hạn Mức Ngân Hàng & Mua Đứt Mặt Bằng Flagship",
+          desc: "Ngân Hàng Tiết Kiệm Mì Cay bổ sung hạn mức tiền gửi an toàn mở rộng dần theo số lượng đánh giá 5⭐ (+1M/đánh giá 5⭐). Tính năng Mua Đứt Mặt Bằng Flagship (50M) cấp Sổ Đỏ Vĩnh Viễn, miễn phí 100% chi phí thuê mặt bằng và điện nước trọn đời.",
+          icon: "🏛️",
+          badge: "Bất Động Sản 🏢",
+          badgeType: "star"
+        },
+        {
+          title: "Đại Tu Đánh Giá Thực Khách & AI Khách Cà Khịa",
+          desc: "Sửa lỗi đánh giá 0 sao; thực khách để lại nhận xét chân thực từ 1-2★, 3★ đến 5★. Khi chủ quán phản hồi cộc lốc / thách thức, khách hàng phản hồi lại bằng văn phong cà khịa cực gắt (\"Không biết ai là khách ai là chủ luôn á\").",
+          icon: "💬",
+          badge: "Đại Tu Đánh Giá 🍲",
           badgeType: "manage"
         }
       ],
-      "Sửa Lỗi & Tối Ưu"
+      "Cày Danh Tiếng, Doanh Thu Offline & Sổ Đỏ Flagship"
     );
   }
 
@@ -33,6 +54,21 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "1.8.1",
+        181,
+        "21/10/2026",
+        [
+          {
+            title: "Sửa Lỗi & Tối Ưu",
+            desc: "Sửa lỗi không tải được file sao lưu trên Facebook và Messenger browser. Bổ sung tính năng sao chép mã sao lưu và dán mã khôi phục; thêm hướng dẫn mở bằng Chrome/Safari.",
+            icon: "🛠️",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Sửa Lỗi & Tối Ưu"
+      ),
       new txaversion(
         "1.8.0",
         180,
