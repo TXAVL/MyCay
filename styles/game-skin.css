@@ -4272,3 +4272,62 @@
 }
 
 
+
+/* ==========================================================
+   TAB ĐÁNH GIÁ: NHÃN PHÂN TÍCH PHẢN HỒI & TÁC ĐỘNG
+   ========================================================== */
+.reply-analysis-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 2px;
+  font-size: 11px;
+}
+
+.reply-analysis-label {
+  font-weight: 800;
+  color: #7A5B40;
+}
+
+.reply-analysis-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(45, 180, 90, 0.12);
+  border: 1px solid rgba(45, 180, 90, 0.35);
+  color: #1E7A3E;
+  font-weight: 700;
+}
+
+.reply-analysis-tag.is-bad {
+  background: rgba(217, 56, 58, 0.1);
+  border-color: rgba(217, 56, 58, 0.35);
+  color: #B4161B;
+}
+
+.customer-comeback-bubble.tier-annoyed,
+.customer-comeback-bubble.tier-furious {
+  border-color: rgba(217, 56, 58, 0.45);
+  background: #FFF4F3;
+}
+
+.customer-comeback-bubble.tier-delighted {
+  border-color: rgba(45, 180, 90, 0.45);
+}
+
+.reply-effect-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.reply-effect-row .fx-up {
+  color: #1E9A49;
+}
+
+.reply-effect-row .fx-down {
+  color: #C62828;
+}

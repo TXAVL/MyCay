@@ -39,8 +39,8 @@ export class txaversion {
           badgeType: "star"
         },
         {
-          title: "Đại Tu Đánh Giá Thực Khách & AI Khách Cà Khịa",
-          desc: "Sửa lỗi đánh giá 0 sao; thực khách để lại nhận xét chân thực từ 1-2★, 3★ đến 5★. Khi chủ quán phản hồi cộc lốc / thách thức, khách hàng phản hồi lại bằng văn phong cà khịa cực gắt (\"Không biết ai là khách ai là chủ luôn á\").",
+          title: "Tab Đánh Giá Mới & Khách Đọc Hiểu Phản Hồi",
+          desc: "Đánh giá có tab 💬 riêng. Sao chấm đủ 1-5★ theo tốc độ, giá, món kèm và tính cách từng khách. Khách đọc kỹ lời chủ tiệm: xin lỗi đúng vấn đề, hứa đền bù (tiệm chi thật), đổ lỗi, trả lời cho có, copy paste hay văng tục đều bị khách trích lại và đáp đúng nội dung.",
           icon: "💬",
           badge: "Đại Tu Đánh Giá 🍲",
           badgeType: "manage"

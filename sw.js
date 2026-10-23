@@ -22,6 +22,8 @@ const PRECACHE_ASSETS = [
   "./js/modal.js?v=1.9.0",
   "./js/shop-scene.js",
   "./js/shop-scene.js?v=1.9.0",
+  "./js/reviews.js",
+  "./js/reviews.js?v=1.9.0",
   "./js/backup.js",
   "./js/backup.js?v=1.9.0",
   "./js/quests.js",

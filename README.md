@@ -25,14 +25,14 @@
 - Bộ lọc thông minh ngăn chặn các từ ngữ thô tục, bậy bạ, phản cảm hoặc ký tự rác.
 - **Cảnh báo đỏ sinh động** với hiệu ứng rung nhẹ (`anime-shake`), **tự động biến mất** hoặc chuyển sang trạng thái xanh hợp lệ ngay khi người chơi gõ tên tử tế và đúng quy định (từ 3 - 25 ký tự).
 
-### 3. ⭐ Hệ Thống Đánh Giá & AI Thực Khách Phản Hồi (Review & Comeback)
-- Khách sau khi dùng bữa hoặc nhận đơn shipper sẽ để lại đánh giá (đa dạng 1-5 ⭐, nhận xét chân thực từ chất lượng, độ cay đến thái độ đóng gói/giao hàng).
-- **Chủ quán phản hồi:**
-  - Có các nút **Gợi ý trả lời nhanh** siêu ngọt ngào và hiếu khách.
-  - Hoặc **tự gõ phản hồi thủ công** vào ô nhập văn bản theo ý thích.
-- **AI Khách hàng phản hồi & Cà khịa cực gắt**:
-  - Khi chủ quán chân thành xin lỗi hoặc giải thích vui tính: khách vui vẻ tặng thêm tip 🪙 và cộng điểm Danh tiếng ⭐.
-  - Khi chủ quán phản hồi cộc lốc / thái độ thách thức ("kệ", "không ăn thì biến"...): khách hàng sẽ **cà khịa lại cực gắt** (*"Không biết ai là khách ai là chủ luôn á. Bán hàng kiểu này khuyên thật nên giải nghệ sớm! 🙄"*), trừ điểm danh tiếng nặng nề!
+### 3. 💬 Tab Đánh Giá & Khách Đọc Hiểu Phản Hồi
+- Đánh giá có **tab riêng** trên thanh điều hướng, chấm đỏ báo số đánh giá chưa trả lời.
+- **Sao chấm đủ 1-5★** theo điểm tổng hợp: tốc độ ra món, giá bán, thiếu món kèm/nguyên liệu, món đặc biệt, decor và **tính cách từng khách** (dễ tính, khó tính, xéo xắt, Gen Z...). Nội dung đánh giá ghép từ đúng vấn đề khách gặp.
+- **Khách đọc hiểu lời chủ tiệm** (chạy ngay trong máy, chơi offline vẫn được):
+  - Nhận ra xin lỗi, nói đúng vấn đề khách phàn nàn, hứa cải thiện, đền bù, giải thích, cảm ơn, gọi tên khách, hài hước.
+  - Bắt lỗi đổ lỗi cho khách, trả lời cho có ("kệ"), copy paste câu cũ, viết hoa quát tháo, văng tục.
+  - Khách **trích lại đúng câu chủ tiệm viết** để đáp lời, ví dụ *"Quán bảo 'Tại bạn gọi đúng giờ cao điểm' là đổ lỗi cho khách hả?"*.
+  - Kết quả: tăng/giảm sao, danh tiếng, tip; hứa đền bù thì tiệm chi thật 10k. Dưới mỗi phản hồi có nhãn **"Khách nhận ra"** để biết khách hiểu gì.
 
 ### 4. 🛠️ Nâng Cấp Tiệm & 🐾 Thuê Nhân Viên Cao Cấp
 - **Nâng cấp cửa hàng**:

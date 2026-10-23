@@ -303,6 +303,10 @@
             <span class="tab-btn-icon">⭐</span>
             <span class="tab-btn-label">Bộ sưu tập</span>
           </button>
+          <button class="nav-grid-btn" data-tab="tab-reviews">
+            <span class="tab-btn-icon">💬</span>
+            <span class="tab-btn-label">Đánh giá</span>
+          </button>
           <button class="nav-grid-btn" data-tab="tab-summary">
             <span class="tab-btn-icon">📈</span>
             <span class="tab-btn-label">Tổng kết</span>
@@ -501,7 +505,7 @@
           <!-- ================= TAB 8: TỔNG KẾT & ĐÁNH GIÁ THỰC TẾ ================= -->
           <section id="tab-summary" class="tab-pane">
             <p class="tab-description-hint">
-              Báo cáo chi tiết hoạt động kinh doanh, số tô mì đã bán, tiền tip và sổ tay đánh giá chân thực từ khách hàng.
+              Báo cáo chi tiết hoạt động kinh doanh, số tô mì đã bán, tiền tip và và các chỉ số chính của tiệm.
             </p>
             <div class="summary-stats-cards">
               <div class="stat-card">
@@ -538,11 +542,15 @@
               </div>
             </div>
 
-            <div class="reviews-section-block">
-              <h3 class="category-heading">⭐ Sổ Tay Đánh Giá Của Khách Ăn Mì</h3>
-              <div id="reviews-list" class="reviews-list">
-                <!-- Render các đánh giá và phản hồi nhận tip -->
-              </div>
+          </section>
+
+          <!-- ================= TAB ĐÁNH GIÁ: SỔ TAY ĐÁNH GIÁ & PHẢN HỒI KHÁCH ================= -->
+          <section id="tab-reviews" class="tab-pane">
+            <p class="tab-description-hint">
+              Đánh giá thật từ khách ăn tại quán và đơn online. Khách sẽ đọc kỹ lời bạn phản hồi: xin lỗi đúng vấn đề, hứa đền bù hay trả lời cộc lốc đều được khách đáp lại tương ứng.
+            </p>
+            <div id="reviews-list" class="reviews-list">
+              <!-- Render các đánh giá và phản hồi -->
             </div>
           </section>
 
