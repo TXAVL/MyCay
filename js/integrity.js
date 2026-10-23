@@ -1,5 +1,5 @@
 // ==========================================================
-// ĐOÀN KIỂM TRA LIÊN NGÀNH - PHÁT HIỆN GIAN LẬN (v1.9.1)
+// ĐOÀN KIỂM TRA LIÊN NGÀNH - PHÁT HIỆN GIAN LẬN (v1.9.1, cảnh sát pixel từ v2.0.0)
 // Chữ ký bản lưu + dấu hiệu bất thường -> điểm nghi vấn.
 // Có nghi vấn thì mỗi lần sang ngày mới chỉ có xác suất RẤT THẤP bị kiểm tra,
 // nên người chơi tử tế gần như không bao giờ gặp.

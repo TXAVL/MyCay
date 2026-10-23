@@ -3,16 +3,17 @@
 // Kết nối UI, Sự kiện, Tab Navigation và Logic Game
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=1.9.1";
-import { NameValidator } from "./filter.js?v=1.9.1";
-import { SpicyNoodleGame } from "./game.js?v=1.9.1";
-import { txatheme } from "./txatheme.js?v=1.9.1";
-import { txacoachmark } from "./txacoachmark.js?v=1.9.1";
-import { txaqr } from "./txaqr.js?v=1.9.1";
-import { GameUIModal } from "./modal.js?v=1.9.1";
-import { realtimeStats } from "./realtime-stats.js?v=1.9.1";
-import { ShopScene } from "./shop-scene.js?v=1.9.1";
-import { GameBackup } from "./backup.js?v=1.9.1";
+import { txaversion } from "./txaversion.js?v=2.0.0";
+import { NameValidator } from "./filter.js?v=2.0.0";
+import { SpicyNoodleGame } from "./game.js?v=2.0.0";
+import { txatheme } from "./txatheme.js?v=2.0.0";
+import { txacoachmark } from "./txacoachmark.js?v=2.0.0";
+import { txaqr } from "./txaqr.js?v=2.0.0";
+import { GameUIModal } from "./modal.js?v=2.0.0";
+import { realtimeStats } from "./realtime-stats.js?v=2.0.0";
+import { ShopScene } from "./shop-scene.js?v=2.0.0";
+import { GameBackup } from "./backup.js?v=2.0.0";
+import { WorldMap } from "./world-map.js?v=2.0.0";
 
 // Gắn biến toàn cục phục vụ Console Admin và Dashboard phân tích số liệu
 if (typeof window !== "undefined") {
@@ -173,6 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
           window.shopScene = game.scene;
           game.scene.mount(document.getElementById("shop-scene-root"));
         }
+
+        // v2.0.0: vào game là đứng ngoài phố, chạm Tiệm Mỳ Cay mới vào trong tiệm
+        if (!window.worldMap) window.worldMap = new WorldMap(game);
+        window.worldMap.show();
 
         const verCheck = txaversion.checkNewVersion();
         if (verCheck.isNew) {

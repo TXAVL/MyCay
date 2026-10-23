@@ -10,22 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 1.9.1 - Đoàn Kiểm Tra Liên Ngành)
+  // Khai báo phiên bản hiện tại của game (Bản 2.0.0 - Bản Đồ Phố Pixel)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "1.9.1",
-      191,
+      "2.0.0",
+      200,
       "23/10/2026",
       [
         {
-          title: "Đoàn Kiểm Tra Liên Ngành",
-          desc: "Chơi gian lận (sửa dữ liệu, chỉ số bất thường) có thể bị đoàn kiểm tra ghé thăm, tịch thu cả tiệm. Tỉ lệ rất thấp, chơi thật thì không lo.",
-          icon: "👮",
+          title: "Bản Đồ Phố Pixel",
+          desc: "Vào game là đứng ngoài phố ẩm thực. Kéo để dạo phố, chạm Tiệm Mỳ Cay để vào bán hàng; nút 🗺️ để ra phố.",
+          icon: "🗺️",
           badge: "Mới ✨",
           badgeType: "hot"
+        },
+        {
+          title: "Phố Có Chợ, Ngân Hàng, Bưu Cục",
+          desc: "Chạm Chợ Nguyên Liệu, Ngân Hàng, Việc Làm, Bưu Cục để đi tới và mở thẳng chức năng đó.",
+          icon: "🏙️",
+          badge: "Mới ✨",
+          badgeType: "hot"
+        },
+        {
+          title: "Đoàn Kiểm Tra Sống Động",
+          desc: "Cảnh sát pixel đi bộ tới tiệm, hội thoại kiểu RPG khi phát hiện gian lận.",
+          icon: "👮",
+          badge: "Nâng Cấp 🌟",
+          badgeType: "star"
         }
       ],
-      "Đoàn Kiểm Tra Liên Ngành"
+      "Bản Đồ Phố Pixel"
     );
   }
 
@@ -33,6 +47,15 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "1.9.1",
+        191,
+        "23/10/2026",
+        [
+          { title: "Đoàn Kiểm Tra Liên Ngành", desc: "Chơi gian lận (sửa dữ liệu, chỉ số bất thường) có thể bị đoàn kiểm tra ghé thăm, tịch thu cả tiệm. Tỉ lệ rất thấp, chơi thật thì không lo.", icon: "👮", badge: "Mới ✨", badgeType: "hot" }
+        ],
+        "Đoàn Kiểm Tra Liên Ngành"
+      ),
       new txaversion(
         "1.9.0",
         190,
