@@ -18,35 +18,35 @@ export class txaversion {
       "23/10/2026",
       [
         {
-          title: "Cày Điểm Danh Tiếng & Hướng Dẫn Chi Tiết",
-          desc: "Hiển thị điểm Danh Tiếng ⭐ ngay trên thanh HUD đỉnh đầu và Sổ Nhân Viên. Mở trần uy tín lên 1000⭐ (không còn bị chặn ở 100⭐), giúp tiệm chiêu mộ toàn bộ nhân sự cao cấp (Rồng Ryu 800⭐, Bạch Hổ Tora 600⭐). Tích hợp cẩm nang 4 bí quyết cày danh tiếng nhanh chóng.",
-          icon: "⭐",
-          badge: "Nâng Cấp VIP 🌟",
+          title: "Tab Đánh Giá Mới",
+          desc: "Đánh giá có tab riêng, đủ 1-5 sao. Khách đọc kỹ lời bạn trả lời và đáp lại đúng ý.",
+          icon: "💬",
+          badge: "Mới ✨",
           badgeType: "hot"
         },
         {
-          title: "Báo Cáo Doanh Thu Offline (Mở Khóa Từ Ngày 30)",
-          desc: "Từ Ngày 30, khi bạn vắng mặt, Quản Lý Ca Trực bán hàng theo đúng menu, giá và tồn kho thật (tối đa 8 giờ/ngày). Quay lại sẽ nhận báo cáo từng món đã bán, tiền boa, hoa hồng 10% và lợi nhuận cộng thẳng vào két.",
+          title: "Doanh Thu Offline",
+          desc: "Từ Ngày 30, quán tự bán khi bạn vắng mặt (tối đa 8 giờ/ngày).",
           icon: "📊",
-          badge: "Tính Năng Mới ✨",
+          badge: "Mới ✨",
           badgeType: "hot"
         },
         {
-          title: "Hạn Mức Ngân Hàng & Mua Đứt Mặt Bằng Flagship",
-          desc: "Ngân Hàng Tiết Kiệm Mì Cay bổ sung hạn mức tiền gửi an toàn mở rộng dần theo số lượng đánh giá 5⭐ (+1M/đánh giá 5⭐). Tính năng Mua Đứt Mặt Bằng Flagship (50M) cấp Sổ Đỏ Vĩnh Viễn, miễn phí 100% chi phí thuê mặt bằng và điện nước trọn đời.",
+          title: "Danh Tiếng & Mặt Bằng",
+          desc: "Danh tiếng lên tới 1000⭐. Có thể mua đứt mặt bằng để miễn tiền thuê.",
           icon: "🏛️",
-          badge: "Bất Động Sản 🏢",
+          badge: "Nâng Cấp 🌟",
           badgeType: "star"
         },
         {
-          title: "Tab Đánh Giá Mới & Khách Đọc Hiểu Phản Hồi",
-          desc: "Đánh giá có tab 💬 riêng. Sao chấm đủ 1-5★ theo tốc độ, giá, món kèm và tính cách từng khách. Khách đọc kỹ lời chủ tiệm: xin lỗi đúng vấn đề, hứa đền bù (tiệm chi thật), đổ lỗi, trả lời cho có, copy paste hay văng tục đều bị khách trích lại và đáp đúng nội dung.",
-          icon: "💬",
-          badge: "Đại Tu Đánh Giá 🍲",
+          title: "Sửa Lỗi & Tối Ưu",
+          desc: "Sửa lỗi khôi phục sao lưu và một số lỗi nhỏ khác.",
+          icon: "🛠️",
+          badge: "Sửa Lỗi 🛠️",
           badgeType: "manage"
         }
       ],
-      "Cày Danh Tiếng, Doanh Thu Offline & Sổ Đỏ Flagship"
+      "Tab Đánh Giá & Doanh Thu Offline"
     );
   }
 

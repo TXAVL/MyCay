@@ -4331,3 +4331,14 @@
 .reply-effect-row .fx-down {
   color: #C62828;
 }
+
+/* Mobile: thu nhỏ chữ & khung toàn game một chút cho dễ nhìn hơn trên màn hình hẹp */
+@media (max-width: 600px) {
+  .game-phone-frame,
+  .modal-dialog,
+  .tmc-bk-box,
+  .offline-report-card,
+  .game-toast-container {
+    zoom: 0.92;
+  }
+}
