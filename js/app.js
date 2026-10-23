@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Kiểm tra quy trình mở tiệm lần đầu & hướng dẫn tân thủ
   function checkFirstTimeFlow() {
-    const isFirstNameSetup = !localStorage.getItem("mycay_first_name_set");
+    const isFirstNameSetup = !localStorage.getItem("mycay_first_name_set") || !game.state.ownerFullName;
     if (isFirstNameSetup) {
       setTimeout(openNamePrompt, 400);
     } else if (txacoachmark.checkShouldShow()) {
@@ -226,6 +226,8 @@ document.addEventListener("DOMContentLoaded", () => {
       nameInput.focus();
       nameInput.select();
     }
+    const fullNameInput = document.getElementById("input-owner-fullname");
+    if (fullNameInput) fullNameInput.value = game.state.ownerFullName || "";
     updateNameValidation(nameInput ? nameInput.value : "");
   }
 
@@ -317,10 +319,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const fullNameInput = document.getElementById("input-owner-fullname");
+      const fullName = (fullNameInput ? fullNameInput.value : "").replace(/\s+/g, " ").trim();
+      const fullCheck = NameValidator.validatePersonName(fullName);
+      if (!fullCheck.isValid) {
+        if (fullNameInput) {
+          fullNameInput.classList.add("is-invalid", "anime-shake");
+          setTimeout(() => fullNameInput.classList.remove("anime-shake"), 500);
+          fullNameInput.focus();
+        }
+        GameUIModal.showToast(fullCheck.message, "warning", "🪪");
+        return;
+      }
+      if (fullNameInput) fullNameInput.classList.remove("is-invalid");
+
       if (nameWarningTimer) clearTimeout(nameWarningTimer);
 
+      game.state.ownerFullName = fullName;
       game.state.shopName = val;
       game.saveGame();
+      if (window.worldMap && window.worldMap.root) window.worldMap.updateChips();
       game.renderHeader();
       game.renderChalkboardBanner();
       game.sound.playCoinChime();

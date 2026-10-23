@@ -10710,3 +10710,20 @@ body.is-device-locked #loading-screen {
   font-size: 15px;
   line-height: 1.7;
 }
+.wm-owner-card {
+  position: absolute;
+  top: calc(max(10px, env(safe-area-inset-top)) + 38px);
+  left: 12px;
+  right: 12px;
+  text-align: center;
+  background: rgba(122, 28, 24, 0.9);
+  color: #f6e3a8;
+  border: 2px solid #c9a24a;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

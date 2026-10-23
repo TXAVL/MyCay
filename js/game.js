@@ -43,7 +43,8 @@ export class SpicyNoodleGame {
     this.state = {
       shopName: "Tiệm Mỳ Cay",
       ownerAvatar: "assets/cust_cat.png",
-      ownerName: "Bếp Trưởng Mèo Linh",
+      ownerName: "Bếp Trưởng Mèo Linh", // Tên nhân vật avatar
+      ownerFullName: "", // Họ tên thật của chủ tiệm (người chơi nhập)
       day: 1,
       dayPhase: "prep", // "prep" (Chuẩn bị) | "open" (Đang mở cửa bán)
       money: 400, // Đơn vị k = 1.000đ (400k = 400.000đ)
@@ -939,6 +940,7 @@ export class SpicyNoodleGame {
         if (parsed.shopName) this.state.shopName = parsed.shopName;
         if (parsed.ownerAvatar) this.state.ownerAvatar = parsed.ownerAvatar;
         if (parsed.ownerName) this.state.ownerName = parsed.ownerName;
+        if (typeof parsed.ownerFullName === "string") this.state.ownerFullName = parsed.ownerFullName;
         if (parsed.tutorialDismissed) this.state.tutorialDismissed = parsed.tutorialDismissed;
         if (parsed.bank && typeof parsed.bank === "object") {
           this.state.bank = Object.assign({
@@ -6362,14 +6364,15 @@ export class SpicyNoodleGame {
   // Đoàn kiểm tra liên ngành: cảnh sát pixel đi tới tiệm trên bản đồ phố, rồi tịch thu & xoá dữ liệu
   startInspection() {
     if (document.getElementById("inspection-overlay") || !window.worldMap) return;
-    const owner = this.state.ownerName || "Chủ tiệm";
+    const shop = this.state.shopName || "Tiệm Mỳ Cay";
+    const owner = this.state.ownerFullName ? `ông/bà ${this.state.ownerFullName}, chủ ${shop}` : `chủ ${shop}`;
     window.worldMap.playInspection(
       [
-        `Chào ${owner}, chúng tôi là đoàn kiểm tra liên ngành.`,
+        `Chào ${owner}. Chúng tôi là đoàn kiểm tra liên ngành.`,
         "Chúng tôi nhận được đơn tố cáo tiệm có dấu hiệu gian lận số liệu, can thiệp dữ liệu trò chơi."
       ],
       {
-        title: "TIỆM MỲ CAY BỊ NIÊM PHONG",
+        title: `${shop.toUpperCase()} BỊ NIÊM PHONG`,
         text: "Toàn bộ tài sản bị tịch thu, tiệm bị niêm phong.<br>Mọi dữ liệu bị xoá, quay về Ngày 1.<br><br>Đoàn kiểm tra ghét những người gian dối.<br>Chơi thật mới vui nhé!"
       },
       () => this.confiscateAndReset()

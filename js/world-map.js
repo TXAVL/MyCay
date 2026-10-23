@@ -116,7 +116,8 @@ export class WorldMap {
         <span class="wm-chip" id="wm-day">📍 Phố Ẩm Thực</span>
         <span class="wm-chip" id="wm-money"></span>
       </div>
-      <div class="world-map-hint pixel-box" id="wm-hint">Kéo để dạo phố · Chạm vào <b>Tiệm Mỳ Cay</b> để vào bán hàng</div>
+      <div class="wm-owner-card" id="wm-owner"></div>
+      <div class="world-map-hint pixel-box" id="wm-hint">Kéo để dạo phố · Chạm vào <b>tiệm của bạn</b> để vào bán hàng</div>
       <button class="wm-enter-btn" id="wm-enter">🍜 Vào Tiệm</button>
     `;
     document.body.appendChild(root);
@@ -216,7 +217,7 @@ export class WorldMap {
     this.followPlayer = true;
     this.root.classList.remove("wm-hidden");
     this.visible = true;
-    this.setHint("Kéo để dạo phố · Chạm vào <b>Tiệm Mỳ Cay</b> để vào bán hàng");
+    this.setHint(`Kéo để dạo phố · Chạm vào <b>${this.shopTitle()}</b> để vào bán hàng`);
     this.updateChips();
     if (!this.raf) this.loop();
   }
@@ -232,6 +233,11 @@ export class WorldMap {
     const day = this.root.querySelector("#wm-day");
     const money = this.root.querySelector("#wm-money");
     if (day) day.textContent = `📍 Phố Ẩm Thực · Ngày ${st.day || 1}`;
+    const ownerEl = this.root.querySelector("#wm-owner");
+    if (ownerEl) {
+      const shop = st.shopName || "Tiệm Mỳ Cay";
+      ownerEl.textContent = st.ownerFullName ? `🏮 ${shop} · Chủ tiệm: ${st.ownerFullName}` : `🏮 ${shop}`;
+    }
     if (money) money.textContent = `💰 ${Math.floor(st.money || 0).toLocaleString("vi-VN")}k`;
   }
 

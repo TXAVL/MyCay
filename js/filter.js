@@ -13,6 +13,25 @@ export class NameValidator {
     "chết", "chet", "tự tử", "tu tu", "giết", "giet", "ma túy", "ma tuy"
   ];
 
+  // Từ cấm phải đứng độc lập; chỉ từ dài (>= 4 ký tự) mới so cả chuỗi con
+  // để "Nguyễn" không bị bắt nhầm vì chứa "ngu"
+  static hasBadWord(normalized) {
+    return NameValidator.BAD_WORDS.some(badWord => {
+      const regex = new RegExp(`(^|\\s)${badWord}(\\s|$)`, "i");
+      return regex.test(normalized) || (badWord.length >= 4 && normalized.includes(badWord));
+    });
+  }
+
+  // Họ tên chủ tiệm: 2-30 ký tự, chỉ chữ cái & khoảng trắng
+  static validatePersonName(rawName) {
+    const trimmed = String(rawName || "").replace(/\s+/g, " ").trim();
+    if (trimmed.length < 2) return { isValid: false, message: "Vui lòng nhập họ tên chủ tiệm." };
+    if (trimmed.length > 30) return { isValid: false, message: "Họ tên tối đa 30 ký tự." };
+    if (!/^[\p{L}\s]+$/u.test(trimmed)) return { isValid: false, message: "Họ tên chỉ gồm chữ cái và khoảng trắng." };
+    if (NameValidator.hasBadWord(trimmed.toLowerCase())) return { isValid: false, message: "Họ tên chứa từ ngữ chưa phù hợp." };
+    return { isValid: true, message: "" };
+  }
+
   /**
    * Kiểm tra tính hợp lệ của tên quán
    * @param {string} rawName 
@@ -56,15 +75,11 @@ export class NameValidator {
       .toLowerCase()
       .replace(/[\s\-_.]+/g, " ");
 
-    for (const badWord of NameValidator.BAD_WORDS) {
-      // Tìm theo từ đứng độc lập hoặc cụm từ
-      const regex = new RegExp(`(^|\\s)${badWord}(\\s|$)`, "i");
-      if (regex.test(normalized) || normalized.includes(badWord)) {
-        return {
-          isValid: false,
-          message: "Tên quán chứa từ ngữ chưa phù hợp. Hãy chọn một cái tên ấm cúng, dễ thương hơn nhé!"
-        };
-      }
+    if (NameValidator.hasBadWord(normalized)) {
+      return {
+        isValid: false,
+        message: "Tên quán chứa từ ngữ chưa phù hợp. Hãy chọn một cái tên ấm cúng, dễ thương hơn nhé!"
+      };
     }
 
     // Tên hợp lệ
