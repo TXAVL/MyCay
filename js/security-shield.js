@@ -808,6 +808,12 @@ class SecurityShield {
     this.deviceId = this.generateHardwareFingerprint();
     window.mycay_device_id = this.deviceId;
 
+    // Chạy trên máy dev (localhost): bỏ qua toàn bộ khóa để test không bị khóa nhầm.
+    // Người chơi trên domain thật vẫn được bảo vệ như cũ.
+    if (["localhost", "127.0.0.1", "[::1]"].includes(location.hostname) || location.hostname.endsWith(".localhost")) {
+      return;
+    }
+
     // 0. ƯU TIÊN KIỂM TRA QUYỀN ADMIN TRƯỚC HẾT
     if (this.checkAdminDevMode()) {
       // Admin đã bật dev mode: Bỏ qua kiểm tra khóa và không chạy bẫy DevTools

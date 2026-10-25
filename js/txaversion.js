@@ -10,36 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.0.0 - Bản Đồ Phố Pixel)
+  // Khai báo phiên bản hiện tại của game (Bản 2.1.0 - Nội Thất Pixel & Tối Ưu Màn Rộng)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.0.0",
-      200,
-      "23/10/2026",
+      "2.1.0",
+      210,
+      "25/10/2026",
       [
         {
-          title: "Bản Đồ Phố Pixel",
-          desc: "Vào game là đứng ngoài phố ẩm thực. Kéo để dạo phố, chạm Tiệm Mỳ Cay để vào bán hàng; nút 🗺️ để ra phố.",
-          icon: "🗺️",
-          badge: "Mới ✨",
+          title: "Nội Thất & Nhân Vật Pixel Toàn Diện",
+          desc: "Đồng bộ đồ họa Retro Pixel 16-bit từ ngoài phố vào tận trong tiệm: 10 loài khách thú dễ thương, nhân viên bếp/sảnh, niêu đất sôi sùng sục và bàn ghế gỗ ấm cúng.",
+          icon: "🏮",
+          badge: "Đại Trùng Tu ✨",
           badgeType: "hot"
         },
         {
-          title: "Phố Có Chợ, Ngân Hàng, Bưu Cục",
-          desc: "Chạm Chợ Nguyên Liệu, Ngân Hàng, Việc Làm, Bưu Cục để đi tới và mở thẳng chức năng đó.",
-          icon: "🏙️",
-          badge: "Mới ✨",
-          badgeType: "hot"
-        },
-        {
-          title: "Đoàn Kiểm Tra Sống Động",
-          desc: "Cảnh sát pixel đi bộ tới tiệm, hội thoại kiểu RPG khi phát hiện gian lận.",
-          icon: "👮",
+          title: "Tối Ưu Màn Hình Rộng Desktop",
+          desc: "Giao diện cân đối hoàn hảo trên màn hình PC/Laptop (tỉ lệ 980px chuẩn), thanh điều hướng 11 nút trải đều 1 dòng thoáng mắt, không bị xé hình hay che khuất chữ.",
+          icon: "🖥️",
           badge: "Nâng Cấp 🌟",
           badgeType: "star"
+        },
+        {
+          title: "Đồng Bộ 7 Theme & Giao Diện Gọn Gàng",
+          desc: "Tương thích hoàn hảo 7 bảng màu sắc Anime & Dark Mode; trả lại Bảng Đen Menu phấn trắng nổi bật; xóa bỏ hoàn toàn viền lồng hộp gây rối mắt trên các thẻ.",
+          icon: "🎨",
+          badge: "Tối Ưu 🛠️",
+          badgeType: "manage"
         }
       ],
-      "Bản Đồ Phố Pixel"
+      "Nội Thất Pixel & Tối Ưu Màn Rộng"
     );
   }
 
@@ -47,6 +47,35 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.0.0",
+        200,
+        "23/10/2026",
+        [
+          {
+            title: "Bản Đồ Phố Pixel",
+            desc: "Vào game là đứng ngoài phố ẩm thực. Kéo để dạo phố, chạm Tiệm Mỳ Cay để vào bán hàng; nút 🗺️ để ra phố.",
+            icon: "🗺️",
+            badge: "Mới ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Phố Có Chợ, Ngân Hàng, Bưu Cục",
+            desc: "Chạm Chợ Nguyên Liệu, Ngân Hàng, Việc Làm, Bưu Cục để đi tới và mở thẳng chức năng đó.",
+            icon: "🏙️",
+            badge: "Mới ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Đoàn Kiểm Tra Sống Động",
+            desc: "Cảnh sát pixel đi bộ tới tiệm, hội thoại kiểu RPG khi phát hiện gian lận.",
+            icon: "👮",
+            badge: "Nâng Cấp 🌟",
+            badgeType: "star"
+          }
+        ],
+        "Bản Đồ Phố Pixel"
+      ),
       new txaversion(
         "1.9.1",
         191,

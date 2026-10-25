@@ -8,8 +8,9 @@
 // ==========================================================
 
 const SCALE = 4;
-const VIEW_W = 160; // bề ngang khung nhìn (px logic)
+const TARGET_VIEW_H = 240; // chiều cao khung nhìn mong muốn (px logic): quyết định cỡ 1 pixel trên màn hình
 const WORLD_W = 480;
+const EXT = 400; // vỉa hè, đường, cây kéo dài ra hai bên cho màn hình siêu rộng
 
 // Chibi 8x12: h tóc/mũ, k vành mũ, y huy hiệu, s da, e mắt, r má, c áo, b cúc, p quần, f giày
 const PERSON = [
@@ -81,7 +82,8 @@ export class WorldMap {
     this.canvas = null;
     this.ctx = null;
     this.visible = false;
-    this.camX = WORLD_W / 2 - VIEW_W / 2;
+    this.viewW = 160;
+    this.camX = WORLD_W / 2 - this.viewW / 2;
     this.viewH = 260;
     this.walkers = [];
     this.cars = [];
@@ -94,10 +96,10 @@ export class WorldMap {
 
   makeSkyline() {
     const list = [];
-    let x = -10;
+    let x = -EXT;
     let seed = 7;
     const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
-    while (x < WORLD_W) {
+    while (x < WORLD_W + EXT) {
       const w = 14 + Math.floor(rnd() * 18);
       list.push({ x, w, h: 40 + Math.floor(rnd() * 45), tone: rnd() > 0.5 ? "#4d6a8f" : "#3e5878", lit: seed });
       x += w + 2;
@@ -134,9 +136,17 @@ export class WorldMap {
     if (!this.canvas) return;
     const w = window.innerWidth;
     const h = window.innerHeight;
-    this.viewH = Math.max(220, Math.round((VIEW_W * h) / w));
-    this.canvas.width = VIEW_W * SCALE;
+    // Pixel vuông chuẩn 1:1 theo chiều cao màn hình
+    this.cssPx = Math.max(2, Math.floor(h / TARGET_VIEW_H));
+    // Giới hạn chiều rộng logic tối đa 360 để trên màn hình máy tính rộng không bị kéo toác cả con phố
+    const maxLogicalW = 360;
+    this.viewW = Math.min(maxLogicalW, Math.ceil(w / this.cssPx));
+    this.viewH = Math.max(200, Math.ceil(h / this.cssPx));
+    this.canvas.width = this.viewW * SCALE;
     this.canvas.height = this.viewH * SCALE;
+    this.canvas.style.width = `${this.viewW * this.cssPx}px`;
+    this.canvas.style.height = `${this.viewH * this.cssPx}px`;
+    this.camX = this.clampCam(this.camX);
     this.ctx.imageSmoothingEnabled = false;
   }
 
@@ -155,7 +165,7 @@ export class WorldMap {
       const dx = e.clientX - down.x;
       if (Math.abs(dx) > 6) down.moved = true;
       if (down.moved) {
-        this.camX = this.clampCam(down.cam - dx * (VIEW_W / window.innerWidth));
+        this.camX = this.clampCam(down.cam - dx / this.cssPx);
         this.followPlayer = false;
       }
     });
@@ -165,7 +175,7 @@ export class WorldMap {
       down = null;
       if (!wasTap || this.police) return;
       const rect = this.canvas.getBoundingClientRect();
-      const lx = ((e.clientX - rect.left) / rect.width) * VIEW_W + this.camX;
+      const lx = ((e.clientX - rect.left) / rect.width) * this.viewW + this.camX;
       const ly = ((e.clientY - rect.top) / rect.height) * this.viewH;
       const b = BUILDINGS.find(bd => lx >= bd.x && lx <= bd.x + bd.w && ly <= this.baseY + 4 && ly >= this.baseY - 90);
       if (b) this.goTo(b);
@@ -174,7 +184,9 @@ export class WorldMap {
   }
 
   clampCam(x) {
-    return Math.max(0, Math.min(WORLD_W - VIEW_W, x));
+    // Màn hình rộng hơn cả con phố: đặt phố vào giữa
+    if (this.viewW >= WORLD_W) return (WORLD_W - this.viewW) / 2;
+    return Math.max(0, Math.min(WORLD_W - this.viewW, x));
   }
 
   walkTo(x, onArrive = null) {
@@ -213,7 +225,7 @@ export class WorldMap {
     const shop = BUILDINGS.find(b => b.main);
     this.player.x = shop.x + shop.w / 2;
     this.player.target = null;
-    this.camX = this.clampCam(this.player.x - VIEW_W / 2);
+    this.camX = this.clampCam(this.player.x - this.viewW / 2);
     this.followPlayer = true;
     this.root.classList.remove("wm-hidden");
     this.visible = true;
@@ -265,22 +277,22 @@ export class WorldMap {
         p.x += Math.sign(d) * 0.9;
       }
     }
-    if (this.followPlayer) this.camX += (this.clampCam(p.x - VIEW_W / 2) - this.camX) * 0.12;
+    if (this.followPlayer) this.camX += (this.clampCam(p.x - this.viewW / 2) - this.camX) * 0.12;
 
-    if (this.walkers.length < 7 && Math.random() < 0.02) {
+    if (this.walkers.length < 12 && Math.random() < 0.02) {
       const dir = Math.random() < 0.5 ? 1 : -1;
-      this.walkers.push({ x: dir > 0 ? -8 : WORLD_W + 8, dir, speed: 0.25 + Math.random() * 0.25, lane: Math.random() * 10, colors: WALKER_COLORS[Math.floor(Math.random() * WALKER_COLORS.length)] });
+      this.walkers.push({ x: dir > 0 ? -EXT / 2 : WORLD_W + EXT / 2, dir, speed: 0.25 + Math.random() * 0.25, lane: Math.random() * 10, colors: WALKER_COLORS[Math.floor(Math.random() * WALKER_COLORS.length)] });
     }
     this.walkers.forEach(w => (w.x += w.dir * w.speed));
-    this.walkers = this.walkers.filter(w => w.x > -12 && w.x < WORLD_W + 12);
+    this.walkers = this.walkers.filter(w => w.x > -EXT && w.x < WORLD_W + EXT);
 
-    if (this.cars.length < 4 && Math.random() < 0.012) {
+    if (this.cars.length < 6 && Math.random() < 0.012) {
       const dir = Math.random() < 0.5 ? 1 : -1;
       const palette = ["#d94a3a", "#f2c230", "#3d8bd9", "#e9e9e9", "#2fa36b"];
-      this.cars.push({ x: dir > 0 ? -30 : WORLD_W + 30, dir, speed: 0.9 + Math.random() * 0.8, color: palette[Math.floor(Math.random() * palette.length)], bus: Math.random() < 0.2 });
+      this.cars.push({ x: dir > 0 ? -EXT / 2 : WORLD_W + EXT / 2, dir, speed: 0.9 + Math.random() * 0.8, color: palette[Math.floor(Math.random() * palette.length)], bus: Math.random() < 0.2 });
     }
     this.cars.forEach(c => (c.x += c.dir * c.speed));
-    this.cars = this.cars.filter(c => c.x > -40 && c.x < WORLD_W + 40);
+    this.cars = this.cars.filter(c => c.x > -EXT && c.x < WORLD_W + EXT);
 
     if (this.police) this.updatePolice();
   }
@@ -301,13 +313,13 @@ export class WorldMap {
     sky.addColorStop(0, night ? "#141b33" : "#7fb7e6");
     sky.addColorStop(1, night ? "#2b3560" : "#cfe6f5");
     ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, VIEW_W, base);
+    ctx.fillRect(0, 0, this.viewW, base);
 
     // Mây / sao
     ctx.fillStyle = night ? "#f3f0c8" : "#ffffff";
     for (let i = 0; i < 6; i++) {
-      const cx = ((i * 97 + this.t * 0.03) % (VIEW_W + 40)) - 20;
-      if (night) ctx.fillRect(Math.round((i * 53) % VIEW_W), 6 + ((i * 17) % 30), 1, 1);
+      const cx = ((i * 97 + this.t * 0.03) % (this.viewW + 40)) - 20;
+      if (night) ctx.fillRect(Math.round((i * 53) % this.viewW), 6 + ((i * 17) % 30), 1, 1);
       else ctx.fillRect(Math.round(cx), 10 + ((i * 13) % 25), 14, 3);
     }
 
@@ -315,7 +327,7 @@ export class WorldMap {
     const off = this.camX * 0.5;
     this.skyline.forEach(s => {
       const x = Math.round(s.x - off);
-      if (x > VIEW_W || x + s.w < 0) return;
+      if (x > this.viewW || x + s.w < 0) return;
       ctx.fillStyle = night ? "#22304d" : s.tone;
       ctx.fillRect(x, base - s.h, s.w, s.h);
       for (let wy = base - s.h + 4; wy < base - 6; wy += 5) {
@@ -332,22 +344,22 @@ export class WorldMap {
 
     // Vỉa hè gạch
     ctx.fillStyle = "#8f8a84";
-    ctx.fillRect(0, base, WORLD_W, 34);
+    ctx.fillRect(-EXT, base, WORLD_W + EXT * 2, 34);
     ctx.fillStyle = "#7d7873";
-    for (let y = base; y < base + 34; y += 8) ctx.fillRect(0, y, WORLD_W, 1);
+    for (let y = base; y < base + 34; y += 8) ctx.fillRect(-EXT, y, WORLD_W + EXT * 2, 1);
     for (let y = base, row = 0; y < base + 34; y += 8, row++) {
-      for (let x = (row % 2) * 6; x < WORLD_W; x += 12) ctx.fillRect(x, y, 1, 8);
+      for (let x = (row % 2) * 6 - EXT; x < WORLD_W + EXT; x += 12) ctx.fillRect(x, y, 1, 8);
     }
     // Lòng đường
     ctx.fillStyle = "#4a4a50";
-    ctx.fillRect(0, base + 34, WORLD_W, 34);
+    ctx.fillRect(-EXT, base + 34, WORLD_W + EXT * 2, 34);
     ctx.fillStyle = "#e8e3c8";
-    for (let x = 0; x < WORLD_W; x += 16) ctx.fillRect(x, base + 50, 8, 1);
+    for (let x = -EXT; x < WORLD_W + EXT; x += 16) ctx.fillRect(x, base + 50, 8, 1);
     // Vỉa hè dưới + quảng trường
     ctx.fillStyle = "#9a958e";
-    ctx.fillRect(0, base + 68, WORLD_W, H - base - 68);
+    ctx.fillRect(-EXT, base + 68, WORLD_W + EXT * 2, H - base - 68);
     ctx.fillStyle = "#88837d";
-    for (let y = base + 76; y < H; y += 10) ctx.fillRect(0, y, WORLD_W, 1);
+    for (let y = base + 76; y < H; y += 10) ctx.fillRect(-EXT, y, WORLD_W + EXT * 2, 1);
 
     this.drawParks(base);
     BUILDINGS.forEach(b => this.drawBuilding(b, base, night));
@@ -376,7 +388,7 @@ export class WorldMap {
 
   drawParks(base) {
     const ctx = this.ctx;
-    [[0, 56], [442, 38]].forEach(([x, w]) => {
+    [[-EXT, EXT + 56], [442, EXT + 38]].forEach(([x, w]) => {
       ctx.fillStyle = "#5c9e4a";
       ctx.fillRect(x, base - 6, w, 6);
       for (let tx = x + 8; tx < x + w - 4; tx += 20) {
@@ -523,8 +535,8 @@ export class WorldMap {
     this.followPlayer = false;
     const shop = BUILDINGS.find(b => b.main);
     this.player.x = shop.x + shop.w / 2 - 10;
-    this.camX = this.clampCam(shop.x + shop.w / 2 - VIEW_W / 2);
-    this.police = { x: this.camX + VIEW_W + 10, target: shop.x + shop.w / 2 + 6, walking: true, arrived: false };
+    this.camX = this.clampCam(shop.x + shop.w / 2 - this.viewW / 2);
+    this.police = { x: this.camX + this.viewW + 10, target: shop.x + shop.w / 2 + 6, walking: true, arrived: false };
     this.setHint("🚨 Có người đang tiến về phía tiệm...");
     if (this.game.sound && this.game.sound.playReviewChime) this.game.sound.playReviewChime();
     this.inspection = { lines, last, onDone, idx: 0 };

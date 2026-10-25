@@ -1533,13 +1533,17 @@
 
 @media (min-width: 900px) {
   .shop-scene {
-    max-width: 900px;
+    max-width: 720px;
     margin-left: auto;
     margin-right: auto;
   }
 
+  .shop-scene .sc-viewport {
+    aspect-ratio: 16 / 9;
+  }
+
   .shop-scene.is-open .sc-viewport {
-    aspect-ratio: 16 / 6.4;
+    aspect-ratio: 16 / 8.5;
   }
 }
 
@@ -3744,23 +3748,34 @@
   }
 }
 
-/* Desktop: dock 10 nút (thêm tab Nhiệm vụ) chia đều trên 1 hàng, không rớt nút lẻ xuống hàng dưới */
+/* Desktop: dock 11 nút chia đều thoải mái trên 1 hàng, chữ hiển thị to rõ không bị bé */
 @media (min-width: 900px) {
   .game-phone-frame .game-nav-grid {
-    flex-wrap: nowrap;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
   }
 
   .game-phone-frame .nav-grid-btn {
-    flex: 1 1 0;
-    width: auto;
-    min-width: 0;
-    max-width: 92px;
+    flex: 1 1 76px;
+    min-width: 76px;
+    max-width: 90px;
+    min-height: 62px;
+    padding: 6px 3px 7px;
+  }
+
+  .game-phone-frame .nav-grid-btn .tab-btn-icon {
+    font-size: 25px !important;
   }
 
   .game-phone-frame .nav-grid-btn .tab-btn-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+    font-size: 16.5px !important;
+    font-weight: 700;
   }
 }
 
@@ -4342,3 +4357,445 @@
     zoom: 0.92;
   }
 }
+
+/* ==========================================================
+   v2.0.0 · GIAO DIỆN PIXEL CHO PHẦN TRONG TIỆM
+   Đồng bộ với bản đồ phố: góc vuông, viền gỗ dày, bóng đổ cứng, chữ pixel
+   ========================================================== */
+html.pixel-ui {
+  --radius-card: 0;
+  --radius-pill: 0;
+  --font-pixel: "VT323", "Courier New", monospace;
+}
+html.pixel-ui body {
+  background-color: #261c16;
+  background-image:
+    linear-gradient(#1c140f 1px, transparent 1px),
+    linear-gradient(90deg, #1c140f 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+html.pixel-ui .game-phone-frame,
+html.pixel-ui .modal-dialog,
+html.pixel-ui .custom-dialog-box,
+html.pixel-ui .upgrade-card,
+html.pixel-ui .staff-card,
+html.pixel-ui .price-card,
+html.pixel-ui .menu-item-card,
+html.pixel-ui .chalkboard-card,
+html.pixel-ui .special-dish-card,
+html.pixel-ui .stat-card,
+html.pixel-ui .bank-atm-card,
+html.pixel-ui .bank-section-box,
+html.pixel-ui .order-slot-card,
+html.pixel-ui .pot-workstation-card,
+html.pixel-ui .kt-ticket,
+html.pixel-ui .ingredient-badge-card,
+html.pixel-ui .preset-recipe-card,
+html.pixel-ui .tab-pane,
+html.pixel-ui .game-toast,
+html.pixel-ui .nav-grid-btn,
+html.pixel-ui .btn-dock-tab,
+html.pixel-ui .btn-bank-quick,
+html.pixel-ui .btn-menu-action,
+html.pixel-ui .btn-stepper,
+html.pixel-ui .btn-stepper-action,
+html.pixel-ui .btn-open-day-prominent,
+html.pixel-ui .btn-brew-action,
+html.pixel-ui .btn-direct-serve,
+html.pixel-ui .btn-quick-cook,
+html.pixel-ui .hud-pill,
+html.pixel-ui .hud-level-badge,
+html.pixel-ui .hud-xp-bar,
+html.pixel-ui .sc-chip,
+html.pixel-ui .sc-ticker,
+html.pixel-ui .sc-door-sign,
+html.pixel-ui .sc-shop-sign,
+html.pixel-ui .sc-bubble,
+html.pixel-ui .pixel-box {
+  border-radius: 0 !important;
+}
+
+html.pixel-ui .sc-bg,
+html.pixel-ui .world-map-canvas,
+html.pixel-ui .sc-pixel-char {
+  image-rendering: pixelated;
+}
+
+html.pixel-ui .game-phone-frame {
+  max-width: 980px !important;
+  border: 4px solid var(--wood-frame, #3a2412) !important;
+  box-shadow: 0 0 0 4px var(--border-card, #8a5a2b), 8px 12px 0 4px rgba(0, 0, 0, 0.45) !important;
+  background: var(--bg-app, #f7eed8);
+}
+
+html.pixel-ui .game-top-header {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 4px solid var(--border-card, #8a5a2b);
+  box-shadow: 0 4px 0 var(--wood-frame, #3a2412);
+  background: var(--bg-tray, #ecd9b5);
+}
+
+html.pixel-ui .modal-dialog,
+html.pixel-ui .custom-dialog-box,
+html.pixel-ui .nav-grid-btn,
+html.pixel-ui .upgrade-card,
+html.pixel-ui .staff-card,
+html.pixel-ui .price-card,
+html.pixel-ui .menu-item-card,
+html.pixel-ui .stat-card,
+html.pixel-ui .bank-atm-card,
+html.pixel-ui .bank-section-box,
+html.pixel-ui .order-slot-card,
+html.pixel-ui .offline-report-card,
+html.pixel-ui .mobile-footer-stats-card,
+html.pixel-ui .review-card,
+html.pixel-ui .game-toast {
+  border: 3px solid var(--border-card, #8a5a2b) !important;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35) !important;
+  background: var(--bg-card, #fff8ea) !important;
+  color: var(--text-main, #3a2412) !important;
+}
+
+/* BẢNG ĐEN MENU HÔM NAY (CHALKBOARD VINTAGE PIXEL) - Giữ nguyên bảng đen phấn trắng trong mọi theme */
+html.pixel-ui .chalkboard-card {
+  background: var(--accent-chalk, #1a2821) !important;
+  color: #FFFDF5 !important;
+  border: 4px solid var(--wood-frame, #6e3f1c) !important;
+  box-shadow: 0 0 0 2px var(--wood-dark, #3f1f0a), 4px 5px 0 rgba(0, 0, 0, 0.45) !important;
+  border-radius: 0 !important;
+}
+
+html.pixel-ui .chalkboard-card .chalkboard-title {
+  color: #FFFDF5 !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 22px !important;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+html.pixel-ui .chalkboard-card .chalk-menu-name {
+  color: #FFFDF5 !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 19px !important;
+}
+
+html.pixel-ui .chalkboard-card .chalk-menu-price {
+  color: #FFE600 !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 19px !important;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+html.pixel-ui .chalkboard-card .chalkboard-topping-label {
+  color: #A3E635 !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 17.5px !important;
+}
+
+html.pixel-ui .chalkboard-card .chalkboard-footer-note {
+  color: #E2E8F0 !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 16px !important;
+}
+
+html.pixel-ui .chalkboard-card .chalk-topping-pill {
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #FFFDF5 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 16px !important;
+}
+
+/* Thẻ Món Đặc Biệt Hôm Nay (Pixel Retro) */
+html.pixel-ui .special-dish-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(217, 119, 6, 0.08) 100%), var(--bg-card, #fff8ea) !important;
+  border: 3px solid var(--accent-gold, #d48816) !important;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35) !important;
+  color: var(--text-main, #3a2412) !important;
+  border-radius: 0 !important;
+}
+
+/* Triệt tiêu triệt để mọi viền lồng, viền khung chữ vào trong các khối con của thẻ */
+html.pixel-ui .upgrade-card > div:first-child,
+html.pixel-ui .staff-card > div:first-child,
+html.pixel-ui .price-card > div:first-child,
+html.pixel-ui .upgrade-card-info,
+html.pixel-ui .staff-card-info,
+html.pixel-ui .price-card-info,
+html.pixel-ui .menu-item-card-info,
+html.pixel-ui .stat-card-info,
+html.pixel-ui .upgrade-card-title,
+html.pixel-ui .staff-card-title,
+html.pixel-ui .price-card-title,
+html.pixel-ui .upgrade-card-desc,
+html.pixel-ui .staff-card-desc,
+html.pixel-ui .price-card-desc,
+html.pixel-ui .bank-card-header,
+html.pixel-ui .bank-card-footer,
+html.pixel-ui .bank-brand-block,
+html.pixel-ui .bank-balance-display,
+html.pixel-ui .shipper-header,
+html.pixel-ui .order-card-header,
+html.pixel-ui [class*="-info"],
+html.pixel-ui [class*="-desc"],
+html.pixel-ui [class*="-header"]:not(.game-top-header):not(.kt-header),
+html.pixel-ui [class*="-footer"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Thanh tiến độ Level nâng cấp chuẩn pixel 8-bit */
+html.pixel-ui .upgrade-lv-progress-bar {
+  border-radius: 0 !important;
+  border: 2px solid #3a2412 !important;
+  background: #ecd9b5 !important;
+  height: 9px !important;
+  margin-top: 6px !important;
+  box-shadow: inset 1px 1px 0 rgba(0,0,0,0.2) !important;
+  overflow: hidden !important;
+}
+
+html.pixel-ui .upgrade-lv-progress-fill {
+  border-radius: 0 !important;
+  background: #27ae60 !important;
+  box-shadow: inset 0 2px 0 #58d68d, inset 0 -2px 0 #1e8449 !important;
+}
+
+html.pixel-ui .upgrade-card-title,
+html.pixel-ui .staff-card-title,
+html.pixel-ui .price-card-title {
+  font-family: var(--font-pixel) !important;
+  font-size: 20px !important;
+  letter-spacing: 0.5px;
+  color: var(--text-title, #3a2412) !important;
+}
+
+html.pixel-ui .upgrade-card-desc,
+html.pixel-ui .staff-card-desc,
+html.pixel-ui .price-card-desc {
+  font-size: 13.5px !important;
+  color: var(--text-muted, #6b4d38) !important;
+  line-height: 1.4 !important;
+}
+
+html.pixel-ui .nav-grid-btn.active {
+  border-color: var(--accent-berry, #a3281d) !important;
+  background: var(--bg-card-subtle, #f3e2bd) !important;
+  box-shadow: inset 0 -4px 0 var(--accent-berry, #a3281d), 4px 4px 0 rgba(0, 0, 0, 0.45) !important;
+}
+
+html.pixel-ui button:not(.nav-grid-btn):not(.btn-header-action):not(.header-pause-btn) {
+  box-shadow: 0 4px 0 rgba(58, 36, 18, 0.75);
+  transition: transform 0.05s steps(1), box-shadow 0.05s steps(1);
+}
+
+html.pixel-ui button:not(.nav-grid-btn):not(.btn-header-action):not(.header-pause-btn):active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(58, 36, 18, 0.75);
+}
+
+/* Chữ pixel cho toàn bộ tiêu đề, nút, số liệu HUD, thực đơn */
+html.pixel-ui h1,
+html.pixel-ui h2,
+html.pixel-ui h3,
+html.pixel-ui button,
+html.pixel-ui .tab-btn-label,
+html.pixel-ui .hud-level-badge,
+html.pixel-ui .hud-level-title,
+html.pixel-ui #hud-xp-text,
+html.pixel-ui .shop-day-sub,
+html.pixel-ui .sc-chip,
+html.pixel-ui .sc-ticker,
+html.pixel-ui .sc-door-sign,
+html.pixel-ui .sc-shop-sign,
+html.pixel-ui .header-money-val,
+html.pixel-ui .header-rep-val,
+html.pixel-ui .header-time-title,
+html.pixel-ui .stat-num,
+html.pixel-ui .stat-label,
+html.pixel-ui .kt-title,
+html.pixel-ui .kt-streak,
+html.pixel-ui .kt-today {
+  font-family: var(--font-pixel) !important;
+  letter-spacing: 0.5px;
+}
+
+html.pixel-ui h1 { font-size: 1.85em; }
+html.pixel-ui h2 { font-size: 1.6em; }
+html.pixel-ui h3 { font-size: 1.45em; }
+html.pixel-ui button { font-size: 1.25em; }
+html.pixel-ui .tab-btn-label { font-size: 16px !important; white-space: nowrap !important; }
+
+html.pixel-ui .header-money-val { font-size: 19.5px !important; }
+html.pixel-ui .header-rep-val,
+html.pixel-ui .header-time-title { font-size: 18px !important; }
+html.pixel-ui .hud-level-badge { font-size: 15px !important; }
+html.pixel-ui .hud-level-title { font-size: 16px !important; }
+html.pixel-ui #hud-xp-text { font-size: 15px !important; }
+html.pixel-ui .shop-day-sub { font-size: 16px !important; }
+html.pixel-ui .stat-num { font-size: 24px !important; }
+html.pixel-ui .stat-label { font-size: 16.5px !important; }
+html.pixel-ui .kt-title { font-size: 18.5px !important; }
+html.pixel-ui .kt-streak,
+html.pixel-ui .kt-today { font-size: 17.5px !important; }
+
+html.pixel-ui .hud-xp-bar,
+html.pixel-ui .hud-xp-bar i {
+  border: 2px solid #3a2412;
+}
+
+html.pixel-ui .sc-chip,
+html.pixel-ui .sc-ticker {
+  font-size: 16px !important;
+  background: rgba(42, 32, 28, 0.88) !important;
+  color: #f6e3a8 !important;
+  border: 2px solid #c9a24a !important;
+}
+
+/* Tối ưu kích cỡ chữ Pixel lớn rõ, chuẩn nét trên màn hình Desktop */
+@media (min-width: 900px) {
+  html.pixel-ui {
+    font-size: 16px;
+  }
+  html.pixel-ui .game-top-header {
+    padding: 10px 18px;
+  }
+  html.pixel-ui h1,
+  html.pixel-ui #display-shop-name {
+    font-size: 26px !important;
+  }
+  html.pixel-ui h2 {
+    font-size: 22px !important;
+  }
+  html.pixel-ui h3 {
+    font-size: 19px !important;
+  }
+  html.pixel-ui .header-money-val {
+    font-size: 22px !important;
+  }
+  html.pixel-ui .header-rep-val,
+  html.pixel-ui .header-time-title {
+    font-size: 20px !important;
+  }
+  html.pixel-ui .hud-level-title,
+  html.pixel-ui .shop-day-sub {
+    font-size: 17.5px !important;
+  }
+  html.pixel-ui .chalkboard-title,
+  html.pixel-ui .special-dish-label {
+    font-size: 22px !important;
+  }
+  html.pixel-ui .chalkboard-footer-note {
+    font-family: var(--font-pixel) !important;
+    font-size: 17px !important;
+  }
+  html.pixel-ui .btn-open-day-prominent,
+  html.pixel-ui .btn-brew-action {
+    font-size: 20px !important;
+  }
+  html.pixel-ui .pot-title-status {
+    font-size: 20px !important;
+  }
+  html.pixel-ui .ingredient-name {
+    font-family: var(--font-pixel) !important;
+    font-size: 17px !important;
+  }
+  html.pixel-ui .btn-dock-tab {
+    font-size: 18.5px !important;
+  }
+  html.pixel-ui .sc-chip,
+  html.pixel-ui .sc-ticker {
+    font-size: 17px !important;
+  }
+  html.pixel-ui .sc-door-sign {
+    font-size: 17px !important;
+  }
+  html.pixel-ui .sc-shop-sign {
+    font-size: 21px !important;
+  }
+  html.pixel-ui .world-map-hint {
+    font-size: 18px !important;
+  }
+  html.pixel-ui .wm-chip {
+    font-size: 17px !important;
+  }
+  html.pixel-ui .wm-enter-btn {
+    font-size: 20px !important;
+  }
+}
+
+/* Nhân vật Pixel trong tiệm */
+.sc-pixel-char-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 100%;
+}
+.sc-pixel-char {
+  display: block;
+  image-rendering: pixelated;
+  width: auto;
+  height: clamp(34px, 8.8cqw, 64px);
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+.sc-actor.walking .sc-pixel-char-wrap {
+  animation: pixelWalkBob 0.28s steps(2) infinite alternate;
+}
+@keyframes pixelWalkBob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-3px); }
+}
+
+/* Bếp Nấu & Niêu Đất Pixel trong Ca Bán (view-open-mode) */
+html.pixel-ui .kitchen-station {
+  background: #e8d7b8 !important;
+  border: 3px solid #8a5a2b !important;
+  box-shadow: 4px 4px 0 rgba(58, 36, 18, 0.45) !important;
+}
+
+html.pixel-ui .pot-workstation-card {
+  background: #2a201c !important;
+  border: 3px solid #8a5a2b !important;
+  box-shadow: 3px 3px 0 #1a1008 !important;
+  color: #f5eed8 !important;
+}
+
+html.pixel-ui .pot-workstation-card.is-ready {
+  border-color: #2fa36b !important;
+  box-shadow: 0 0 0 2px #2fa36b, 3px 3px 0 #1a1008 !important;
+}
+
+html.pixel-ui .kt-ticket {
+  background: #fff8eb !important;
+  border: 2px solid #5a3618 !important;
+  box-shadow: 3px 3px 0 rgba(58, 36, 18, 0.4) !important;
+}
+
+html.pixel-ui .ingredient-badge-card {
+  background: #f4e6cc !important;
+  border: 2px solid #7a4d24 !important;
+  box-shadow: 2px 2px 0 #3a2412 !important;
+}
+
+html.pixel-ui .ingredient-badge-card.selected {
+  border-color: #d9442e !important;
+  box-shadow: inset 0 0 0 2px #d9442e, 2px 2px 0 #3a2412 !important;
+}
+
+html.pixel-ui .btn-dock-tab {
+  background: #d4c09b !important;
+  border: 2px solid #7a4d24 !important;
+  font-family: var(--font-pixel) !important;
+}
+
+html.pixel-ui .btn-dock-tab.active {
+  background: #f7eed8 !important;
+  border-color: #a3281d !important;
+  box-shadow: inset 0 -3px 0 #a3281d !important;
+}
+

@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.0.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-23%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.1.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-25%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
@@ -78,6 +78,12 @@
 - Sao lưu và khôi phục dữ liệu game an toàn.
 - Xóa dữ liệu và chơi lại từ đầu an toàn.
 
+### 8. 🗺️ Bản Đồ Phố Pixel & Nội Thất Tiệm Độc Bản (v2.1.0)
+- **Bản đồ thế giới ẩm thực Pixel (World Map)**: Kéo dạo phố ẩm thực Retro 16-bit, ghé thăm Chợ nguyên liệu, Ngân hàng, Bưu cục shipper và bước chân vào Tiệm Mỳ Cay.
+- **Nội thất & Khách hàng Pixel 16-bit**: Toàn bộ không gian tiệm từ bàn ghế gỗ sồi, niêu đất sôi nghi ngút khói đến 10 loài khách thú anime (mèo, shiba, gấu, thỏ, cáo, panda...) đều được dựng bằng engine vẽ pixel sắc nét độc quyền.
+- **Tối ưu chuẩn mực màn hình Desktop**: Căn chỉnh tỷ lệ vàng 980px trên PC/Laptop, thanh điều hướng 11 tab trải đều 1 dòng thoáng mắt, không bị xé hình.
+- **Tương thích toàn diện 7 Theme**: Bảng đen menu phấn trắng nổi bật, hỗ trợ hoàn hảo cả Dark Mode và Light Mode.
+
 ---
 
 ## 🎮 Hướng Dẫn Trải Nghiệm
@@ -93,15 +99,19 @@
 MyCay/
 ├── index.html          # Trang chính của game
 ├── manifest.json       # Web App Manifest (PWA)
+├── sw.js               # Service Worker PWA Offline 100%
 ├── _headers            # Tối ưu cache và security cho Cloudflare Pages
-├── README.md           # Tài liệu hướng dẫn
+├── README.md           # Tài liệu hướng dẫn & Changelog
 ├── styles/
-│   ├── main.css        # Giao diện Cozy Anime, Responsive, Glassmorphism
-│   └── game-skin.css   # Lớp giao diện game: HUD, khung cảnh tiệm, dock, nút 3D
+│   ├── main.css        # Giao diện Cozy Anime, Responsive, Hệ thống 7 Theme
+│   └── game-skin.css   # Lớp giao diện game Pixel 16-bit, HUD, dock 3D
 └── js/
     ├── app.js          # Khởi động, điều phối loading, popup đặt tên và version
     ├── game.js         # Logic tiệm mì, nấu mì 7 cấp độ, review, nhân viên
-    ├── shop-scene.js   # Khung cảnh tiệm sống động: khách chibi, nhân viên, xu bay, cấp độ tiệm
+    ├── shop-scene.js   # Khung cảnh tiệm: điều phối khách ăn mì, nhân viên, bàn ghế
+    ├── pixel-sprites.js# Engine nhân vật Pixel Art 16-bit (10 loài thú, chủ tiệm, nhân viên)
+    ├── pixel-interior.js# Đồ họa nội thất quán mì pixel canvas 192x108
+    ├── world-map.js    # Bản đồ phố ẩm thực Pixel tương tác mượt mà
     ├── quests.js       # Nhiệm vụ hằng ngày, rương thưởng & thành tựu tiệm
     ├── txaversion.js   # Quản lý phiên bản game và thông báo cập nhật mới
     ├── filter.js       # Bộ lọc kiểm duyệt tên quán, cảnh báo đỏ tự biến mất

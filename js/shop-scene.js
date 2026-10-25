@@ -8,6 +8,9 @@
 // Toàn bộ tọa độ tính theo % khung ảnh nội thất 16:9 (assets/interior.jpg)
 // ==========================================================
 
+import { renderPixelInterior } from "./pixel-interior.js?v=2.1.0";
+import { getPixelCharacterUrl } from "./pixel-sprites.js?v=2.1.0";
+
 const DOOR = { x: 44.5, y: 58 };
 
 // Chỗ đứng gọi món trước quầy bar (neo ở chân nhân vật)
@@ -98,7 +101,7 @@ export class ShopScene {
     container.innerHTML = `
       <div class="sc-viewport" id="sc-viewport">
         <div class="sc-stage" id="sc-stage">
-          <img class="sc-bg" src="assets/interior.jpg" alt="Nội thất tiệm mì" draggable="false" />
+          <img class="sc-bg" src="${renderPixelInterior()}" alt="Nội thất tiệm mì" draggable="false" />
           <div class="sc-glow"><i style="left:4.5%;top:11%"></i><i style="left:11%;top:13%"></i><i style="left:41.5%;top:20%"></i><i style="left:46%;top:21%"></i><i style="left:63.5%;top:5%"></i><i style="left:91.5%;top:6%"></i></div>
           <div class="sc-shop-sign" id="sc-shop-sign"><span id="sc-shop-sign-text">Tiệm Mỳ Cay</span></div>
           <div class="sc-door-sign is-closed" id="sc-door-sign">ĐÓNG</div>
@@ -237,16 +240,23 @@ export class ShopScene {
             this.actors.set(key, actor);
             this.toDiner(actor, t.id);
             this.showEmote(actor, "😋");
-            this.moveActor(actor, spot, () => actor.el.classList.add("seated"));
+            this.moveActor(actor, spot, () => {
+              actor.el.classList.add("seated");
+              this.setActorSeated(actor, true);
+            });
           } else {
             const actor = this.createActor(key, t.customer);
             this.toDiner(actor, t.id);
             if (instant) {
               this.placeActor(actor, spot);
               actor.el.classList.add("seated");
+              this.setActorSeated(actor, true);
             } else {
               this.placeActor(actor, DOOR);
-              this.moveActor(actor, spot, () => actor.el.classList.add("seated"));
+              this.moveActor(actor, spot, () => {
+                actor.el.classList.add("seated");
+                this.setActorSeated(actor, true);
+              });
             }
           }
         }
@@ -258,6 +268,7 @@ export class ShopScene {
     this.actors.forEach((actor, key) => {
       if (key.startsWith("t") && !liveTableKeys.has(key) && !actor.leaving) {
         actor.el.classList.remove("seated");
+        this.setActorSeated(actor, false);
         this.showEmote(actor, "💕");
         this.leaveActor(actor);
       }
@@ -350,13 +361,17 @@ export class ShopScene {
         el.style.zIndex = String(Math.round(spot.y * 10));
         el.style.setProperty("--bob-delay", `${(i * 0.37).toFixed(2)}s`);
         el.title = member.name;
+        const pixelImg = getPixelCharacterUrl(member.avatar, {
+          isOwner: member.key === "owner",
+          isStaff: true,
+          shirtColor: "#5a3a24",
+          scale: 3
+        });
         el.innerHTML = `
           <div class="sc-bubble sc-talk" hidden></div>
-          <div class="sc-figure">
-            <div class="sc-head"><img src="${member.avatar}" alt="${member.name}" draggable="false" onerror="this.src='assets/cust_cat.png'" /></div>
-            <div class="sc-torso sc-apron"></div>
+          <div class="sc-pixel-char-wrap">
+            <img class="sc-pixel-char" src="${pixelImg}" alt="${member.name}" draggable="false" />
           </div>
-          ${member.key === "owner" ? '<span class="sc-hat">👨‍🍳</span>' : ""}
         `;
         this.staffLayer.appendChild(el);
         this.staffEls.push({ el, member });
@@ -457,15 +472,17 @@ export class ShopScene {
     const shirt = customer.isVip ? "#E9B840" : (SHIRT_COLORS[customer.avatar] || "#E59A7A");
     el.style.setProperty("--shirt", shirt);
     el.style.setProperty("--bob-delay", `${(Math.random() * 0.6).toFixed(2)}s`);
+    const pixelImg = getPixelCharacterUrl(customer.avatar, {
+      isVip: customer.isVip,
+      shirtColor: shirt,
+      isSeated: false,
+      scale: 3
+    });
     el.innerHTML = `
       <div class="sc-bubble" hidden></div>
-      <div class="sc-figure">
-        <div class="sc-head"><img src="${customer.avatar}" alt="${customer.name}" draggable="false" onerror="this.src='assets/cust_cat.png'" /></div>
-        <div class="sc-torso"></div>
-        <div class="sc-legs"><i></i><i></i></div>
+      <div class="sc-pixel-char-wrap">
+        <img class="sc-pixel-char" src="${pixelImg}" alt="${customer.name}" draggable="false" />
       </div>
-      ${customer.isVip ? '<span class="sc-crown">👑</span>' : ""}
-      <span class="sc-bowl">🍜</span>
       <span class="sc-emote"></span>
       <span class="sc-shadow"></span>
     `;
@@ -475,6 +492,19 @@ export class ShopScene {
     el.dataset.key = key;
     this.actors.set(key, actor);
     return actor;
+  }
+
+  setActorSeated(actor, isSeated) {
+    if (!actor || !actor.customer) return;
+    const shirt = actor.customer.isVip ? "#E9B840" : (SHIRT_COLORS[actor.customer.avatar] || "#E59A7A");
+    const imgUrl = getPixelCharacterUrl(actor.customer.avatar, {
+      isVip: actor.customer.isVip,
+      shirtColor: shirt,
+      isSeated,
+      scale: 3
+    });
+    const charImg = actor.el.querySelector(".sc-pixel-char");
+    if (charImg && charImg.src !== imgUrl) charImg.src = imgUrl;
   }
 
   toDiner(actor, tableId) {

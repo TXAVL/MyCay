@@ -39,4 +39,36 @@ if (fs.existsSync(readmeFile)) {
   console.log(`✓ Đã cập nhật README.md -> v${currentVer}`);
 }
 
-console.log("🎉 Hoàn tất đồng bộ phiên bản!");
+// 4. Cập nhật sw.js (CACHE_NAME & PRECACHE_ASSETS query ?v=)
+const swFile = path.join(rootDir, "sw.js");
+if (fs.existsSync(swFile)) {
+  let sw = fs.readFileSync(swFile, "utf-8");
+  sw = sw.replace(/const CACHE_NAME = ["'][^"']+["'];/, `const CACHE_NAME = "mycay-pwa-v${currentVer}";`);
+  sw = sw.replace(/\?v=[0-9a-zA-Z.-]+/g, `?v=${currentVer}`);
+  fs.writeFileSync(swFile, sw, "utf-8");
+  console.log(`✓ Đã cập nhật sw.js -> CACHE_NAME mycay-pwa-v${currentVer}`);
+}
+
+// 5. Cập nhật index.html (link stylesheets & scripts ?v=)
+const indexFile = path.join(rootDir, "index.html");
+if (fs.existsSync(indexFile)) {
+  let html = fs.readFileSync(indexFile, "utf-8");
+  html = html.replace(/\?v=[0-9a-zA-Z.-]+/g, `?v=${currentVer}`);
+  fs.writeFileSync(indexFile, html, "utf-8");
+  console.log(`✓ Đã cập nhật index.html -> query ?v=${currentVer}`);
+}
+
+// 6. Cập nhật các ES module imports trong thư mục js/
+const jsDir = path.join(rootDir, "js");
+const jsFiles = fs.readdirSync(jsDir).filter(f => f.endsWith(".js"));
+for (const file of jsFiles) {
+  const filePath = path.join(jsDir, file);
+  let jsContent = fs.readFileSync(filePath, "utf-8");
+  if (jsContent.includes("?v=")) {
+    jsContent = jsContent.replace(/\?v=[0-9a-zA-Z.-]+/g, `?v=${currentVer}`);
+    fs.writeFileSync(filePath, jsContent, "utf-8");
+    console.log(`✓ Đã cập nhật imports trong js/${file} -> ?v=${currentVer}`);
+  }
+}
+
+console.log("🎉 Hoàn tất đồng bộ toàn bộ file trong dự án!");

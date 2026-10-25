@@ -4,14 +4,14 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.0.0";
-import { txaformat } from "./txaformat.js?v=2.0.0";
-import { NameValidator } from "./filter.js?v=2.0.0";
-import { SoundManager } from "./audio.js?v=2.0.0";
-import { GameUIModal } from "./modal.js?v=2.0.0";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.0.0";
-import { GameIntegrity } from "./integrity.js?v=2.0.0";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona } from "./reviews.js?v=2.0.0";
+import { txaversion } from "./txaversion.js?v=2.1.0";
+import { txaformat } from "./txaformat.js?v=2.1.0";
+import { NameValidator } from "./filter.js?v=2.1.0";
+import { SoundManager } from "./audio.js?v=2.1.0";
+import { GameUIModal } from "./modal.js?v=2.1.0";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.1.0";
+import { GameIntegrity } from "./integrity.js?v=2.1.0";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona } from "./reviews.js?v=2.1.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -1351,7 +1351,11 @@ export class SpicyNoodleGame {
 
     const ownerAvatarEl = document.getElementById("header-owner-avatar");
     if (ownerAvatarEl) {
-      ownerAvatarEl.src = this.state.ownerAvatar || "assets/cust_cat.png";
+      if (document.documentElement.classList.contains("pixel-ui") && window.getPixelCharacterUrl) {
+        ownerAvatarEl.src = window.getPixelCharacterUrl(this.state.ownerAvatar || "assets/cust_cat.png", { isOwner: true, scale: 3 });
+      } else {
+        ownerAvatarEl.src = this.state.ownerAvatar || "assets/cust_cat.png";
+      }
     }
 
     if (nameEl) nameEl.textContent = this.state.shopName || "Tiệm Mỳ Cay";
