@@ -127,17 +127,34 @@ export class WorldMap {
     this.canvas = root.querySelector("canvas");
     this.ctx = this.canvas.getContext("2d");
     root.querySelector("#wm-enter").addEventListener("click", () => this.goTo(BUILDINGS.find(b => b.main)));
+    this.applyLayout(root);
     this.bindInput();
     window.addEventListener("resize", () => this.resize());
     this.resize();
   }
 
+  // Bố cục cốt lõi đặt thẳng bằng inline style để không phụ thuộc CSS cache cũ:
+  // các thanh phủ luôn nằm giữa, rộng tối đa 520-560px và không bao giờ tràn khỏi màn hình
+  applyLayout(root) {
+    Object.assign(root.style, { position: "fixed", inset: "0", overflow: "hidden", maxWidth: "100vw" });
+    const center = (el, maxW) => {
+      if (!el) return;
+      Object.assign(el.style, {
+        left: "50%", right: "auto", margin: "0", transform: "translateX(-50%)",
+        width: `min(${maxW}px, calc(100% - 24px))`, boxSizing: "border-box",
+      });
+    };
+    center(root.querySelector(".world-map-topbar"), 520);
+    center(root.querySelector("#wm-owner"), 560);
+    center(root.querySelector("#wm-hint"), 520);
+  }
+
   resize() {
     if (!this.canvas) return;
-    const w = window.innerWidth;
+    const w = document.documentElement.clientWidth || window.innerWidth;
     const h = window.innerHeight;
     // Pixel vuông chuẩn 1:1 theo chiều cao màn hình
-    this.cssPx = Math.max(2, Math.floor(h / TARGET_VIEW_H));
+    this.cssPx = Math.min(6, Math.max(2, Math.floor(h / TARGET_VIEW_H)));
     // Giới hạn chiều rộng logic tối đa 360 để trên màn hình máy tính rộng không bị kéo toác cả con phố
     const maxLogicalW = 360;
     this.viewW = Math.min(maxLogicalW, Math.ceil(w / this.cssPx));
