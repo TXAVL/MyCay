@@ -6,8 +6,8 @@
 // - Chỉ trả lại hàng trong ngày mua, hàng đã qua đêm chợ không nhận lại
 // Các hàm bên dưới được gắn vào prototype của SpicyNoodleGame trong game.js
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.3.2";
-import { txaformat } from "./txaformat.js?v=2.3.2";
+import { GameUIModal } from "./modal.js?v=2.3.3";
+import { txaformat } from "./txaformat.js?v=2.3.3";
 
 // Hạn dùng (ngày, tính cả ngày mua). null = không hỏng (niêu đất)
 const SHELF_LIFE = {

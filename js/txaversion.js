@@ -10,16 +10,16 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.3.2 - Sửa lỗi)
+  // Khai báo phiên bản hiện tại của game (Bản 2.3.3 - Sửa lỗi)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.3.2",
-      232,
+      "2.3.3",
+      233,
       "29/10/2026",
       [
         {
           title: "Sửa Lỗi",
-          desc: "Sửa lỗi hướng dẫn tân thủ hiện lên khi đang ở ngoài phố và chỉ sai chỗ.",
+          desc: "Sửa lỗi chữ khó đọc, thiếu tương phản ở cả 7 theme trên tất cả các trang.",
           icon: "🛠️",
           badge: "Sửa Lỗi 🛠️",
           badgeType: "manage"
@@ -33,6 +33,21 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.3.2",
+        232,
+        "29/10/2026",
+        [
+          {
+            title: "Sửa Lỗi",
+            desc: "Sửa lỗi hướng dẫn tân thủ hiện lên khi đang ở ngoài phố và chỉ sai chỗ.",
+            icon: "🛠️",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Sửa Lỗi"
+      ),
       new txaversion(
         "2.3.1",
         231,

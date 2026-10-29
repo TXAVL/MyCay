@@ -18,15 +18,15 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=2.3.2" />
+  <link rel="stylesheet" href="styles/main.css?v=2.3.3" />
   <!-- Lớp giao diện game (HUD, khung cảnh tiệm, dock nút tròn, nút 3D) -->
-  <link rel="stylesheet" href="styles/game-skin.css?v=2.3.2" />
+  <link rel="stylesheet" href="styles/game-skin.css?v=2.3.3" />
 
   <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
-  <script src="js/security-shield.js?v=2.3.2"></script>
+  <script src="js/security-shield.js?v=2.3.3"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -503,7 +503,7 @@
             <div class="summary-stats-cards">
               <div class="stat-card">
                 <span class="stat-label">Tổng Doanh Thu (Lũy kế)</span>
-                <span id="sum-total-money" class="stat-num" style="color: #258A6D;">400.000đ</span>
+                <span id="sum-total-money" class="stat-num" style="color: var(--cp-text-good);">400.000đ</span>
               </div>
               <div class="stat-card">
                 <span class="stat-label">Số Dư Tiền Mặt Ví</span>
@@ -680,7 +680,7 @@
               🍳 Bếp Nấu
             </button>
             <button class="btn-open-view-tab" id="btn-tab-dining" onclick="window.game.switchMobileOpenTab('dining')">
-              🪑 Sảnh Bàn Ăn <span class="tab-dining-badge" id="open-dining-count" style="font-size: 11px; font-weight: 700; color: #8C431A; margin-left: 2px;"></span> <span class="tab-badge-dirty" id="tab-badge-dirty" style="display:none;">🧹</span>
+              🪑 Sảnh Bàn Ăn <span class="tab-dining-badge" id="open-dining-count" style="font-size: 11px; font-weight: 700; color: var(--text-main); margin-left: 2px;"></span> <span class="tab-badge-dirty" id="tab-badge-dirty" style="display:none;">🧹</span>
             </button>
           </div>
 
@@ -1576,6 +1576,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=2.3.2"></script>
+  <script type="module" src="js/app.js?v=2.3.3"></script>
 </body>
 </html>

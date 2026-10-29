@@ -3,17 +3,17 @@
 // Kết nối UI, Sự kiện, Tab Navigation và Logic Game
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.3.2";
-import { NameValidator } from "./filter.js?v=2.3.2";
-import { SpicyNoodleGame } from "./game.js?v=2.3.2";
-import { txatheme } from "./txatheme.js?v=2.3.2";
-import { txacoachmark } from "./txacoachmark.js?v=2.3.2";
-import { txaqr } from "./txaqr.js?v=2.3.2";
-import { GameUIModal } from "./modal.js?v=2.3.2";
-import { realtimeStats } from "./realtime-stats.js?v=2.3.2";
-import { ShopScene } from "./shop-scene.js?v=2.3.2";
-import { GameBackup } from "./backup.js?v=2.3.2";
-import { WorldMap } from "./world-map.js?v=2.3.2";
+import { txaversion } from "./txaversion.js?v=2.3.3";
+import { NameValidator } from "./filter.js?v=2.3.3";
+import { SpicyNoodleGame } from "./game.js?v=2.3.3";
+import { txatheme } from "./txatheme.js?v=2.3.3";
+import { txacoachmark } from "./txacoachmark.js?v=2.3.3";
+import { txaqr } from "./txaqr.js?v=2.3.3";
+import { GameUIModal } from "./modal.js?v=2.3.3";
+import { realtimeStats } from "./realtime-stats.js?v=2.3.3";
+import { ShopScene } from "./shop-scene.js?v=2.3.3";
+import { GameBackup } from "./backup.js?v=2.3.3";
+import { WorldMap } from "./world-map.js?v=2.3.3";
 
 // Gắn biến toàn cục phục vụ Console Admin và Dashboard phân tích số liệu
 if (typeof window !== "undefined") {

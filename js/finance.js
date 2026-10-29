@@ -5,8 +5,8 @@
 // - Hóa đơn theo thực tế: thuê mặt bằng, điện, nước, gas, lương; thiếu tiền thì ghi nợ chịu phí chậm trả
 // - Thuế khoán 2% doanh thu (miễn 5 ngày khai trương), nộp mỗi 7 ngày
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.3.2";
-import { txaformat } from "./txaformat.js?v=2.3.2";
+import { GameUIModal } from "./modal.js?v=2.3.3";
+import { txaformat } from "./txaformat.js?v=2.3.3";
 
 const SAVINGS_RATES = { flexi: 0.002, term3: 0.005, term7: 0.008 }; // %/ngày
 const TAX_RATE = 0.02;
@@ -486,7 +486,7 @@ export const FinanceMethods = {
     if (b.debtPaid > 0) h += row("📑 Trả nợ hóa đơn cũ:", `-${money(b.debtPaid)}`);
     if (b.lateFee > 0) h += row("⚠️ Phí chậm trả & phạt:", `-${money(b.lateFee)}`);
     if (b.waste > 0) h += row("🗑️ Hàng hỏng phải đổ bỏ (giá vốn):", `-${money(b.waste)}`);
-    if (b.unpaid > 0) h += `<div class="receipt-sub-staff" style="color:#DC2626;font-weight:800;">🚨 Còn nợ hóa đơn ${money(b.unpaid)}, phí chậm trả ${DEBT_LATE_FEE * 100}%/ngày!</div>`;
+    if (b.unpaid > 0) h += `<div class="receipt-sub-staff" style="color:var(--cp-text-bad);font-weight:800;">🚨 Còn nợ hóa đơn ${money(b.unpaid)}, phí chậm trả ${DEBT_LATE_FEE * 100}%/ngày!</div>`;
     if (b.hrNotes && b.hrNotes.length) h += `<div class="receipt-sub-staff">${b.hrNotes.join("<br>")}</div>`;
     return h;
   },

@@ -2801,12 +2801,12 @@
 }
 
 #view-open-mode .ingredient-badge-card.is-out {
-  opacity: 0.55;
+  opacity: 0.82;
   filter: grayscale(0.9);
 }
 
 #view-open-mode .ingredient-badge-card.is-out .ingredient-stock-bubble {
-  background: #9CA3AF;
+  background: #4B5563;
 }
 
 #view-open-mode .quick-presets-grid {
@@ -4827,3 +4827,164 @@ html.pixel-ui .dlv-card .dlv-items,
 html.pixel-ui .dlv-card .dlv-note {
   font-size: 14px !important;
 }
+
+/* ==========================================================
+   v2.3.3 · RÀ SOÁT ĐỘ TƯƠNG PHẢN (WCAG AA) CHO 7 THEME
+   Lớp chốt cuối: huy hiệu / chip dùng cặp màu chữ-nền cố định đủ đậm, riêng nhóm theme tối dùng bảng màu sáng
+   ========================================================== */
+:root {
+  --cp-good-fg: #0F5C36; --cp-good-bg: #DDF3E4;
+  --cp-warn-fg: #7A4300; --cp-warn-bg: #FDEBC8;
+  --cp-bad-fg: #A12622;  --cp-bad-bg: #FCE0DE;
+  --cp-mute-fg: #475569; --cp-mute-bg: #E6EAF0;
+  --cp-text-good: #0F6B3A; --cp-text-bad: #9B1C13; --cp-text-warn: #8A4B00;
+}
+:is([data-theme="tokyo-night"], [data-theme="spicy-fire"], [data-theme="midnight-boba"]) {
+  --cp-good-fg: #7DF0B0; --cp-good-bg: #123524;
+  --cp-warn-fg: #FFD27A; --cp-warn-bg: #3A2A0A;
+  --cp-bad-fg: #FF9AA5;  --cp-bad-bg: #3F1620;
+  --cp-mute-fg: #C5CDE8; --cp-mute-bg: #2A2F4A;
+  --cp-text-good: #5EEAA0; --cp-text-bad: #FF8A95; --cp-text-warn: #FFC857;
+}
+
+/* Huy hiệu / chip có nền riêng */
+.req-pill.req-met, .staff-badge-working, .kho-badge.in-stock, .item-status.status-selling,
+.bank-plan-rate-badge, .online-indicator, .flagship-status-pill {
+  color: var(--cp-good-fg) !important;
+  background: var(--cp-good-bg) !important;
+}
+.req-pill.req-unmet {
+  color: var(--cp-bad-fg) !important;
+  background: var(--cp-bad-bg) !important;
+}
+.price-indicator-badge.badge-fair, .flagship-status-pill.pending {
+  color: var(--cp-warn-fg) !important;
+  background: var(--cp-warn-bg) !important;
+}
+.staff-lock-badge, .collection-status-pill.pill-locked, .badge-tag-locked, .staff-card-wage, .bank-wallet-pill {
+  color: var(--cp-mute-fg) !important;
+  background: var(--cp-mute-bg) !important;
+}
+
+/* Chữ trơn đặt trên nền thẻ của theme */
+.mk-trend.down { color: var(--cp-text-good) !important; }
+.mk-trend.up, .mk-life.is-danger { color: var(--cp-text-bad) !important; }
+.mk-life.is-warn, .hr-stars { color: var(--cp-text-warn) !important; }
+.subtotal-amount { color: var(--cp-text-good) !important; }
+.price-active-amount { color: var(--cp-text-bad) !important; }
+.badge-desc, .badge-progress-label, .collection-name, .collection-bio { color: var(--text-main) !important; }
+
+/* Nút nền sáng/nhạt cần chữ đậm, nút nền xanh cần chữ trắng đủ tương phản */
+.btn-rep-guide-action { color: #2B1600 !important; }
+.hr-btn { background: #15803D !important; color: #FFF !important; }
+.hr-btn.hr-btn-ghost { background: transparent !important; color: var(--text-title) !important; }
+
+/* Thẻ nguyên liệu chưa mở khóa dùng màu theo theme thay vì nền trắng cố định */
+.kho-card.card-locked { background-color: var(--bg-card-subtle) !important; }
+
+/* Thẻ ngân hàng luôn nền tối (chữ bên trong cố định màu sáng), không bị skin pixel đè thành nền sáng */
+html.pixel-ui .bank-atm-card {
+  background: linear-gradient(135deg, #1C2833 0%, #2C3E50 50%, #17202A 100%) !important;
+  color: #FFF !important;
+}
+.cp-text-good { color: var(--cp-text-good) !important; }
+.cp-text-warn { color: var(--cp-text-warn) !important; }
+.cp-text-bad { color: var(--cp-text-bad) !important; }
+.price-active-amount { color: var(--cp-text-bad) !important; }
+/* Gói tiết kiệm đang dùng: nền theo bảng màu huy hiệu để chữ theme luôn đọc được */
+.bank-plan-card.active-plan {
+  background: var(--cp-good-bg) !important;
+}
+.bank-plan-card.active-plan .bank-plan-name, .bank-plan-card.active-plan .bank-plan-desc,
+.bank-plan-card.active-plan .bank-plan-status-text { color: var(--cp-good-fg) !important; }
+
+/* Hóa đơn kết toán, hộp cài đặt, hồ sơ chủ tiệm */
+.receipt-val-green, .receipt-net-val.profit-pos { color: var(--cp-text-good) !important; }
+.receipt-net-val.profit-neg { color: var(--cp-text-bad) !important; }
+.receipt-stamp-badge { color: var(--cp-text-bad) !important; }
+.action-banner-btn { background: color-mix(in srgb, var(--accent-berry) 70%, #000) !important; color: #FFF !important; }
+.settings-tile-btn.danger .tile-text { color: var(--cp-text-bad) !important; }
+.owner-avatar-opt span { color: var(--text-title) !important; }
+#modal-dev-buff em { color: var(--cp-text-warn) !important; }
+
+/* Thanh điều hướng: nhãn tab thường dùng màu chữ theo theme (nền nút theo theme), tab đang chọn nền vàng giữ chữ nâu đậm */
+.game-phone-frame .nav-grid-btn:not(.active) .tab-btn-label,
+.nav-grid-btn:not(.active) .tab-btn-label { color: var(--text-title) !important; }
+.game-phone-frame .nav-grid-btn.active .tab-btn-label,
+.nav-grid-btn.active .tab-btn-label { color: #3B1E09 !important; }
+
+/* Hóa đơn của mọi theme tối dùng nền thẻ theo theme (trước đây Midnight Boba bị nền kem + chữ sáng) */
+:is([data-theme="tokyo-night"], [data-theme="spicy-fire"], [data-theme="midnight-boba"]) .day-receipt-box {
+  background: var(--bg-card);
+  border-color: var(--border-card);
+  color: var(--text-main);
+}
+.settings-section-badge span { color: var(--text-title) !important; }
+:is([data-theme="tokyo-night"], [data-theme="spicy-fire"], [data-theme="midnight-boba"]) .nav-grid-btn.active .tab-btn-label {
+  color: var(--text-title) !important;
+}
+
+/* ----- Khu bếp (ca bán) là "đảo giấy kem" cố định ở mọi theme: nền sáng cứng nên trong theme tối
+   phải dùng lại bảng màu chữ sáng-nền như theme Cozy, nếu không chữ trắng nằm trên nền kem ----- */
+:is([data-theme="tokyo-night"], [data-theme="spicy-fire"], [data-theme="midnight-boba"]) :is(.kitchen-station, .offline-report-card) {
+  --bg-card: #FFFFFF; --bg-card-subtle: #FAF7F0; --bg-tray: #EEE3D0; --bg-app: #FAF5ED;
+  --border-subtle: #DECDBB; --border-card: #C7B099; --border-btn: #B59B82;
+  --text-title: #2A1508; --text-main: #3B2110; --text-muted: #664C3B; --text-hint: #533928;
+  --accent-berry: #C4385E; --accent-money: #B8384E; --accent-gold: #D48816; --accent-caramel: #8C5919;
+  --accent-green: #1B7A5D; --accent-red: #D9383A;
+  --cp-good-fg: #0F5C36; --cp-good-bg: #DDF3E4;
+  --cp-warn-fg: #7A4300; --cp-warn-bg: #FDEBC8;
+  --cp-bad-fg: #A12622;  --cp-bad-bg: #FCE0DE;
+  --cp-mute-fg: #475569; --cp-mute-bg: #E6EAF0;
+  --cp-text-good: #0F6B3A; --cp-text-bad: #9B1C13; --cp-text-warn: #8A4B00;
+  color: var(--text-main);
+}
+
+/* Niêu đất có nền tối cố định: chữ phải sáng */
+.pot-title-status { color: #FFF5E0 !important; }
+.pot-sub-status { color: #E8D7B8 !important; }
+
+/* Bảng đơn giao hàng online trong ca bán */
+html.pixel-ui .dlv-card { background: var(--bg-card); }
+.dlv-net { color: var(--cp-text-good) !important; }
+.dlv-note { color: var(--cp-warn-fg) !important; background: var(--cp-warn-bg) !important; }
+.dlv-eta { color: var(--cp-text-warn) !important; }
+.dlv-step.is-now { background: var(--accent-gold) !important; color: #2B1600 !important; }
+.dlv-step.is-past { background: var(--cp-good-bg); color: var(--cp-good-fg); }
+.shipper-app-badge.app-grab { background: #007A36 !important; color: #FFF !important; }
+.shipper-app-badge.app-shopee { background: #C23A1C !important; color: #FFF !important; }
+.shipper-app-badge.app-baemin { background: #0F7C7C !important; color: #FFF !important; }
+
+/* Nút nền nhấn: tối bớt để chữ trắng đạt AA ở mọi theme */
+.btn-serve-slot, .btn-mini-size.active { background: color-mix(in srgb, var(--accent-berry) 72%, #000) !important; color: #FFF !important; }
+.ingredient-stock-bubble { background: #17803A !important; color: #FFF !important; }
+.fever-status-text { color: var(--cp-text-warn) !important; }
+
+/* Trạng thái / nhật ký / hóa đơn: màu theo bảng AA */
+.kho-badge.out-of-stock { background: #B5301F !important; color: #FFF !important; }
+.dlv-stat.is-bad { background: var(--cp-bad-bg) !important; color: var(--cp-bad-fg) !important; }
+.collection-status-pill.pill-met { background: var(--cp-good-bg) !important; color: var(--cp-good-fg) !important; }
+.collection-sub-meta span { color: var(--text-main) !important; }
+.dlv-log.is-ok { color: var(--cp-text-good) !important; }
+.dlv-log.is-warn { color: var(--cp-text-warn) !important; }
+.dlv-log.is-bad { color: var(--cp-text-bad) !important; }
+.receipt-val-gold { color: var(--cp-text-warn) !important; }
+.receipt-val-red { color: var(--cp-text-bad) !important; }
+.receipt-val-free { color: var(--cp-text-good) !important; }
+
+/* Báo cáo offline: thẻ nền sáng cố định ở theme tối (chữ bên trong dùng bảng màu sáng) */
+:is([data-theme="tokyo-night"], [data-theme="spicy-fire"], [data-theme="midnight-boba"]) .offline-report-card {
+  background: #FFFFFF !important;
+  color: #1F2937 !important;
+}
+.offline-report-notice { color: #7A3E0B !important; }
+
+/* Tab Đánh giá */
+.rating-big-num { color: var(--cp-text-warn) !important; }
+.review-star-tag.star-5, .review-star-tag.star-4 { color: var(--cp-good-fg) !important; background: var(--cp-good-bg) !important; }
+.review-star-tag.star-3 { color: var(--cp-warn-fg) !important; background: var(--cp-warn-bg) !important; }
+.review-star-tag.star-2, .review-star-tag.star-1 { color: var(--cp-bad-fg) !important; background: var(--cp-bad-bg) !important; }
+.btn-send-reply { background: #1B7A5D !important; color: #FFF !important; }
+.owner-reply-title { color: var(--cp-text-warn) !important; }
+.customer-comeback-title { color: var(--cp-text-good) !important; }
+.review-filter-pill.active { background: color-mix(in srgb, var(--accent-berry) 72%, #000) !important; color: #FFF !important; }

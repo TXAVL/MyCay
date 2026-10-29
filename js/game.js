@@ -4,18 +4,18 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.3.2";
-import { txaformat } from "./txaformat.js?v=2.3.2";
-import { NameValidator } from "./filter.js?v=2.3.2";
-import { SoundManager } from "./audio.js?v=2.3.2";
-import { GameUIModal } from "./modal.js?v=2.3.2";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.2";
-import { GameIntegrity } from "./integrity.js?v=2.3.2";
-import { MarketMethods } from "./market.js?v=2.3.2";
-import { HrMethods } from "./hr.js?v=2.3.2";
-import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.2";
-import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.2";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.2";
+import { txaversion } from "./txaversion.js?v=2.3.3";
+import { txaformat } from "./txaformat.js?v=2.3.3";
+import { NameValidator } from "./filter.js?v=2.3.3";
+import { SoundManager } from "./audio.js?v=2.3.3";
+import { GameUIModal } from "./modal.js?v=2.3.3";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.3";
+import { GameIntegrity } from "./integrity.js?v=2.3.3";
+import { MarketMethods } from "./market.js?v=2.3.3";
+import { HrMethods } from "./hr.js?v=2.3.3";
+import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.3";
+import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.3";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.3";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -1032,7 +1032,7 @@ export class SpicyNoodleGame {
       message: `
         <div style="text-align: left; font-size: 12.5px; line-height: 1.5; color: var(--text-main); display: flex; flex-direction: column; gap: 8px;">
           <div style="background: rgba(245, 158, 11, 0.12); padding: 8px 10px; border-radius: 8px; border-left: 3px solid #F59E0B;">
-            <b>⭐ Điểm hiện tại:</b> <span style="font-weight: 800; color: #D97706; font-size: 14px;">${this.state.reputation || 30} ⭐ Danh tiếng</span>
+            <b>⭐ Điểm hiện tại:</b> <span style="font-weight: 800; color: var(--cp-text-warn); font-size: 14px;">${this.state.reputation || 30} ⭐ Danh tiếng</span>
           </div>
           <div><b>1. 🍜 Phục vụ nhanh & đúng món:</b> Khách hài lòng chấm 4★ - 5★ cộng ngay <b>+1 đến +3 ⭐</b> Danh tiếng mỗi tô! (Khách chờ lâu bỏ về bị trừ -4 ⭐).</div>
           <div><b>2. 💌 Phản hồi Sổ Tay Đánh Giá (Tab 4):</b> Chủ tiệm gửi phản hồi tử tế hoặc đền voucher xoa dịu khách sẽ được cộng ngay <b>+2 đến +4 ⭐</b> Danh tiếng!</div>
@@ -1312,7 +1312,7 @@ export class SpicyNoodleGame {
     if (listEl) {
       const activeNoodles = Object.values(this.state.noodles).filter(n => n.unlocked && n.inMenu);
       if (activeNoodles.length === 0) {
-        listEl.innerHTML = `<span style="font-size: 13px; color: #BBB;">Chưa chọn món nào vào menu</span>`;
+        listEl.innerHTML = `<span style="font-size: 13px; color: var(--text-muted);">Chưa chọn món nào vào menu</span>`;
       } else {
         listEl.innerHTML = activeNoodles.slice(0, 2).map(noodle => `
           <div class="chalk-menu-item">
@@ -1639,7 +1639,7 @@ export class SpicyNoodleGame {
               <span class="price-card-title">${item.icon} ${item.name}</span>
               <span class="price-stock-tag">Kho: <strong>${item.stock || 0}</strong></span>
             </div>
-            <span class="price-card-desc">Vốn: <strong>${txaformat.formatVND(item.unitCost)}</strong> · Chuẩn thị trường: <strong>${txaformat.formatVND(base)}</strong> · Lãi dự kiến: <strong style="color: #258A6D;">+${txaformat.formatVND(profit)} / phần</strong></span>
+            <span class="price-card-desc">Vốn: <strong>${txaformat.formatVND(item.unitCost)}</strong> · Chuẩn thị trường: <strong>${txaformat.formatVND(base)}</strong> · Lãi dự kiến: <strong class="cp-text-good">+${txaformat.formatVND(profit)} / phần</strong></span>
             <span class="price-indicator-badge ${badgeClass}">${badgeText}</span>
           </div>
           <div class="price-card-controls">
@@ -1817,7 +1817,7 @@ export class SpicyNoodleGame {
         <div class="collection-progress-header" style="grid-column: 1 / -1;">
           <div class="collection-progress-meta">
             <span>🐾 Hồ Sơ Thực Khách Đã Khám Phá:</span>
-            <span style="color: #F59E0B; font-weight: 800;">${unlockedCustomerCount} / ${totalCustomers} vị khách (${customerPct}%)</span>
+            <span class="cp-text-warn" style="font-weight: 800;">${unlockedCustomerCount} / ${totalCustomers} vị khách (${customerPct}%)</span>
           </div>
           <div class="collection-progress-bar-track">
             <div class="collection-progress-bar-fill" style="width: ${customerPct}%;"></div>
@@ -1852,7 +1852,7 @@ export class SpicyNoodleGame {
               <div class="collection-avatar is-locked-avatar">❓</div>
               <span class="collection-name" style="color: var(--text-muted);">??? (Chưa gặp)</span>
               <span class="collection-bio">Vị khách bí ẩn chưa từng ghé tiệm. Hãy mở cửa đón thêm thực khách để mở khóa hồ sơ nhé!</span>
-              <div class="collection-sub-meta" style="opacity: 0.7;">
+              <div class="collection-sub-meta">
                 <span>🔒 Chưa khám phá</span>
               </div>
               <span class="collection-status-pill pill-locked">🔒 Chưa Khám Phá</span>
@@ -1987,7 +1987,7 @@ export class SpicyNoodleGame {
         <div class="collection-progress-header" style="grid-column: 1 / -1;">
           <div class="collection-progress-meta">
             <span>🏆 Huy Hiệu Đã Đạt:</span>
-            <span style="color: #F59E0B; font-weight: 800;">${unlockedBadgesCount} / ${badges.length} (${badgePct}%)</span>
+            <span class="cp-text-warn" style="font-weight: 800;">${unlockedBadgesCount} / ${badges.length} (${badgePct}%)</span>
           </div>
           <div class="collection-progress-bar-track">
             <div class="collection-progress-bar-fill" style="width: ${badgePct}%;"></div>
@@ -2249,7 +2249,7 @@ export class SpicyNoodleGame {
                     ` : ''}
                   </div>
                   <div class="reply-quick-chips">
-                    <div style="font-size: 10px; font-weight: 800; color: #7F8C8D; width: 100%; margin-bottom: 3px;">
+                    <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); width: 100%; margin-bottom: 3px;">
                       💡 Gợi ý (bấm để điền rồi sửa tùy ý). Khách sẽ đọc kỹ từng chữ bạn viết!
                     </div>
                     ${this.getReviewReplyCategories(starCount, esc(r.customerName)).map(tpl => `
@@ -3302,7 +3302,7 @@ export class SpicyNoodleGame {
         summaryPills.innerHTML = [
           `<span class="pot-pill-tag">🍜 ${noodleName}</span>`,
           `<span class="pot-pill-tag">Niêu ${pot.size}</span>`,
-          `<span class="pot-pill-tag" style="color:#D32F2F;">🌶️ Cấp ${pot.spicyLevel}</span>`,
+          `<span class="pot-pill-tag" style="color:var(--cp-text-bad);">🌶️ Cấp ${pot.spicyLevel}</span>`,
           ...pot.toppings.map(id => `<span class="pot-pill-tag">${this.state.toppings[id] ? this.state.toppings[id].name : ""}</span>`)
         ].join("");
       }
@@ -4587,7 +4587,7 @@ export class SpicyNoodleGame {
             <span class="prep-daikin-temp">${tempDisplay}</span>
             <span class="ac-led-dot led-green"></span>
           </div>
-          <div style="font-weight:700; color:#00796B;">Không gian mát lạnh (+${bonusPct}% kiên nhẫn)</div>
+          <div style="font-weight:700; color:var(--cp-text-good);">Không gian mát lạnh (+${bonusPct}% kiên nhẫn)</div>
           <div style="font-size:12px;">❄️💨</div>
         </div>
       `;
