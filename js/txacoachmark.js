@@ -311,7 +311,18 @@ export class txacoachmark {
     } else if (spaceAbove > cardHeight + 20) {
       cardTop = spotTop - cardHeight - 16;
     } else {
-      cardTop = Math.max(16, (viewHeight - cardHeight) / 2);
+      // Không đủ chỗ trên/dưới (mục tiêu cao): đặt card ngay bên cạnh nếu còn chỗ, tránh che mục tiêu
+      const spaceRight = viewWidth - (spotLeft + spotWidth);
+      const spaceLeftSide = spotLeft;
+      if (spaceRight > cardWidth + 32) {
+        cardLeft = spotLeft + spotWidth + 16;
+      } else if (spaceLeftSide > cardWidth + 32) {
+        cardLeft = spotLeft - cardWidth - 16;
+      }
+      cardTop = Math.max(16, Math.min(spotTop, viewHeight - cardHeight - 16));
+      if (cardLeft < spotLeft + spotWidth && cardLeft + cardWidth > spotLeft) {
+        cardTop = Math.max(16, (viewHeight - cardHeight) / 2); // vẫn không tránh được: căn giữa như cũ
+      }
     }
 
     this.cardEl.style.top = `${cardTop}px`;

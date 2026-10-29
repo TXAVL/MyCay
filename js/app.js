@@ -145,15 +145,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 38);
 
+  // Hướng dẫn spotlight trỏ vào giao diện bên trong tiệm, nên chỉ chạy khi người chơi đã vào tiệm.
+  // Đang đứng ngoài bản đồ phố thì chờ tới lúc bước vào tiệm (sự kiện mycay:enter-shop)
+  let coachmarkPending = false;
+  function startCoachmarkWhenInShop(delay = 500) {
+    if (!txacoachmark.checkShouldShow()) return;
+    if (window.worldMap && window.worldMap.visible) {
+      coachmarkPending = true;
+      return;
+    }
+    setTimeout(() => new txacoachmark().start(), delay);
+  }
+  document.addEventListener("mycay:enter-shop", () => {
+    if (!coachmarkPending) return;
+    coachmarkPending = false;
+    startCoachmarkWhenInShop(700);
+  });
+
   // Kiểm tra quy trình mở tiệm lần đầu & hướng dẫn tân thủ
   function checkFirstTimeFlow() {
     const isFirstNameSetup = !localStorage.getItem("mycay_first_name_set") || !game.state.ownerFullName;
     if (isFirstNameSetup) {
       setTimeout(openNamePrompt, 400);
-    } else if (txacoachmark.checkShouldShow()) {
-      setTimeout(() => {
-        new txacoachmark().start();
-      }, 500);
+    } else {
+      startCoachmarkWhenInShop(500);
     }
   }
 
@@ -347,11 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       GameUIModal.showToast(`Biển hiệu "${val}" đã được treo lên! Khai trương hồng phát! 🎉`, "success", "🏮");
 
-      if (txacoachmark.checkShouldShow()) {
-        setTimeout(() => {
-          new txacoachmark().start();
-        }, 400);
-      }
+      startCoachmarkWhenInShop(400);
     });
   }
 

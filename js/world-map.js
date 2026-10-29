@@ -258,6 +258,8 @@ export class WorldMap {
     if (!this.root) return;
     this.root.classList.add("wm-hidden");
     this.visible = false;
+    // Báo cho các phần khác (VD: hướng dẫn tân thủ) biết người chơi đã vào trong tiệm
+    document.dispatchEvent(new CustomEvent("mycay:enter-shop"));
   }
 
   updateChips() {
