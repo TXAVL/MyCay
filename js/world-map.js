@@ -7,8 +7,8 @@
 // Mọi thứ vẽ bằng canvas theo đơn vị pixel logic (1 px logic = SCALE px thật)
 // ==========================================================
 
-const SCALE = 4;
-const TARGET_VIEW_H = 240; // chiều cao khung nhìn mong muốn (px logic): quyết định cỡ 1 pixel trên màn hình
+const SCALE = 4; // cỡ gốc để chỉnh chữ; số px thật mỗi pixel logic nằm ở this.px (nguyên, theo màn hình thật)
+const TARGET_VIEW_H = 300; // chiều cao khung nhìn mong muốn (px logic): quyết định cỡ 1 pixel trên màn hình
 const WORLD_W = 480;
 const EXT = 400; // vỉa hè, đường, cây kéo dài ra hai bên cho màn hình siêu rộng
 
@@ -151,18 +151,21 @@ export class WorldMap {
 
   resize() {
     if (!this.canvas) return;
-    const w = document.documentElement.clientWidth || window.innerWidth;
-    const h = window.innerHeight;
-    // Pixel vuông chuẩn 1:1 theo chiều cao màn hình
-    this.cssPx = Math.min(6, Math.max(2, Math.floor(h / TARGET_VIEW_H)));
-    // Giới hạn chiều rộng logic tối đa 360 để trên màn hình máy tính rộng không bị kéo toác cả con phố
-    const maxLogicalW = 360;
-    this.viewW = Math.min(maxLogicalW, Math.ceil(w / this.cssPx));
-    this.viewH = Math.max(200, Math.ceil(h / this.cssPx));
-    this.canvas.width = this.viewW * SCALE;
-    this.canvas.height = this.viewH * SCALE;
-    this.canvas.style.width = `${this.viewW * this.cssPx}px`;
-    this.canvas.style.height = `${this.viewH * this.cssPx}px`;
+    // Windows hay chạy tỉ lệ 125%/150%: tính theo pixel vật lý để mỗi pixel logic luôn là số nguyên pixel thật,
+    // nếu không canvas bị co giãn lẻ làm hình bị giãn / răng cưa không đều
+    const dpr = window.devicePixelRatio || 1;
+    const cw = document.documentElement.clientWidth || window.innerWidth;
+    const devW = Math.round(cw * dpr);
+    const devH = Math.round(window.innerHeight * dpr);
+    this.px = Math.min(8, Math.max(2, Math.floor(devH / TARGET_VIEW_H)));
+    this.cssPx = this.px / dpr;
+    // Chiều rộng logic tối đa 700: vỉa hè, đường, cây đã kéo dài sẵn hai bên cho màn hình siêu rộng
+    this.viewW = Math.min(700, Math.ceil(devW / this.px));
+    this.viewH = Math.max(200, Math.ceil(devH / this.px));
+    this.canvas.width = this.viewW * this.px;
+    this.canvas.height = this.viewH * this.px;
+    this.canvas.style.width = `${(this.canvas.width / dpr).toFixed(3)}px`;
+    this.canvas.style.height = `${(this.canvas.height / dpr).toFixed(3)}px`;
     this.camX = this.clampCam(this.camX);
     this.ctx.imageSmoothingEnabled = false;
   }
@@ -324,7 +327,7 @@ export class WorldMap {
     const H = this.viewH;
     const base = this.baseY;
     const night = this.isNight();
-    ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    ctx.setTransform(this.px, 0, 0, this.px, 0, 0);
 
     const sky = ctx.createLinearGradient(0, 0, 0, base);
     sky.addColorStop(0, night ? "#141b33" : "#7fb7e6");
@@ -466,14 +469,15 @@ export class WorldMap {
     ctx.fillStyle = "#f6e3a8";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    let size = 26;
+    const k = this.px / SCALE;
+    let size = Math.round(26 * k);
     ctx.font = `bold ${size}px "Courier New", monospace`;
-    const maxW = (w - 12) * SCALE;
-    while (ctx.measureText(title).width > maxW && size > 12) {
+    const maxW = (w - 12) * this.px;
+    while (ctx.measureText(title).width > maxW && size > Math.round(12 * k)) {
       size -= 2;
       ctx.font = `bold ${size}px "Courier New", monospace`;
     }
-    ctx.fillText(title, (x + w / 2 - this.camX) * SCALE, (signY + 5.5) * SCALE);
+    ctx.fillText(title, (x + w / 2 - this.camX) * this.px, (signY + 5.5) * this.px);
     ctx.restore();
 
     // Mặt tiền tầng trệt
@@ -511,10 +515,10 @@ export class WorldMap {
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = "#fff";
-      ctx.font = `bold 13px "Courier New", monospace`;
+      ctx.font = `bold ${Math.round(13 * this.px / SCALE)}px "Courier New", monospace`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(open ? "OPEN" : "CLOSED", (x + w / 2 - this.camX) * SCALE, (shopTop + 21) * SCALE);
+      ctx.fillText(open ? "OPEN" : "CLOSED", (x + w / 2 - this.camX) * this.px, (shopTop + 21) * this.px);
       ctx.restore();
       // Mũi tên nhấp nháy gợi ý chạm vào
       if (Math.floor(this.t / 25) % 2 === 0 && !this.police) {

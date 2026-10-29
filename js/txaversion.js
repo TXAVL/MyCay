@@ -10,36 +10,22 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.3.0 - Kinh Tế Thật)
+  // Khai báo phiên bản hiện tại của game (Bản 2.3.1 - Sửa Bản Đồ Phố Trên Windows)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.3.0",
-      230,
+      "2.3.1",
+      231,
       "29/10/2026",
       [
         {
-          title: "Chợ Nguyên Liệu Có Giá & Hạn Dùng",
-          desc: "Giá chợ đổi mỗi ngày, có mưa bão, khuyến mãi; chợ bán số lượng có hạn, nhập sỉ được giảm giá. Hàng tươi có hạn dùng, để quá hạn là hỏng phải đổ bỏ.",
-          icon: "🏪",
-          badge: "Đại Trùng Tu ✨",
-          badgeType: "hot"
-        },
-        {
-          title: "Tuyển Dụng Phỏng Vấn & Tâm Trạng",
-          desc: "Ứng viên có tay nghề, mức lương và tính cách riêng, thử việc 2 ngày. Nhân viên có tâm trạng, xin tăng lương, nghỉ việc nếu bị nợ lương. Có thể thưởng nóng hoặc sa thải. Khi bạn vắng mặt, chính nhân viên trông tiệm và có thể chán đời nghỉ việc giữa ca.",
-          icon: "🧑‍🍳",
-          badge: "Mới ✨",
-          badgeType: "hot"
-        },
-        {
-          title: "Vay Vốn, Thuế & Hóa Đơn Thật",
-          desc: "Vay trả góp có lãi, điểm tín dụng, nợ xấu bị trích sổ. Tiền thuê, điện, nước, gas tính theo lượng khách; thuế khoán 2% nộp mỗi 7 ngày. Lãi tiết kiệm sát thực tế hơn.",
-          icon: "🏦",
-          badge: "Nâng Cấp 🌟",
-          badgeType: "star"
+          title: "Bản Đồ Phố Hết Bị Giãn Trên Windows",
+          desc: "Mỗi pixel trên bản đồ phố giờ khớp đúng số pixel thật của màn hình, kể cả khi Windows đặt tỉ lệ 125%, 150%. Màn hình rộng thấy trọn con phố, hình sắc nét, không còn bị kéo giãn hay phóng quá to.",
+          icon: "🗺️",
+          badge: "Sửa Lỗi 🛠️",
+          badgeType: "manage"
         }
       ],
-      "Kinh Tế Thật"
+      "Sửa Bản Đồ Phố Trên Windows"
     );
   }
 
@@ -47,6 +33,35 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.3.0",
+        230,
+        "29/10/2026",
+        [
+          {
+            title: "Chợ Nguyên Liệu Có Giá & Hạn Dùng",
+            desc: "Giá chợ đổi mỗi ngày, có mưa bão, khuyến mãi; chợ bán số lượng có hạn, nhập sỉ được giảm giá. Hàng tươi có hạn dùng, để quá hạn là hỏng phải đổ bỏ.",
+            icon: "🏪",
+            badge: "Đại Trùng Tu ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Tuyển Dụng Phỏng Vấn & Tâm Trạng",
+            desc: "Ứng viên có tay nghề, mức lương và tính cách riêng, thử việc 2 ngày. Nhân viên có tâm trạng, xin tăng lương, nghỉ việc nếu bị nợ lương. Có thể thưởng nóng hoặc sa thải. Khi bạn vắng mặt, chính nhân viên trông tiệm và có thể chán đời nghỉ việc giữa ca.",
+            icon: "🧑‍🍳",
+            badge: "Mới ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Vay Vốn, Thuế & Hóa Đơn Thật",
+            desc: "Vay trả góp có lãi, điểm tín dụng, nợ xấu bị trích sổ. Tiền thuê, điện, nước, gas tính theo lượng khách; thuế khoán 2% nộp mỗi 7 ngày. Lãi tiết kiệm sát thực tế hơn.",
+            icon: "🏦",
+            badge: "Nâng Cấp 🌟",
+            badgeType: "star"
+          }
+        ],
+        "Kinh Tế Thật"
+      ),
       new txaversion(
         "2.2.0",
         220,

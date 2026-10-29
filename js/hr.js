@@ -5,7 +5,7 @@
 // - Nhân viên có tâm trạng: lương trễ, bị bỏ rơi thì chán việc, xin tăng lương, thậm chí nghỉ việc
 // - Có thể thưởng nóng, sa thải (phải đền 2 ngày lương)
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.3.0";
+import { GameUIModal } from "./modal.js?v=2.3.1";
 
 export const STAFF_ROSTER = [
   { key: "mochi", name: "Bé Mèo Mochi", role: "Tiếp tân", desc: "Chào đón khách nồng hậu & tăng +25% tiền tip", cost: 450, wage: 35, minDay: 2, minRep: 25, icon: "🐱" },
