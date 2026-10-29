@@ -102,6 +102,8 @@ export class txacoachmark {
    */
   start(startIndex = 0) {
     if (this.isActive) return;
+    // Đang đứng ngoài bản đồ phố thì giao diện tiệm bị che, spotlight sẽ trỏ sai chỗ: không bắt đầu
+    if (window.worldMap && window.worldMap.visible) return;
     this.isActive = true;
     this.currentStep = startIndex;
 

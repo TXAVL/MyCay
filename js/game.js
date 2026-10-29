@@ -4,18 +4,18 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.3.1";
-import { txaformat } from "./txaformat.js?v=2.3.1";
-import { NameValidator } from "./filter.js?v=2.3.1";
-import { SoundManager } from "./audio.js?v=2.3.1";
-import { GameUIModal } from "./modal.js?v=2.3.1";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.1";
-import { GameIntegrity } from "./integrity.js?v=2.3.1";
-import { MarketMethods } from "./market.js?v=2.3.1";
-import { HrMethods } from "./hr.js?v=2.3.1";
-import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.1";
-import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.1";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.1";
+import { txaversion } from "./txaversion.js?v=2.3.2";
+import { txaformat } from "./txaformat.js?v=2.3.2";
+import { NameValidator } from "./filter.js?v=2.3.2";
+import { SoundManager } from "./audio.js?v=2.3.2";
+import { GameUIModal } from "./modal.js?v=2.3.2";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.2";
+import { GameIntegrity } from "./integrity.js?v=2.3.2";
+import { MarketMethods } from "./market.js?v=2.3.2";
+import { HrMethods } from "./hr.js?v=2.3.2";
+import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.2";
+import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.2";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.2";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu

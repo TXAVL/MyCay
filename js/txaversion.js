@@ -10,22 +10,22 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.3.1 - Sửa Bản Đồ Phố Trên Windows)
+  // Khai báo phiên bản hiện tại của game (Bản 2.3.2 - Sửa lỗi)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.3.1",
-      231,
+      "2.3.2",
+      232,
       "29/10/2026",
       [
         {
-          title: "Bản Đồ Phố Hết Bị Giãn Trên Windows",
-          desc: "Mỗi pixel trên bản đồ phố giờ khớp đúng số pixel thật của màn hình, kể cả khi Windows đặt tỉ lệ 125%, 150%. Màn hình rộng thấy trọn con phố, hình sắc nét, không còn bị kéo giãn hay phóng quá to.",
-          icon: "🗺️",
+          title: "Sửa Lỗi",
+          desc: "Sửa lỗi hướng dẫn tân thủ hiện lên khi đang ở ngoài phố và chỉ sai chỗ.",
+          icon: "🛠️",
           badge: "Sửa Lỗi 🛠️",
           badgeType: "manage"
         }
       ],
-      "Sửa Bản Đồ Phố Trên Windows"
+      "Sửa Lỗi"
     );
   }
 
@@ -33,6 +33,21 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.3.1",
+        231,
+        "29/10/2026",
+        [
+          {
+            title: "Bản Đồ Phố Hết Bị Giãn Trên Windows",
+            desc: "Mỗi pixel trên bản đồ phố giờ khớp đúng số pixel thật của màn hình, kể cả khi Windows đặt tỉ lệ 125%, 150%. Màn hình rộng thấy trọn con phố, hình sắc nét, không còn bị kéo giãn hay phóng quá to.",
+            icon: "🗺️",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Sửa Bản Đồ Phố Trên Windows"
+      ),
       new txaversion(
         "2.3.0",
         230,
