@@ -4,18 +4,19 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.3.3";
-import { txaformat } from "./txaformat.js?v=2.3.3";
-import { NameValidator } from "./filter.js?v=2.3.3";
-import { SoundManager } from "./audio.js?v=2.3.3";
-import { GameUIModal } from "./modal.js?v=2.3.3";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.3";
-import { GameIntegrity } from "./integrity.js?v=2.3.3";
-import { MarketMethods } from "./market.js?v=2.3.3";
-import { HrMethods } from "./hr.js?v=2.3.3";
-import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.3";
-import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.3";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.3";
+import { txaversion } from "./txaversion.js?v=2.3.4";
+import { txaformat } from "./txaformat.js?v=2.3.4";
+import { NameValidator } from "./filter.js?v=2.3.4";
+import { SoundManager } from "./audio.js?v=2.3.4";
+import { GameUIModal } from "./modal.js?v=2.3.4";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.4";
+import { GameIntegrity } from "./integrity.js?v=2.3.4";
+import { MarketMethods } from "./market.js?v=2.3.4";
+import { HrMethods } from "./hr.js?v=2.3.4";
+import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.4";
+import { DevMenuMethods } from "./devmenu.js?v=2.3.4";
+import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.4";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.4";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -1164,6 +1165,8 @@ export class SpicyNoodleGame {
   // RENDER TOÀN BỘ GIAO DIỆN
   // ==========================================================
   renderAll() {
+    // Đang bán: màn rộng được nới khung ra để dùng hết chiều ngang (xem .is-selling trong game-skin.css)
+    document.body.classList.toggle("is-selling", this.state.dayPhase === "open");
     this.renderHeader();
     const prepView = document.getElementById("view-prep-mode");
     const openView = document.getElementById("view-open-mode");
@@ -6179,136 +6182,7 @@ export class SpicyNoodleGame {
 
     this.sound.playButtonClick();
   }
-
-  // ==========================================================
-  // 15. MENU TRỢ LỰC BÍ MẬT (SECRET DEVELOPER BUFF CONSOLE)
-  // ==========================================================
-  openSecretBuffModal() {
-    const modal = document.getElementById("modal-dev-buff");
-    if (modal) {
-      modal.style.display = "flex";
-      this.sound.playCoinChime();
-      GameUIModal.showToast("👑 Đã mở Bảng Trợ Lực Hệ Thống dành riêng cho Chủ Quán!", "success", "✨");
-    }
-  }
-
-  devBuff(type) {
-    switch (type) {
-      case "money_50m":
-        this.state.money += 50000;
-        this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + 50000;
-        GameUIModal.showToast("💰 Đã buff +50.000k (50 Triệu VNĐ) vào két sắt!", "success", "✨");
-        break;
-
-      case "money_500m":
-        this.state.money += 500000;
-        this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + 500000;
-        GameUIModal.showToast("💎 Đã buff +500.000k (500 Triệu VNĐ) tài chính vô hạn!", "success", "✨");
-        break;
-
-      case "reputation_max":
-        this.state.reputation = 100;
-        GameUIModal.showToast("⭐ Đã nâng Danh Tiếng quán lên tối đa 100⭐!", "success", "👑");
-        break;
-
-      case "fever_rush":
-        this.feverPoints = 100;
-        this.triggerFeverRush();
-        GameUIModal.showToast("🔥 Đã kích hoạt Giờ Vàng FEVER RUSH bão khách ngay lập tức!", "success", "🔥");
-        break;
-
-      case "stock_full":
-        for (const k in this.state.noodles) this.state.noodles[k].stock = Math.max(99, (this.state.noodles[k].stock || 0) + 99);
-        for (const k in this.state.toppings) this.state.toppings[k].stock = Math.max(99, (this.state.toppings[k].stock || 0) + 99);
-        for (const k in this.state.drinks) this.state.drinks[k].stock = Math.max(99, (this.state.drinks[k].stock || 0) + 99);
-        for (const k in this.state.supplies) this.state.supplies[k].stock = Math.max(99, (this.state.supplies[k].stock || 0) + 99);
-        GameUIModal.showToast("📦 Kho hàng đã được bơm đầy +99 toàn bộ mì, topping & trà sữa!", "success", "📦");
-        break;
-
-      case "hire_all_staff":
-        for (const k in this.state.staff) this.state.staff[k] = true;
-        GameUIModal.showToast("👥 Đã chiêu mộ toàn bộ 11 nhân viên toàn năng về tiệm mì!", "success", "🐾");
-        break;
-
-      case "max_all_upgrades":
-        this.state.upgrades.tableCount = 8;
-        this.state.upgrades.stoveSpeed = 6;
-        this.state.upgrades.chiliSecret = 5;
-        this.state.upgrades.acCooling = 5;
-        this.state.upgrades.decorScore = 6;
-        this.state.upgrades.freezerStorage = 5;
-        this.state.upgrades.lofiAcoustic = 4;
-        this.state.upgrades.autoSealer = 5;
-        this.state.upgrades.dualStove = 5;
-        this.state.upgrades.airPurifier = 5;
-        this.state.upgrades.zenGarden = 5;
-        this.state.upgrades.shichimiSpice = 5;
-        this.initTables();
-        while (this.state.tables.length < 8) {
-          this.state.tables.push({
-            id: this.state.tables.length + 1,
-            status: "empty",
-            customer: null,
-            order: null,
-            patience: 100,
-            maxPatience: 100
-          });
-        }
-        GameUIModal.showToast("🛠️ Đã nâng cấp Max Cực Đại toàn bộ 12 trang thiết bị quán!", "success", "🌟");
-        break;
-
-      case "unlock_customers":
-        this.customerTemplates.forEach(c => {
-          this.unlockCustomer(c, false);
-        });
-        GameUIModal.showToast("👑 Đã mở khóa đủ toàn bộ 16 khách quen & VIP trong Bộ sưu tập!", "success", "🎉");
-        break;
-
-      case "clean_tables":
-        this.state.tables.forEach(t => {
-          t.status = "empty";
-          t.customer = null;
-          t.order = null;
-        });
-        GameUIModal.showToast("✨ Đã lau dọn sạch bóng toàn bộ bàn ghế trong tiệm!", "success", "🧹");
-        break;
-
-      case "skip_day_10":
-        this.state.day = 10;
-        GameUIModal.showToast("⏭️ Đã tua nhanh thời gian tới Ngày 10!", "info", "📅");
-        break;
-
-      case "skip_day_30":
-        this.state.day = 30;
-        GameUIModal.showToast("🚀 Đã tua nhanh thời gian tới Ngày 30!", "info", "📅");
-        break;
-
-      case "skip_day_50":
-        this.state.day = 50;
-        GameUIModal.showToast("🐉 Đã tua nhanh thời gian tới Ngày 50!", "info", "📅");
-        break;
-
-      case "bank_100m":
-        if (!this.state.bank) {
-          this.state.bank = { savings: 0, totalInterestEarned: 0, activePlan: "flexi", termDepositAmount: 0, termDaysRemaining: 0, history: [] };
-        }
-        this.state.bank.savings = (this.state.bank.savings || 0) + 100000;
-        this.addBankHistory("deposit", 100000, "👑 Buff Trợ Lực Chủ Quán (+100 Triệu VNĐ)");
-        this.renderBankTab();
-        GameUIModal.showToast("🏦 Đã buff +100.000k (100 Triệu VNĐ) vào Ngân Hàng Tiết Kiệm!", "success", "✨");
-        break;
-    }
-
-    this.sound.playCoinChime();
-    this.saveGame();
-    this.renderAll();
-    if (this.state.dayPhase === "open") {
-      this.renderOpenMode();
-      this.renderDiningStage();
-      this.renderStaffKitchenBar();
-    }
-  }
 }
 
 // Kinh tế thật (v2.3.0): chợ nguyên liệu, nhân sự, tài chính được tách ra module riêng
-Object.assign(SpicyNoodleGame.prototype, MarketMethods, HrMethods, FinanceMethods, OfflineMethods);
+Object.assign(SpicyNoodleGame.prototype, MarketMethods, HrMethods, FinanceMethods, OfflineMethods, DevMenuMethods);

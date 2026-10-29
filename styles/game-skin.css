@@ -4988,3 +4988,58 @@ html.pixel-ui .dlv-card { background: var(--bg-card); }
 .owner-reply-title { color: var(--cp-text-warn) !important; }
 .customer-comeback-title { color: var(--cp-text-good) !important; }
 .review-filter-pill.active { background: color-mix(in srgb, var(--accent-berry) 72%, #000) !important; color: #FFF !important; }
+
+/* ==========================================================
+   v2.3.4 · CA BÁN TRÊN MÀN HÌNH RỘNG: dùng hết chiều ngang thay vì khung 980px hẹp
+   ========================================================== */
+.kt-body, .kt-col { display: contents; }
+
+@media (min-width: 1300px) {
+  html.pixel-ui body.is-selling .game-phone-frame {
+    max-width: min(1760px, calc(100vw - 40px)) !important;
+  }
+  html.pixel-ui body.is-selling #view-open-mode .open-mode-responsive-layout {
+    grid-template-columns: minmax(380px, 0.5fr) minmax(0, 1.5fr);
+    gap: 24px;
+  }
+  /* Khu bếp: đơn hàng bên trái, niêu & dock nguyên liệu bên phải */
+  body.is-selling #open-col-kitchen-side .kt-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  body.is-selling #open-col-kitchen-side .kt-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+}
+
+/* Menu trợ lực: tiêu đề nhóm */
+.dev-buff-section-title {
+  margin: 14px 0 8px;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-title);
+  letter-spacing: 0.3px;
+}
+.dev-buff-notice { color: var(--cp-text-warn) !important; }
+.dev-buff-body .dev-buff-grid { margin-bottom: 4px; }
+
+/* Hướng dẫn tân thủ (coachmark): nút không bị bóp chữ ở bước cuối, thẻ rộng hơn trên desktop */
+.txa-coachmark-card { max-width: 440px; }
+.txa-coachmark-actions { flex-wrap: wrap; row-gap: 8px; }
+.txa-coachmark-nav-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+.txa-coachmark-btn-skip, .txa-coachmark-btn-prev, .txa-coachmark-btn-next {
+  white-space: nowrap;
+  font-size: 14px !important;
+  line-height: 1.2;
+}
+.txa-coachmark-btn-next { color: #FFF !important; background: color-mix(in srgb, var(--accent-berry) 78%, #000) !important; }
+.txa-coachmark-btn-next.btn-final { padding: 9px 18px; }
+@media (max-width: 480px) {
+  .txa-coachmark-nav-group { width: 100%; }
+  .txa-coachmark-nav-group > button { flex: 1; }
+}

@@ -4,7 +4,7 @@
 // Bất kỳ thay đổi nào (dù chỉ 1 ký tự) trong file đều khiến chữ ký sai -> chặn khôi phục.
 // ==========================================================
 
-import { GameIntegrity } from "./integrity.js?v=2.3.3";
+import { GameIntegrity } from "./integrity.js?v=2.3.4";
 
 const SAVE_KEY = "mycay_save_data";
 const BACKUP_FORMAT = "TMC-BACKUP";

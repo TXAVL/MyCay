@@ -5,8 +5,8 @@
 // - Hóa đơn theo thực tế: thuê mặt bằng, điện, nước, gas, lương; thiếu tiền thì ghi nợ chịu phí chậm trả
 // - Thuế khoán 2% doanh thu (miễn 5 ngày khai trương), nộp mỗi 7 ngày
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.3.3";
-import { txaformat } from "./txaformat.js?v=2.3.3";
+import { GameUIModal } from "./modal.js?v=2.3.4";
+import { txaformat } from "./txaformat.js?v=2.3.4";
 
 const SAVINGS_RATES = { flexi: 0.002, term3: 0.005, term7: 0.008 }; // %/ngày
 const TAX_RATE = 0.02;

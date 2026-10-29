@@ -8,8 +8,8 @@
 // Toàn bộ tọa độ tính theo % khung ảnh nội thất 16:9 (assets/interior.jpg)
 // ==========================================================
 
-import { renderPixelInterior } from "./pixel-interior.js?v=2.3.3";
-import { getPixelCharacterUrl } from "./pixel-sprites.js?v=2.3.3";
+import { renderPixelInterior } from "./pixel-interior.js?v=2.3.4";
+import { getPixelCharacterUrl } from "./pixel-sprites.js?v=2.3.4";
 
 const DOOR = { x: 44.5, y: 58 };
 
