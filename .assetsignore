@@ -1,0 +1,14 @@
+# Không đưa vào Cloudflare Static Assets (assets directory = ".")
+node_modules
+.git
+.claude
+.wrangler
+scripts
+worker.js
+wrangler.toml
+package.json
+package-lock.json
+.gitignore
+.assetsignore
+README.md
+*.log
