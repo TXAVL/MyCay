@@ -54,8 +54,8 @@
   - *Bạch Hổ Tora (Đội Trưởng An Ninh - 600⭐)*: Giữ trật tự, xóa sổ quỵt tiền và tăng 35% tốc độ kiên nhẫn.
   - *Thần Long Ryu (Linh Thú Huyền Thoại - 800⭐)*: Kích hoạt mưa vàng và năng lượng FEVER RUSH cực đại.
 
-### 5. 📊 Ca Bán Offline Do Nhân Viên Trông Tiệm (v2.3.0)
-- Mỗi khi người chơi vắng mặt (đóng trình duyệt hoặc ẩn tab từ 3 phút), **chính các nhân viên đã thuê** mở cửa bán thay bạn. Không có nhân viên thì không ai mở cửa.
+### 5. 📊 Ca Bán Offline Do Nhân Viên Trông Tiệm (Mở Khóa Từ Ngày 30)
+- Khi tiệm đạt từ **Ngày 30 trở lên**, mỗi khi người chơi vắng mặt (đóng trình duyệt hoặc ẩn tab từ 3 phút), **chính các nhân viên đã thuê** mở cửa bán thay bạn. Không có nhân viên thì không ai mở cửa. Chưa tới Ngày 30 thì chưa treo offline được.
 - Bán **đúng món trong menu, theo giá bạn đặt và tồn kho thật**: mỗi tô trừ mì, mì sợi, nước hầm, niêu đất; khách gọi kèm đồ uống. Hết hàng thì quán đóng cửa sớm.
 - Tốc độ bán tính theo từng người: Gấu Kenji là đầu bếp then chốt (không có Kenji, nhân viên nấu chậm chỉ bằng 40%), rồi tới Usagi, Mochi, Shiba...; tay nghề, tâm trạng và danh tiếng đều ảnh hưởng.
 - **Mỗi giờ trông tiệm là tâm trạng nhân viên tụt dần**, càng đông khách càng mệt. Ai chán đời quá sẽ **nghỉ việc ngay giữa ca** (tiệm mất 3 ⭐ uy tín), công suất giảm theo.

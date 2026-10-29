@@ -14,7 +14,7 @@ import { GameIntegrity } from "./integrity.js?v=2.3.0";
 import { MarketMethods } from "./market.js?v=2.3.0";
 import { HrMethods } from "./hr.js?v=2.3.0";
 import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.0";
-import { OfflineMethods, emptyOfflineResult, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.0";
+import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.0";
 import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
@@ -1081,8 +1081,8 @@ export class SpicyNoodleGame {
     }
     this.state.lastActiveTime = now;
 
-    // Không có nhân viên nào thì không ai mở cửa hộ, không cần báo cáo
-    if (!last || !this.state.day || !this.getHiredStaffKeys().length) return null;
+    // Chưa tới Ngày 30 hoặc không có nhân viên nào thì không ai mở cửa hộ, không cần báo cáo
+    if (!last || !this.state.day || this.state.day < OFFLINE_UNLOCK_DAY || !this.getHiredStaffKeys().length) return null;
 
     const elapsedMinutes = Math.floor((now - last) / 60000);
     if (elapsedMinutes < OFFLINE_MIN_MINUTES) return null;

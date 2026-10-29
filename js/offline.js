@@ -10,6 +10,7 @@
 import { txaformat } from "./txaformat.js?v=2.3.0";
 import { STAFF_ROSTER } from "./hr.js?v=2.3.0";
 
+export const OFFLINE_UNLOCK_DAY = 30; // từ Ngày 30 mới mở được ca treo offline
 export const OFFLINE_DAILY_CAP_MIN = 480; // tối đa 8 giờ bán offline mỗi ngày thực tế
 export const OFFLINE_MIN_MINUTES = 3;
 const OFFLINE_EFFICIENCY = 0.6;
