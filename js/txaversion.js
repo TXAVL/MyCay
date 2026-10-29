@@ -10,36 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.1.0 - Nội Thất Pixel & Tối Ưu Màn Rộng)
+  // Khai báo phiên bản hiện tại của game (Bản 2.2.0 - Giao Hàng Online Như Thật)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.1.0",
-      210,
-      "25/10/2026",
+      "2.2.0",
+      220,
+      "29/10/2026",
       [
         {
-          title: "Nội Thất & Nhân Vật Pixel Toàn Diện",
-          desc: "Đồng bộ đồ họa Retro Pixel 16-bit từ ngoài phố vào tận trong tiệm: 10 loài khách thú dễ thương, nhân viên bếp/sảnh, niêu đất sôi sùng sục và bàn ghế gỗ ấm cúng.",
-          icon: "🏮",
+          title: "Giao Hàng Online Như Ngoài Đời",
+          desc: "Đơn GrabFood, ShopeeFood, BeFood, Baemin: nhận hoặc từ chối đơn trong 15s, nấu niêu, ép màng, đóng túi, kèm đũa sốt, dán tem, báo món xong rồi giao cho tài xế đọc mã lấy hàng.",
+          icon: "🛵",
           badge: "Đại Trùng Tu ✨",
           badgeType: "hot"
         },
         {
-          title: "Tối Ưu Màn Hình Rộng Desktop",
-          desc: "Giao diện cân đối hoàn hảo trên màn hình PC/Laptop (tỉ lệ 980px chuẩn), thanh điều hướng 11 nút trải đều 1 dòng thoáng mắt, không bị xé hình hay che khuất chữ.",
-          icon: "🖥️",
+          title: "Phí Nền Tảng & Tỉ Lệ Nhận Đơn",
+          desc: "Mỗi app thu phí riêng (15-20%). Có đơn COD: tài xế thu tiền mặt, đối soát cuối ca, khách có thể bom hàng nên nhớ gọi xác nhận. Ép màng niêu là miết tay quanh miệng niêu thật.",
+          icon: "💸",
           badge: "Nâng Cấp 🌟",
           badgeType: "star"
         },
         {
-          title: "Đồng Bộ 7 Theme & Giao Diện Gọn Gàng",
-          desc: "Tương thích hoàn hảo 7 bảng màu sắc Anime & Dark Mode; trả lại Bảng Đen Menu phấn trắng nổi bật; xóa bỏ hoàn toàn viền lồng hộp gây rối mắt trên các thẻ.",
-          icon: "🎨",
+          title: "Đánh Giá Theo Đúng Chuyến Giao",
+          desc: "Khách chấm sao theo thực tế: giao trễ hẹn, mì nguội, đổ nước dùng, thiếu đũa ống hút, đóng gói ẩu. Cáo Shiro tự nhận đơn, đóng gói và giao tài xế.",
+          icon: "⭐",
           badge: "Tối Ưu 🛠️",
           badgeType: "manage"
         }
       ],
-      "Nội Thất Pixel & Tối Ưu Màn Rộng"
+      "Giao Hàng Online Như Thật"
     );
   }
 
@@ -47,6 +47,35 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.1.0",
+        210,
+        "25/10/2026",
+        [
+          {
+            title: "Nội Thất & Nhân Vật Pixel Toàn Diện",
+            desc: "Đồng bộ đồ họa Retro Pixel 16-bit từ ngoài phố vào tận trong tiệm: 10 loài khách thú dễ thương, nhân viên bếp/sảnh, niêu đất sôi sùng sục và bàn ghế gỗ ấm cúng.",
+            icon: "🏮",
+            badge: "Đại Trùng Tu ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Tối Ưu Màn Hình Rộng Desktop",
+            desc: "Giao diện cân đối hoàn hảo trên màn hình PC/Laptop (tỉ lệ 980px chuẩn), thanh điều hướng 11 nút trải đều 1 dòng thoáng mắt, không bị xé hình hay che khuất chữ.",
+            icon: "🖥️",
+            badge: "Nâng Cấp 🌟",
+            badgeType: "star"
+          },
+          {
+            title: "Đồng Bộ 7 Theme & Giao Diện Gọn Gàng",
+            desc: "Tương thích hoàn hảo 7 bảng màu sắc Anime & Dark Mode; trả lại Bảng Đen Menu phấn trắng nổi bật; xóa bỏ hoàn toàn viền lồng hộp gây rối mắt trên các thẻ.",
+            icon: "🎨",
+            badge: "Tối Ưu 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Nội Thất Pixel & Tối Ưu Màn Rộng"
+      ),
       new txaversion(
         "2.0.0",
         200,

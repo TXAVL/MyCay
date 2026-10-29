@@ -18,15 +18,15 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=2.1.0" />
+  <link rel="stylesheet" href="styles/main.css?v=2.2.0" />
   <!-- Lớp giao diện game (HUD, khung cảnh tiệm, dock nút tròn, nút 3D) -->
-  <link rel="stylesheet" href="styles/game-skin.css?v=2.1.0" />
+  <link rel="stylesheet" href="styles/game-skin.css?v=2.2.0" />
 
   <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
-  <script src="js/security-shield.js?v=2.1.0"></script>
+  <script src="js/security-shield.js?v=2.2.0"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -471,16 +471,19 @@
           <!-- ================= TAB 6: ONLINE (SHIPPER GIAO MỲ CAY) ================= -->
           <section id="tab-online" class="tab-pane">
             <p class="tab-description-hint">
-              Mở bán mỳ cay & trà giải cay giao tận nhà qua ứng dụng GrabFood & ShopeeFood để nổ đơn liên tục!
+              Đơn từ GrabFood, ShopeeFood, BeFood, Baemin: nhận đơn, nấu, đóng gói, báo món xong rồi giao cho tài xế. Mỗi app thu phí nền tảng riêng!
             </p>
             <div class="online-orders-container">
               <div class="online-status-bar">
-                <span class="online-indicator">🟢 Đang nhận đơn tự động</span>
+                <span class="online-indicator">🟢 Ứng dụng đang bật</span>
                 <span id="online-total-delivered" class="online-stat-pill">Đã giao: 0 đơn</span>
               </div>
+              <div class="dlv-stats" id="online-stats-row"></div>
               <div id="online-orders-list" class="online-orders-list">
                 <!-- Render động các đơn hàng ship mỳ cay -->
               </div>
+              <h4 class="dlv-log-title">📜 Nhật ký đơn hôm nay</h4>
+              <div class="dlv-logs" id="online-history-list"></div>
             </div>
           </section>
 
@@ -741,29 +744,8 @@
               <!-- Nhắc món đặc biệt hôm nay ngay trong bếp (nấu đúng để nhận Bonus) -->
               <div class="kt-special-chip" id="kt-special-chip"></div>
 
-              <!-- ĐƠN HÀNG ONLINE SHIPPER TRỰC TIẾP TRONG CA BÁN (CÓ HẸN GIỜ ĐỢI) -->
-              <div class="open-mode-shipper-card" id="open-mode-shipper-card" style="display: none;">
-                <div class="shipper-driver-profile" id="open-shipper-profile">
-                  <!-- Render động qua JS: avatar, tên tài xế, app badge, xe cộ -->
-                </div>
-                <div class="shipper-header">
-                  <span class="shipper-tag" id="open-shipper-tag">🛵 Đơn Giao Hỏa Tốc</span>
-                  <span class="shipper-timer-badge" id="open-shipper-timer">⏱️ 20s</span>
-                  <span class="shipper-price" id="open-shipper-price">+65k</span>
-                </div>
-                <div class="shipper-timer-track">
-                  <div class="shipper-timer-fill" id="open-shipper-timer-fill" style="width: 100%;"></div>
-                </div>
-                <div class="shipper-desc" id="open-shipper-desc">1 Mì cay bò Mỹ (Cấp 2)</div>
-                <div class="shipper-actions-grid">
-                  <button class="btn-pack-seal" id="btn-open-pack-seal" onclick="window.game.packAndSealOnlineOrder()">
-                    🔒 Ép Màng & Đóng Thùng (+15k)
-                  </button>
-                  <button class="btn-shipper-handover" id="btn-open-handover" onclick="window.game.handoverToShipper()">
-                    🛵 Giao Cho Shipper (Space)
-                  </button>
-                </div>
-              </div>
+              <!-- BẢNG ĐƠN ONLINE TRONG CA BÁN: nhận đơn -> nấu -> đóng gói -> tài xế lấy -> giao khách (render qua JS) -->
+              <div class="dlv-board" id="open-mode-shipper-card" style="display: none;"></div>
 
               <!-- HÀNG TRẠNG THÁI BẾP: ĐIỀU HÒA · ĐỒNG HỒ CA · GIỜ VÀNG FEVER -->
               <div class="kt-status-row">
@@ -978,7 +960,7 @@
 
                 <!-- Gợi ý phím tắt (chỉ hiện trên máy có chuột/bàn phím) -->
                 <div class="kt-hotkeys">
-                  ⌨️ <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Bưng khách · <kbd>C</kbd> Làm lại · <kbd>P</kbd> Tạm dừng · <kbd>Space</kbd> Giao shipper
+                  ⌨️ <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Bưng khách · <kbd>C</kbd> Làm lại · <kbd>P</kbd> Tạm dừng · <kbd>Space</kbd> Nhận đơn / giao tài xế
                 </div>
               </div> <!-- /cooking-steps-container -->
 
@@ -1599,6 +1581,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=2.1.0"></script>
+  <script type="module" src="js/app.js?v=2.2.0"></script>
 </body>
 </html>

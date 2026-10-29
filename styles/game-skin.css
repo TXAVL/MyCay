@@ -4799,3 +4799,31 @@ html.pixel-ui .btn-dock-tab.active {
   box-shadow: inset 0 -3px 0 #a3281d !important;
 }
 
+
+/* v2.2.0 · Bảng đơn giao hàng online theo phong cách pixel */
+html.pixel-ui .dlv-card,
+html.pixel-ui .dlv-chip,
+html.pixel-ui .dlv-btn,
+html.pixel-ui .dlv-step,
+html.pixel-ui .dlv-stat,
+html.pixel-ui .dlv-note,
+html.pixel-ui .dlv-bar,
+html.pixel-ui .dlv-bar > i {
+  border-radius: 0 !important;
+}
+html.pixel-ui .dlv-card {
+  border: 3px solid #8a5a2b;
+  background: #f3e2bd;
+  box-shadow: 3px 3px 0 rgba(58, 36, 18, 0.45);
+}
+html.pixel-ui .dlv-bar { border: 2px solid #3a2412; height: 10px; background: #ecd9b5; }
+html.pixel-ui .dlv-btn,
+html.pixel-ui .dlv-chip {
+  font-size: 14px !important;
+  padding: 4px 8px !important;
+  line-height: 1.2 !important;
+}
+html.pixel-ui .dlv-card .dlv-items,
+html.pixel-ui .dlv-card .dlv-note {
+  font-size: 14px !important;
+}

@@ -10736,3 +10736,207 @@ body.is-device-locked #loading-screen {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ==========================================================
+   v2.2.0 · GIAO HÀNG ONLINE THEO QUY TRÌNH THẬT
+   Đơn mới -> nhận đơn -> nấu -> đóng gói -> tài xế lấy -> giao khách
+   ========================================================== */
+.dlv-board {
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.dlv-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.04) 100%), var(--bg-card);
+  border: 1.5px solid var(--accent-gold);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+.dlv-card.is-new { border-style: dashed; }
+.dlv-card.is-delivering { opacity: 0.92; border-color: #00A86B; }
+.dlv-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.dlv-id { color: var(--text-title); font-weight: 800; }
+.dlv-net { margin-left: auto; font-weight: 900; color: #258A6D; }
+.dlv-steps {
+  display: flex;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.dlv-step {
+  flex: 1;
+  text-align: center;
+  padding: 2px 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+}
+.dlv-step.is-past { background: #D1F2E4; color: #1A6B53; }
+.dlv-step.is-now { background: var(--accent-gold); color: #FFF; }
+.dlv-items {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-title);
+}
+.dlv-note {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #B45309;
+  background: rgba(245, 158, 11, 0.14);
+  border-radius: 8px;
+  padding: 3px 8px;
+}
+.dlv-money, .dlv-sub, .dlv-wait {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.dlv-wait { color: #DC2626; font-weight: 800; }
+.dlv-age {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.dlv-age.is-late { color: #DC2626; }
+.dlv-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.dlv-bar > i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: #F59E0B;
+  transition: width 0.9s linear;
+}
+.dlv-bar.is-warn > i { background: #DC2626; }
+.dlv-road { flex: 1; height: 8px; margin: 0 6px; }
+.dlv-road > i { background: #00A86B; }
+.dlv-road > em {
+  position: absolute;
+  top: -9px;
+  font-style: normal;
+  font-size: 16px;
+  transition: left 0.9s linear;
+}
+.dlv-route { display: flex; align-items: center; font-size: 16px; }
+.dlv-driver { margin-bottom: 0; }
+.dlv-eta { font-size: 11px; font-weight: 800; color: var(--accent-gold); white-space: nowrap; }
+.dlv-cook { font-size: 12px; font-weight: 800; color: var(--text-title); display: flex; flex-direction: column; gap: 3px; }
+.dlv-cook.is-done { color: #1A6B53; }
+.dlv-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dlv-chip {
+  border: 1.5px solid var(--border-card);
+  background: var(--bg-card);
+  color: var(--text-title);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.dlv-chip:hover:not(:disabled) { border-color: var(--accent-gold); transform: translateY(-1px); }
+.dlv-chip.is-done { background: #D1F2E4; border-color: #00A86B; color: #1A6B53; cursor: default; }
+.dlv-chip:disabled:not(.is-done) { opacity: 0.45; cursor: not-allowed; }
+.dlv-actions { display: flex; gap: 8px; }
+.dlv-btn {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--bg-card-subtle);
+  color: var(--text-title);
+}
+.dlv-btn-go {
+  background: linear-gradient(135deg, #00A86B 0%, #00875A 100%);
+  color: #FFF;
+  box-shadow: 0 3px 8px rgba(0, 168, 107, 0.3);
+}
+.dlv-btn-ghost { flex: 0 0 auto; background: transparent; border: 1.5px solid var(--border-card); }
+.dlv-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.dlv-btn:hover:not(:disabled) { filter: brightness(1.06); }
+.dlv-stats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.dlv-stat {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card-subtle);
+  color: var(--text-title);
+}
+.dlv-stat.is-bad { background: #FEE2E2; color: #DC2626; }
+.dlv-empty { text-align: center; padding: 24px 0; color: var(--text-muted); }
+.dlv-log-title { margin: 14px 0 6px; font-size: 13px; color: var(--text-title); }
+.dlv-log {
+  font-size: 11.5px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+}
+.dlv-log.is-bad { color: #DC2626; }
+.dlv-log.is-warn { color: #B45309; }
+.dlv-log.is-ok { color: #1A6B53; }
+.dlv-card.is-compact { padding: 8px 10px; gap: 5px; }
+.dlv-card.is-compact.is-new .dlv-steps { display: none; }
+.dlv-card.is-compact .dlv-btn { padding: 5px 10px; }
+
+/* Ép màng thủ công & đơn COD */
+.dlv-payrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.dlv-pay {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+.dlv-pay.is-cod { background: #FEF3C7; color: #B45309; }
+.seal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 12, 8, 0.7);
+  touch-action: none;
+}
+.seal-card {
+  background: var(--bg-card, #fff7e6);
+  border: 3px solid var(--accent-gold, #c9a24a);
+  border-radius: 16px;
+  padding: 14px 16px 12px;
+  width: min(92vw, 360px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.seal-title { font-size: 15px; font-weight: 900; color: var(--text-title); }
+.seal-hint { font-size: 12px; color: var(--text-muted); }
+.seal-svg { width: min(78vw, 300px); height: auto; touch-action: none; cursor: grab; user-select: none; }
+.seal-svg:active { cursor: grabbing; }
+.seal-pot { fill: #5a3a22; stroke: #3a2412; stroke-width: 4; }
+.seal-film { fill: rgba(255, 255, 255, 0.18); stroke: rgba(255, 255, 255, 0.35); stroke-width: 2; }
+.seal-seg { fill: none; stroke: rgba(255, 255, 255, 0.28); stroke-width: 26; stroke-linecap: butt; }
+.seal-seg.is-sealed { stroke: #f6c453; }
+.seal-count { font-size: 26px; font-weight: 900; fill: #fff; pointer-events: none; }

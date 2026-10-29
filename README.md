@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.1.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-25%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.2.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-29%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
@@ -83,6 +83,12 @@
 - **Nội thất & Khách hàng Pixel 16-bit**: Toàn bộ không gian tiệm từ bàn ghế gỗ sồi, niêu đất sôi nghi ngút khói đến 10 loài khách thú anime (mèo, shiba, gấu, thỏ, cáo, panda...) đều được dựng bằng engine vẽ pixel sắc nét độc quyền.
 - **Tối ưu chuẩn mực màn hình Desktop**: Căn chỉnh tỷ lệ vàng 980px trên PC/Laptop, thanh điều hướng 11 tab trải đều 1 dòng thoáng mắt, không bị xé hình.
 - **Tương thích toàn diện 7 Theme**: Bảng đen menu phấn trắng nổi bật, hỗ trợ hoàn hảo cả Dark Mode và Light Mode.
+
+### 9. 🛵 Giao Hàng Online Như Ngoài Đời (v2.2.0)
+- **Quy trình thật**: Đơn GrabFood / ShopeeFood / BeFood / Baemin đổ về, quán có 15s để nhận hoặc từ chối → nấu niêu → ép màng, túi giữ nhiệt, đũa · ống hút · sốt, tem + bill → báo món xong → tài xế tới đọc mã lấy hàng → giao khách.
+- **Phí nền tảng**: Mỗi app thu phí 15-20%, giá trên app cao hơn tại quán ~12%. Tiền về ví sau khi giao xong.
+- **Tỉ lệ nhận đơn**: Từ chối / bỏ lỡ nhiều đơn thì app đẩy ít đơn cho quán. Tài xế chờ quá 30s không có hàng sẽ hủy chuyến.
+- **Đánh giá theo thực tế**: Giao trễ hẹn, mì nguội, đổ nước dùng, thiếu đũa sốt, đóng gói ẩu đều ảnh hưởng số sao. Cáo Shiro tự nhận đơn, đóng gói và giao tài xế.
 
 ---
 

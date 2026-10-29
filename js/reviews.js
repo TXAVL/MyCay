@@ -268,24 +268,37 @@ export function rateDineIn(ctx) {
 // Chấm sao đơn online
 export function rateOnline(ctx) {
   const persona = getPersona(ctx.customerName);
-  const issues = [];
+  let issues = [];
   let score = 76 + persona.leniency;
-  if (ctx.isPacked) score += 12;
-  else {
-    score -= 4;
-    if (Math.random() < 0.3) { score -= 24; issues.push("spill"); }
-    else if (Math.random() < 0.25) { score -= 10; issues.push("packing"); }
+  if (Array.isArray(ctx.issues)) {
+    // Đơn đã đi qua quy trình thật (nhận đơn, đóng gói, tài xế, giao): chấm theo đúng những gì đã xảy ra
+    issues = ctx.issues;
+    const penalty = { spill: 24, packing: 10, late: 16, cold: 12, missing: 14 };
+    issues.forEach(k => { score -= penalty[k] || 0; });
+    if (ctx.fullPack) score += 12;
+    else if (ctx.isPacked) score += 6;
+    if (ctx.fast) score += 6;
+    if (ctx.owl) score += 6;
+    score += Math.round((Math.random() - 0.5) * 8);
+  } else {
+    if (ctx.isPacked) score += 12;
+    else {
+      score -= 4;
+      if (Math.random() < 0.3) { score -= 24; issues.push("spill"); }
+      else if (Math.random() < 0.25) { score -= 10; issues.push("packing"); }
+    }
+    if (Math.random() < 0.2) { score -= 14; issues.push("late"); }
+    if (Math.random() < (ctx.isPacked ? 0.05 : 0.2)) { score -= 10; issues.push("cold"); }
+    if (ctx.owl) score += 6;
+    score += Math.round((Math.random() - 0.5) * 16);
   }
-  if (Math.random() < 0.2) { score -= 14; issues.push("late"); }
-  if (Math.random() < (ctx.isPacked ? 0.05 : 0.2)) { score -= 10; issues.push("cold"); }
-  if (ctx.owl) score += 6;
-  score += Math.round((Math.random() - 0.5) * 16);
 
   const stars = starsFromScore(score);
   const parts = [pick(OPENERS[stars])];
   if (issues.includes("spill")) parts.push("Không ép màng nắp nên nước dùng đổ lênh láng ra túi. 😩");
   if (issues.includes("packing")) parts.push("Đóng gói hơi ẩu, hộp móp méo.");
-  if (issues.includes("late")) parts.push(`${ctx.shipperName || "Shipper"} giao trễ, chờ dài cổ.`);
+  if (issues.includes("late")) parts.push("Đơn giao trễ hơn giờ hẹn khá nhiều, chờ dài cổ.");
+  if (issues.includes("missing")) parts.push("Quên kèm đũa, ống hút với sốt ớt, phải đi xin hàng xóm. 🥲");
   if (issues.includes("cold")) parts.push("Mở ra mì nguội mất rồi.");
   if (!issues.length) {
     parts.push(ctx.isPacked
