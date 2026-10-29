@@ -78,6 +78,14 @@ export const FinanceMethods = {
     return this.getRentCost() + this.computeUtilities(20, 8).total;
   },
 
+  // Cộng dồn thuế khoán tạm tính cho một khoản doanh thu (ca thường hoặc ca offline)
+  accrueTax(sales) {
+    if (this.state.day <= TAX_FREE_DAYS) return 0;
+    const tax = round1(sales * TAX_RATE * (this.state.staff.torto ? 0.7 : 1));
+    this.state.eco.tax.accrued = round1(this.state.eco.tax.accrued + tax);
+    return tax;
+  },
+
   getNextTaxDay() {
     return Math.ceil(this.state.day / TAX_PERIOD) * TAX_PERIOD;
   },
@@ -381,8 +389,7 @@ export const FinanceMethods = {
     bills.waste = this.spoilExpiredStock().cost;
 
     // Thuế khoán tạm tính theo doanh thu hôm nay
-    bills.taxToday = day > TAX_FREE_DAYS ? round1((st.todayEarnings || 0) * TAX_RATE * (st.staff.torto ? 0.7 : 1)) : 0;
-    eco.tax.accrued = round1(eco.tax.accrued + bills.taxToday);
+    bills.taxToday = this.accrueTax(st.todayEarnings || 0);
 
     // Lãi tiết kiệm đêm nay
     bills.bankInterest = this.accrueSavingsInterest();

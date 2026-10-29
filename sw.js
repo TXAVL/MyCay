@@ -42,6 +42,8 @@ const PRECACHE_ASSETS = [
   "./js/hr.js?v=2.3.0",
   "./js/finance.js",
   "./js/finance.js?v=2.3.0",
+  "./js/offline.js",
+  "./js/offline.js?v=2.3.0",
   "./js/street.js",
   "./js/txacoachmark.js",
   "./js/txaformat.js",

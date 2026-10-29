@@ -54,12 +54,14 @@
   - *Bạch Hổ Tora (Đội Trưởng An Ninh - 600⭐)*: Giữ trật tự, xóa sổ quỵt tiền và tăng 35% tốc độ kiên nhẫn.
   - *Thần Long Ryu (Linh Thú Huyền Thoại - 800⭐)*: Kích hoạt mưa vàng và năng lượng FEVER RUSH cực đại.
 
-### 5. 📊 Báo Cáo Doanh Thu Ngoại Tuyến (Mở Khóa Từ Ngày 30)
-- Khi tiệm mì đạt từ **Ngày 30 trở lên**, mỗi khi người chơi vắng mặt (đóng trình duyệt hoặc ẩn tab từ 3 phút), Quản Lý Ca Trực sẽ thay bạn bán hàng.
+### 5. 📊 Ca Bán Offline Do Nhân Viên Trông Tiệm (v2.3.0)
+- Mỗi khi người chơi vắng mặt (đóng trình duyệt hoặc ẩn tab từ 3 phút), **chính các nhân viên đã thuê** mở cửa bán thay bạn. Không có nhân viên thì không ai mở cửa.
 - Bán **đúng món trong menu, theo giá bạn đặt và tồn kho thật**: mỗi tô trừ mì, mì sợi, nước hầm, niêu đất; khách gọi kèm đồ uống. Hết hàng thì quán đóng cửa sớm.
-- Tốc độ bán phụ thuộc số bàn, nhân viên (Kenji, Usagi, Shiba, Mochi) và điểm danh tiếng.
+- Tốc độ bán tính theo từng người: Gấu Kenji là đầu bếp then chốt (không có Kenji, nhân viên nấu chậm chỉ bằng 40%), rồi tới Usagi, Mochi, Shiba...; tay nghề, tâm trạng và danh tiếng đều ảnh hưởng.
+- **Mỗi giờ trông tiệm là tâm trạng nhân viên tụt dần**, càng đông khách càng mệt. Ai chán đời quá sẽ **nghỉ việc ngay giữa ca** (tiệm mất 3 ⭐ uy tín), công suất giảm theo.
+- Làm thêm giờ được trả lương 1/8 lương ngày mỗi giờ; ví không đủ thì ghi nợ hóa đơn và nhân viên bực mình thêm. Doanh thu offline cũng chịu điện nước, gas và thuế khoán như ca thường.
 - Tối đa **8 giờ bán offline mỗi ngày thực tế**; quán đóng sớm vì hết hàng thì không mất phần hạn mức còn lại.
-- Lúc quay lại, **Bảng Báo Cáo** liệt kê thời gian, từng món đã bán, doanh thu, tiền boa, hoa hồng Quản Lý (10%), mặt bằng & điện nước (miễn phí nếu có Sổ Đỏ Flagship); lợi nhuận ròng được cộng thẳng vào két.
+- Lúc quay lại, **Bảng Báo Cáo** liệt kê từng nhân viên (tâm trạng trước và sau, ai nghỉ việc), từng món đã bán, doanh thu, tiền boa, lương làm thêm, điện nước, thuế tạm tính; lợi nhuận ròng được cộng thẳng vào két.
 - Chống gian lận: chỉnh đồng hồ máy hay khôi phục bản sao lưu cũ không nhận thêm doanh thu offline.
 - **Đoàn Kiểm Tra Liên Ngành (v1.9.1)**: bản lưu có chữ ký; sửa tay dữ liệu, chỉ số bất khả thi hay mở DevTools sẽ bị ghi nhận nghi vấn. Khi sang ngày mới, người bị nghi vấn có xác suất rất thấp (3-12%) bị đoàn kiểm tra ghé thăm, tịch thu tiệm và xoá dữ liệu. Người chơi bình thường không bao giờ bị ảnh hưởng.
 

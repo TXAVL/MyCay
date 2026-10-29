@@ -26,7 +26,7 @@ export class txaversion {
         },
         {
           title: "Tuyển Dụng Phỏng Vấn & Tâm Trạng",
-          desc: "Ứng viên có tay nghề, mức lương và tính cách riêng, thử việc 2 ngày. Nhân viên có tâm trạng, xin tăng lương, nghỉ việc nếu bị nợ lương. Có thể thưởng nóng hoặc sa thải.",
+          desc: "Ứng viên có tay nghề, mức lương và tính cách riêng, thử việc 2 ngày. Nhân viên có tâm trạng, xin tăng lương, nghỉ việc nếu bị nợ lương. Có thể thưởng nóng hoặc sa thải. Khi bạn vắng mặt, chính nhân viên trông tiệm và có thể chán đời nghỉ việc giữa ca.",
           icon: "🧑‍🍳",
           badge: "Mới ✨",
           badgeType: "hot"

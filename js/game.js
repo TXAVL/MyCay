@@ -14,6 +14,7 @@ import { GameIntegrity } from "./integrity.js?v=2.3.0";
 import { MarketMethods } from "./market.js?v=2.3.0";
 import { HrMethods } from "./hr.js?v=2.3.0";
 import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.0";
+import { OfflineMethods, emptyOfflineResult, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.0";
 import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
@@ -22,15 +23,6 @@ const FEVER_SECONDS = 15;
 const SIZE_L_SURCHARGE = 7; // Phụ thu niêu size L (k)
 const MAX_REVIEWS = 60; // Giữ 60 đánh giá gần nhất: sao trung bình phản ánh phong độ hiện tại & save nhẹ
 // Nguyên liệu phụ tiêu hao mỗi phần bán ra (thiếu thì vẫn bán được nhưng món kém ngon: -giá, -sao)
-const BOWL_SUPPLIES = ["mi_soi", "nuoc_ham", "nieu_dat"];
-const DRINK_SUPPLIES = ["tra_den", "sua_tuoi_nguyenkem"];
-
-// Doanh thu offline: mở khóa từ Ngày 30, tính tối đa 8 giờ mỗi ngày thực tế
-const OFFLINE_UNLOCK_DAY = 30;
-const OFFLINE_MIN_MINUTES = 3;
-const OFFLINE_DAILY_CAP_MIN = 480;
-const OFFLINE_EFFICIENCY = 0.6;
-const OFFLINE_MANAGER_COMMISSION = 0.1;
 
 // Giao hàng online: mỗi app thu phí nền tảng khác nhau, giá trên app cao hơn giá tại quán
 const DELIVERY_APPS = {
@@ -62,10 +54,6 @@ const DELIVERY_NOTES = [
   { text: "Đóng gói cẩn thận, nhà mình ở xa đó quán ơi" },
   { text: "Tới cổng gọi mình xuống lấy nha" }
 ];
-
-function escapeOfflineHtml(str) {
-  return String(str == null ? "" : str).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
-}
 
 export class SpicyNoodleGame {
   constructor() {
@@ -1058,7 +1046,7 @@ export class SpicyNoodleGame {
 
   // ==========================================================
   // DOANH THU OFFLINE (MỞ KHÓA TỪ NGÀY 30)
-  // Quản Lý Ca Trực bán hàng thật khi người chơi vắng mặt: dùng đúng menu, giá bán & tồn kho,
+  // Nhân viên bán hàng thật khi người chơi vắng mặt: dùng đúng menu, giá bán & tồn kho,
   // trừ nguyên liệu phụ, giới hạn 8 giờ mỗi ngày thực tế và bỏ qua khi đồng hồ máy bị chỉnh lùi.
   // ==========================================================
   ensureOfflineState() {
@@ -1080,71 +1068,6 @@ export class SpicyNoodleGame {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }
 
-  // Mô phỏng ca bán offline: trả về số liệu và trừ kho trực tiếp vào state
-  simulateOfflineSales(minutes) {
-    const st = this.state;
-    const staff = st.staff || {};
-    const tables = (st.upgrades && st.upgrades.tableCount) || 3;
-    // Công suất tô/giờ của Quản Lý Ca Trực (thấp hơn khi chủ tiệm tự đứng bếp)
-    const baseRate = 8 + tables * 3 + (staff.kenji ? 6 : 0) + (staff.usagi ? 4 : 0) + (staff.shiba ? 2 : 0) + (staff.mochi ? 2 : 0);
-    const repFactor = 0.8 + Math.min(1000, Math.max(0, st.reputation || 0)) / 2000;
-    const capacity = Math.floor(baseRate * OFFLINE_EFFICIENCY * repFactor * (minutes / 60));
-
-    const menuNoodles = Object.values(st.noodles).filter(n => n.unlocked && n.inMenu);
-    const menuDrinks = Object.values(st.drinks).filter(d => d.unlocked && d.inMenu);
-    const drinkRate = staff.ducky ? 0.5 : 0.35;
-    const supplyOk = ids => ids.every(id => !st.supplies[id] || st.supplies[id].stock > 0);
-
-    const soldNoodles = {};
-    const soldDrinks = {};
-    let bowls = 0;
-    let drinks = 0;
-    let revenue = 0;
-    let drinkAcc = 0;
-    let stopReason = "";
-
-    for (let i = 0; i < capacity; i++) {
-      // Ưu tiên món còn nhiều hàng nhất để kho tiêu hao đều
-      const noodle = menuNoodles.filter(n => n.stock > 0).sort((x, y) => y.stock - x.stock)[0];
-      if (!noodle) {
-        stopReason = "Hết mì trong kho";
-        break;
-      }
-      if (!supplyOk(BOWL_SUPPLIES)) {
-        const lack = BOWL_SUPPLIES.map(id => st.supplies[id]).find(sup => sup && sup.stock <= 0);
-        stopReason = `Hết ${lack ? lack.name : "nguyên liệu phụ"}`;
-        break;
-      }
-      noodle.stock -= 1;
-      BOWL_SUPPLIES.forEach(id => { if (st.supplies[id]) st.supplies[id].stock -= 1; });
-      revenue += noodle.price || noodle.basePrice || 0;
-      soldNoodles[noodle.name] = (soldNoodles[noodle.name] || 0) + 1;
-      bowls += 1;
-
-      drinkAcc += drinkRate;
-      if (drinkAcc >= 1) {
-        drinkAcc -= 1;
-        const drink = menuDrinks.filter(d => d.stock > 0).sort((x, y) => y.stock - x.stock)[0];
-        if (drink && supplyOk(DRINK_SUPPLIES)) {
-          drink.stock -= 1;
-          DRINK_SUPPLIES.forEach(id => { if (st.supplies[id]) st.supplies[id].stock -= 1; });
-          revenue += drink.price || drink.basePrice || 0;
-          soldDrinks[drink.name] = (soldDrinks[drink.name] || 0) + 1;
-          drinks += 1;
-        }
-      }
-    }
-
-    const tips = Math.round(revenue * 0.06 * (staff.mochi ? 1.35 : 1));
-    const commission = Math.round((revenue + tips) * OFFLINE_MANAGER_COMMISSION);
-    // Chỉ tính mặt bằng & điện nước cho khoảng thời gian quán thực sự mở bán
-    const openMinutes = stopReason ? (capacity > 0 ? Math.ceil(minutes * (bowls / capacity)) : 0) : minutes;
-    const utilities = bowls > 0 ? Math.round(this.getDailyRentCost() * (openMinutes / OFFLINE_DAILY_CAP_MIN)) : 0;
-    const netProfit = Math.max(0, revenue + tips - commission - utilities);
-
-    return { capacity, openMinutes, bowls, drinks, revenue, tips, commission, utilities, netProfit, soldNoodles, soldDrinks, stopReason };
-  }
-
   checkOfflineEarnings() {
     const now = Date.now();
     const off = this.ensureOfflineState();
@@ -1158,7 +1081,8 @@ export class SpicyNoodleGame {
     }
     this.state.lastActiveTime = now;
 
-    if (!last || !this.state.day || this.state.day < OFFLINE_UNLOCK_DAY) return null;
+    // Không có nhân viên nào thì không ai mở cửa hộ, không cần báo cáo
+    if (!last || !this.state.day || !this.getHiredStaffKeys().length) return null;
 
     const elapsedMinutes = Math.floor((now - last) / 60000);
     if (elapsedMinutes < OFFLINE_MIN_MINUTES) return null;
@@ -1171,17 +1095,11 @@ export class SpicyNoodleGame {
     const remaining = Math.max(0, OFFLINE_DAILY_CAP_MIN - off.minutesUsedToday);
     const minutes = Math.min(elapsedMinutes, remaining);
 
-    const result = minutes > 0
-      ? this.simulateOfflineSales(minutes)
-      : { capacity: 0, bowls: 0, drinks: 0, revenue: 0, tips: 0, commission: 0, utilities: 0, netProfit: 0, soldNoodles: {}, soldDrinks: {}, stopReason: "" };
+    const result = minutes > 0 ? this.simulateOfflineSales(minutes) : emptyOfflineResult();
 
     // Chỉ trừ hạn mức cho thời gian quán thực sự mở bán (đóng sớm vì hết hàng thì không mất phần còn lại)
     off.minutesUsedToday += result.openMinutes || 0;
-    this.state.money += result.netProfit;
-    this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + result.netProfit;
-    this.state.stats.bowlsServed = (this.state.stats.bowlsServed || 0) + result.bowls;
-    this.state.stats.drinksServed = (this.state.stats.drinksServed || 0) + result.drinks;
-    this.state.stats.tipsEarned = (this.state.stats.tipsEarned || 0) + result.tips;
+    this.applyOfflineResult(result);
     off.totalOfflineProfit += result.netProfit;
     off.totalOfflineBowls += result.bowls;
     if (result.bowls > 0) off.totalShifts += 1;
@@ -1223,105 +1141,6 @@ export class SpicyNoodleGame {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
     return h > 0 ? `${h} giờ ${m} phút` : `${m} phút`;
-  }
-
-  showOfflineRevenueModal(r) {
-    const existing = document.getElementById("offline-revenue-modal");
-    if (existing) existing.remove();
-
-    const vnd = v => txaformat.formatVND(v);
-    const capText = this.formatOfflineDuration(OFFLINE_DAILY_CAP_MIN);
-    const itemList = Object.entries(Object.assign({}, r.soldNoodles, r.soldDrinks))
-      .map(([name, qty]) => `<div class="offline-report-row"><span class="offline-row-label">• ${escapeOfflineHtml(name)}</span><span class="offline-row-value">x${qty}</span></div>`)
-      .join("");
-
-    let notice = "";
-    if (r.minutes === 0) {
-      notice = `Đã dùng hết ${capText} bán offline hôm nay. Quản Lý Ca Trực nghỉ, quán đóng cửa tới ngày mai.`;
-    } else if (r.bowls === 0) {
-      notice = `Quán không bán được tô nào: ${escapeOfflineHtml(r.stopReason || "kho trống")}. Hãy nhập thêm hàng trước khi rời tiệm!`;
-    } else if (r.stopReason) {
-      notice = `Quán phải đóng sớm vì ${escapeOfflineHtml(r.stopReason.toLowerCase())}. Nhập thêm hàng để lần sau bán được lâu hơn!`;
-    } else if (r.minutes < r.elapsedMinutes) {
-      notice = `Bạn vắng ${this.formatOfflineDuration(r.elapsedMinutes)}, nhưng mỗi ngày chỉ được tính tối đa ${capText} bán offline.`;
-    }
-
-    const overlay = document.createElement("div");
-    overlay.id = "offline-revenue-modal";
-    overlay.className = "offline-report-overlay";
-    overlay.innerHTML = `
-      <div class="offline-report-card anime-bounce-in">
-        <div class="offline-report-header">
-          <div class="offline-manager-avatars">🍜 🦊</div>
-          <h2 class="offline-report-title">BÁO CÁO DOANH THU OFFLINE</h2>
-          <div class="offline-report-sub">Quản Lý Ca Trực đã thay bạn bán hàng trong lúc vắng mặt.</div>
-        </div>
-
-        <div class="offline-report-table-box">
-          <div class="offline-report-row">
-            <span class="offline-row-label">⏱️ Thời gian vắng mặt:</span>
-            <span class="offline-row-value">${this.formatOfflineDuration(r.elapsedMinutes)}</span>
-          </div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">🏪 Thời gian quán mở bán:</span>
-            <span class="offline-row-value">${this.formatOfflineDuration(r.openMinutes || 0)}</span>
-          </div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">🗓️ Đã dùng hôm nay:</span>
-            <span class="offline-row-value">${this.formatOfflineDuration(r.usedToday)} / ${capText}</span>
-          </div>
-          <div class="offline-row-divider"></div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">🍜 Tô mì đã bán:</span>
-            <span class="offline-row-value">${r.bowls} tô</span>
-          </div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">🧋 Ly nước đã bán:</span>
-            <span class="offline-row-value">${r.drinks} ly</span>
-          </div>
-          ${itemList}
-          <div class="offline-row-divider"></div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">🟢 Doanh thu bán hàng:</span>
-            <span class="offline-row-value text-green">+${vnd(r.revenue)}</span>
-          </div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">💖 Tiền boa thực khách:</span>
-            <span class="offline-row-value text-green">+${vnd(r.tips)}</span>
-          </div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">🔴 Hoa hồng Quản Lý (${Math.round(OFFLINE_MANAGER_COMMISSION * 100)}%):</span>
-            <span class="offline-row-value text-red">-${vnd(r.commission)}</span>
-          </div>
-          <div class="offline-report-row">
-            <span class="offline-row-label">🔴 Mặt bằng & điện nước:</span>
-            <span class="offline-row-value ${r.utilities ? "text-red" : ""}">${this.state.ownedFlagship ? "0đ (Sổ Đỏ Flagship 🏛️)" : `-${vnd(r.utilities)}`}</span>
-          </div>
-        </div>
-
-        ${notice ? `<div class="offline-report-notice">⚠️ ${notice}</div>` : ""}
-
-        <div class="offline-green-card">
-          <div class="offline-green-badge">${r.netProfit > 0 ? "✅ ĐÃ CỘNG VÀO KÉT QUÁN" : "KHÔNG CÓ LỢI NHUẬN"}</div>
-          <div class="offline-green-amount">+${vnd(r.netProfit)}</div>
-          <div class="offline-green-sub">Nguyên liệu đã bán được trừ trực tiếp trong kho.</div>
-        </div>
-
-        <button class="btn-offline-confirm" id="btn-close-offline-report">Đã Hiểu 💖</button>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-    if (this.sound && r.netProfit > 0) this.sound.playCoinChime();
-
-    const btnClose = overlay.querySelector("#btn-close-offline-report");
-    if (btnClose) {
-      btnClose.onclick = () => {
-        overlay.classList.add("fade-out");
-        setTimeout(() => overlay.remove(), 250);
-        this.renderAll();
-      };
-    }
   }
 
   resetGame() {
@@ -6492,4 +6311,4 @@ export class SpicyNoodleGame {
 }
 
 // Kinh tế thật (v2.3.0): chợ nguyên liệu, nhân sự, tài chính được tách ra module riêng
-Object.assign(SpicyNoodleGame.prototype, MarketMethods, HrMethods, FinanceMethods);
+Object.assign(SpicyNoodleGame.prototype, MarketMethods, HrMethods, FinanceMethods, OfflineMethods);
