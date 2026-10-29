@@ -75,7 +75,8 @@ export const GameIntegrity = {
     if (!state) return;
     const num = v => typeof v === "number" && Number.isFinite(v);
     const day = num(state.day) ? state.day : 1;
-    const money = num(state.money) ? state.money : 0;
+    const loan = state.eco && state.eco.loan && num(state.eco.loan.balance) ? state.eco.loan.balance : 0;
+    const money = (num(state.money) ? state.money : 0) - loan; // tiền vay hợp lệ không bị coi là bất thường
     const total = state.stats && num(state.stats.totalRevenue) ? state.stats.totalRevenue : 0;
     const savings = state.bank && num(state.bank.savings) ? state.bank.savings : 0;
 

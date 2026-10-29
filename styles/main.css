@@ -10940,3 +10940,62 @@ body.is-device-locked #loading-screen {
 .seal-seg { fill: none; stroke: rgba(255, 255, 255, 0.28); stroke-width: 26; stroke-linecap: butt; }
 .seal-seg.is-sealed { stroke: #f6c453; }
 .seal-count { font-size: 26px; font-weight: 900; fill: #fff; pointer-events: none; }
+
+/* ==========================================================
+   v2.3.0 · KINH TẾ THẬT: chợ nguyên liệu, nhân sự, vay vốn, thuế
+   ========================================================== */
+.mk-trend { font-size: 11px; font-weight: 800; margin-left: 4px; }
+.mk-trend.up { color: #DC2626; }
+.mk-trend.down { color: #16A34A; }
+.mk-life { display: block; font-size: 11px; font-weight: 700; }
+.mk-life.is-ok { color: var(--text-muted); }
+.mk-life.is-warn { color: #B45309; }
+.mk-life.is-danger { color: #DC2626; }
+.mk-supply { display: block; font-size: 10.5px; color: var(--text-muted); }
+.mk-supply.is-empty { color: #DC2626; font-weight: 800; }
+.mk-danger { color: #DC2626; }
+
+.hr-summary, .hr-notes {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  background: var(--bg-card-subtle);
+  color: var(--text-title);
+}
+.hr-notes { background: #FEF3C7; color: #92400E; font-weight: 700; display: flex; flex-direction: column; gap: 3px; }
+.hr-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-top: 6px; }
+.hr-stars { color: #F59E0B; letter-spacing: 1px; }
+.hr-mood { height: 6px; border-radius: 99px; background: rgba(0, 0, 0, 0.12); margin-top: 5px; overflow: hidden; }
+.hr-mood > i { display: block; height: 100%; background: #16A34A; }
+.hr-mood > i.is-low { background: #DC2626; }
+.hr-raise { margin-top: 6px; font-size: 12px; font-weight: 800; color: #B45309; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.hr-actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.hr-btn {
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  background: #16A34A;
+  color: #FFF;
+}
+.hr-btn-ghost { background: transparent; color: var(--text-title); border: 1.5px solid var(--border-card); }
+.hr-btn:hover { filter: brightness(1.08); }
+.hr-interview { text-align: left; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.hr-note { font-size: 11.5px; color: var(--text-muted); }
+
+.credit-bar { height: 8px; border-radius: 99px; background: rgba(0, 0, 0, 0.12); margin: 6px 0 10px; overflow: hidden; }
+.credit-bar > i { display: block; height: 100%; }
+.credit-bar > i.is-good { background: #16A34A; }
+.credit-bar > i.is-mid { background: #F59E0B; }
+.credit-bar > i.is-bad { background: #DC2626; }
+.loan-row, .fin-row { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; padding: 3px 0; }
+.loan-offer { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px dashed var(--border-card); font-size: 13px; }
+.loan-sub, .loan-note { font-size: 11.5px; color: var(--text-muted); }
+.loan-note { margin-bottom: 6px; }
+.loan-warn { font-size: 12px; font-weight: 800; color: #DC2626; background: #FEE2E2; border-radius: 10px; padding: 6px 10px; margin: 6px 0; }
+.bank-term-btns { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.fin-grid { display: flex; flex-direction: column; }

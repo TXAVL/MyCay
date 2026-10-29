@@ -4,14 +4,17 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.2.0";
-import { txaformat } from "./txaformat.js?v=2.2.0";
-import { NameValidator } from "./filter.js?v=2.2.0";
-import { SoundManager } from "./audio.js?v=2.2.0";
-import { GameUIModal } from "./modal.js?v=2.2.0";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.2.0";
-import { GameIntegrity } from "./integrity.js?v=2.2.0";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.2.0";
+import { txaversion } from "./txaversion.js?v=2.3.0";
+import { txaformat } from "./txaformat.js?v=2.3.0";
+import { NameValidator } from "./filter.js?v=2.3.0";
+import { SoundManager } from "./audio.js?v=2.3.0";
+import { GameUIModal } from "./modal.js?v=2.3.0";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.0";
+import { GameIntegrity } from "./integrity.js?v=2.3.0";
+import { MarketMethods } from "./market.js?v=2.3.0";
+import { HrMethods } from "./hr.js?v=2.3.0";
+import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.0";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -192,7 +195,7 @@ export class SpicyNoodleGame {
         ducky: false, // Vịt Ducky Barista pha chế trà sữa tự động & buff 25% doanh thu nước
         owl: false,   // Cú Mèo Owl Marketing bão khách +40%, đơn online 10s & x2 review 5 sao
         fawn: false,  // Nai Fawn Logistics sỉ chiết khấu -15% & tự động restock kho thông minh
-        torto: false, // Cụ Rùa Torto Kế toán trưởng: giảm 50% tiền mặt bằng & sinh 5% lãi két sắt
+        torto: false, // Cụ Rùa Torto Kế toán trưởng: giảm 50% tiền thuê, giảm 30% thuế, +0,1% lãi tiết kiệm
         tora: false,  // Bạch Hổ Tora Vệ sĩ & an ninh: 85% dỗ dành khách giận dữ ở lại (+30 kiên nhẫn)
         ryu: false    // Thần Long Ryu Linh vật tối thượng: liên tục nạp FEVER & rơi mưa tiền vàng
       },
@@ -200,6 +203,8 @@ export class SpicyNoodleGame {
       // Đơn hàng Online
       onlineOrders: [],
       deliveredOnlineCount: 0,
+      // Kinh tế thật (v2.3.0): giá chợ, hạn dùng, hồ sơ nhân viên, khoản vay, thuế, nợ hóa đơn
+      eco: createEcoState(),
       codPending: 0, // Tiền mặt COD tài xế đã thu hộ, chờ đối soát cuối ca (k)
 
       // Đánh giá thực khách
@@ -984,6 +989,7 @@ export class SpicyNoodleGame {
         if (parsed.ownerName) this.state.ownerName = parsed.ownerName;
         if (typeof parsed.ownerFullName === "string") this.state.ownerFullName = parsed.ownerFullName;
         if (parsed.tutorialDismissed) this.state.tutorialDismissed = parsed.tutorialDismissed;
+        if (parsed.eco && typeof parsed.eco === "object") this.state.eco = mergeEco(parsed.eco);
         if (parsed.bank && typeof parsed.bank === "object") {
           this.state.bank = Object.assign({
             savings: 0,
@@ -1072,14 +1078,6 @@ export class SpicyNoodleGame {
   localDateKey(ts) {
     const d = new Date(ts);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  }
-
-  // Tiền mặt bằng & điện nước của 1 ngày kinh doanh (cùng công thức với hóa đơn cuối ngày)
-  getDailyRentCost() {
-    if (this.state.ownedFlagship) return 0;
-    let rent = this.state.day === 1 ? 0 : Math.min(180, 25 + (this.state.day - 1) * 12);
-    if (this.state.staff.torto && rent > 0) rent = Math.round(rent * 0.5);
-    return rent;
   }
 
   // Mô phỏng ca bán offline: trả về số liệu và trừ kho trực tiếp vào state
@@ -1582,167 +1580,6 @@ export class SpicyNoodleGame {
   }
 
   // 4. Tab 1: Kho (Nguyên liệu dạng Card Grid & Stepper Tối Ưu)
-  renderKhoTab() {
-    const noodleList = document.getElementById("kho-noodle-list");
-    const topList = document.getElementById("kho-topping-list");
-    const tutorialBox = document.getElementById("tutorial-tooltip-kho");
-
-    if (tutorialBox) {
-      tutorialBox.style.display = this.state.tutorialDismissed ? "none" : "flex";
-    }
-
-    // Cập nhật thanh Tạm tính chi phí & Ngân quỹ ví
-    const spentEl = document.getElementById("kho-subtotal-spent");
-    const walletEl = document.getElementById("kho-subtotal-wallet");
-    if (spentEl) {
-      spentEl.textContent = txaformat.formatVND(this.state.todaySupplySpent || 0);
-    }
-    if (walletEl) {
-      walletEl.textContent = txaformat.formatVND(this.state.money);
-    }
-
-    // Hàm render từng thẻ bài nguyên liệu trực quan (Card Grid)
-    const renderCard = (item) => {
-      const isLocked = item.unlocked === false;
-      const isOutOfStock = (item.stock || 0) <= 0;
-      const isTutorialTarget = !this.state.tutorialDismissed && item.id === "mi_soi";
-      const formattedPrice = txaformat.formatVND(item.unitCost);
-      const isMinusDisabled = isOutOfStock;
-
-      let badgeHtml = "";
-      if (isLocked) {
-        badgeHtml = `<span class="kho-badge locked-badge">🔒 CHƯA MỞ MENU</span>`;
-      } else if (isOutOfStock) {
-        badgeHtml = `<span class="kho-badge out-of-stock">⚠️ HẾT HÀNG</span>`;
-      } else {
-        badgeHtml = `<span class="kho-badge in-stock">Còn ${item.stock} phần</span>`;
-      }
-
-      return `
-        <div class="kho-card ${isLocked ? 'card-locked' : ''} ${isOutOfStock && !isLocked ? 'card-out-of-stock' : ''}" data-item-id="${item.id}">
-          <div class="kho-card-badge-wrap">
-            ${badgeHtml}
-          </div>
-
-          <div class="kho-card-icon-box">
-            <span class="kho-card-icon">${item.icon}</span>
-            ${isLocked ? `<span class="card-lock-overlay-icon">🔒</span>` : ''}
-          </div>
-
-          <div class="kho-card-info">
-            <h4 class="kho-card-name" title="${item.name}">${item.name}</h4>
-            <div class="kho-card-price ${isLocked ? 'text-muted' : ''}">
-              ${isLocked ? `Chưa mở bán` : `${formattedPrice} <span class="unit-text">/phần</span>`}
-            </div>
-            <span class="kho-card-shelf-life" title="Nguyên liệu trữ đông tươi ngon, không bao giờ hư hỏng hay mất đi qua các ngày!">
-              ❄️ Hạn dùng: Vô hạn
-            </span>
-          </div>
-
-          ${isLocked ? `
-            <!-- Nút điều hướng sang Menu nếu món chưa mở khóa -->
-            <div class="kho-locked-action-wrap">
-              ${item.stock > 0 ? `
-                <div class="kho-locked-refund-row">
-                  <span class="locked-stock-note">Còn ${item.stock}</span>
-                  <button class="btn-stepper-action btn-minus" 
-                          onclick="window.game.adjustStock('${item.id}', -1)" 
-                          title="Hoàn trả lại kho để lấy lại tiền">
-                    −
-                  </button>
-                </div>
-              ` : ''}
-              <button class="btn-goto-menu-unlock" onclick="window.game.switchTab('tab-menu')" title="Chuyển tới Tab Menu để mở khóa món này">
-                🔓 Mở Trong Menu
-              </button>
-            </div>
-          ` : `
-            <!-- Cụm Stepper gọn gàng: nút -, số lượng, nút + -->
-            <div class="kho-stepper-control">
-              <button class="btn-stepper-action btn-minus ${isMinusDisabled ? 'disabled' : ''}" 
-                      ${isMinusDisabled ? 'disabled' : ''} 
-                      onclick="window.game.adjustStock('${item.id}', -1)"
-                      title="Bớt 1 phần">
-                −
-              </button>
-              <div class="kho-stepper-stock-val">${item.stock}</div>
-              <button class="btn-stepper-action btn-plus ${isTutorialTarget ? 'highlight-glow' : ''}" 
-                      onclick="window.game.adjustStock('${item.id}', 1)"
-                      title="Mua thêm 1 phần">
-                +
-              </button>
-            </div>
-
-            <!-- Nút chọn mua nhanh số lượng lớn -->
-            <div class="kho-quick-chips">
-              <button class="btn-chip-qty" onclick="window.game.adjustStock('${item.id}', 5)" title="Mua nhanh +5 phần">+5</button>
-              <button class="btn-chip-qty" onclick="window.game.adjustStock('${item.id}', 10)" title="Mua nhanh +10 phần">+10</button>
-            </div>
-          `}
-        </div>
-      `;
-    };
-
-    if (noodleList) {
-      const noodleItems = [
-        ...Object.values(this.state.supplies),
-        ...Object.values(this.state.noodles)
-      ];
-      noodleList.innerHTML = noodleItems.map(renderCard).join("");
-    }
-
-    if (topList) {
-      topList.innerHTML = Object.values(this.state.toppings).map(renderCard).join("");
-    }
-  }
-
-  adjustStock(itemId, amount) {
-    let item = this.state.supplies[itemId] || this.state.noodles[itemId] || this.state.toppings[itemId] || this.state.drinks[itemId];
-    if (!item) return;
-
-    if (amount > 0) {
-      // Chặn tuyệt đối mua nguyên liệu của món chưa mở khóa trong Menu
-      if (item.unlocked === false) {
-        GameUIModal.showToast(`Món "${item.name}" chưa được mở khóa trong Menu! Hãy qua tab Menu mở khóa trước khi nhập hàng nhé!`, "warning", "🔒");
-        return;
-      }
-
-      const discount = this.state.staff.fawn ? 0.85 : 1.0;
-      const cost = Math.round((item.unitCost * amount) * discount * 10) / 10;
-      if (this.state.money < cost) {
-        GameUIModal.showToast("Không đủ tiền trong ngân quỹ để mua thêm!", "warning", "🪙");
-        return;
-      }
-      this.state.money -= cost;
-      item.stock += amount;
-      this.state.todaySupplySpent = (this.state.todaySupplySpent || 0) + cost;
-      this.sound.playCoinChime();
-      const fawnTag = this.state.staff.fawn ? " (🦌 Chiết khấu sỉ -15%)" : "";
-      GameUIModal.showToast(`Đã mua +${amount} ${item.name} (-${txaformat.formatVND(cost)}${fawnTag})`, "success", item.icon);
-
-      if (itemId === "mi_soi" && !this.state.tutorialDismissed) {
-        this.state.tutorialDismissed = true;
-      }
-    } else {
-      const reduce = Math.abs(amount);
-      if (item.stock < reduce) {
-        GameUIModal.showToast(`Trong kho chỉ còn ${item.stock} phần thôi!`, "warning", "⚠️");
-        return;
-      }
-      const refund = (item.unitCost * reduce) * 0.8;
-      item.stock -= reduce;
-      this.state.money += refund;
-      this.state.todaySupplySpent = Math.max(0, (this.state.todaySupplySpent || 0) - refund);
-      this.sound.playButtonClick();
-      GameUIModal.showToast(`Đã trả lại kho ${reduce} ${item.name} (+${txaformat.formatVND(refund)})`, "info", "↩️");
-    }
-
-    this.saveGame();
-    this.renderHeader();
-    this.renderKhoTab();
-    this.renderBottomActionBar();
-  }
-
   brewSupplies() {
     this.state.hasBrewedToday = true;
     const stoveLv = this.state.upgrades.stoveSpeed || 1;
@@ -2124,108 +1961,6 @@ export class SpicyNoodleGame {
   }
 
   // 8. Tab 5: Nhân viên (Lộ Trình Tuyển Dụng Dài Hạn Gắn Liền Với Danh Tiếng ⭐ & Ngày)
-  renderStaffTab() {
-    const listEl = document.getElementById("staff-list");
-    if (!listEl) return;
-
-    // Render banner hướng dẫn cày Danh Tiếng
-    const bannerWrap = document.getElementById("staff-reputation-banner-wrap");
-    if (bannerWrap) {
-      bannerWrap.innerHTML = `
-        <div class="staff-rep-banner" onclick="window.game.openReputationGuide()" title="Bấm để xem bí kíp cày điểm Danh Tiếng">
-          <div class="staff-rep-banner-left">
-            <span class="staff-rep-banner-icon">⭐</span>
-            <div>
-              <div class="staff-rep-banner-title">Danh Tiếng Quán: <b style="color: #D97706;">${this.state.reputation || 30} ⭐</b></div>
-              <div class="staff-rep-banner-sub">Cần đủ điểm để ký hợp đồng nhân sự. Bấm xem mẹo cày điểm! 💡</div>
-            </div>
-          </div>
-          <button class="btn-rep-guide-action" type="button">Cách Cày ⭐</button>
-        </div>
-      `;
-    }
-
-    const staffConfig = [
-      { key: "mochi", name: "Bé Mèo Mochi (Tiếp tân)", desc: "Chào đón khách nồng hậu & tăng +25% tiền tip", cost: 450, dailyWage: 35, minDay: 2, minRep: 25, icon: "🐱" },
-      { key: "usagi", name: "Thỏ Usagi (Bưng bê niêu đất)", desc: "Tự động bưng mì nóng hổi ra bàn khi nấu xong", cost: 850, dailyWage: 45, minDay: 4, minRep: 50, icon: "🐰" },
-      { key: "shiba", name: "Cún Shiba (Tạp vụ dọn bàn)", desc: "Tự động lau dọn bàn sạch bóng & nhặt tiền tip", cost: 1350, dailyWage: 45, minDay: 6, minRep: 80, icon: "🐶" },
-      { key: "kenji", name: "Gấu Kenji (Đầu bếp ninh mì)", desc: "Tự động nấu niêu đất khi khách gọi món", cost: 2200, dailyWage: 65, minDay: 9, minRep: 120, icon: "🐼" },
-      { key: "shiro", name: "Cáo Shiro (Thu ngân)", desc: "Tự động tính tiền và giao đơn online cho Shipper", cost: 3200, dailyWage: 60, minDay: 12, minRep: 165, icon: "🦊" },
-      { key: "ducky", name: "Vịt Ducky (Barista Pha Chế)", desc: "Tự pha & kèm trà sữa, tăng +25% doanh thu nước", cost: 4500, dailyWage: 60, minDay: 16, minRep: 220, icon: "🦆" },
-      { key: "owl", name: "Cú Mèo Owl (Trưởng Marketing)", desc: "Bão khách ghé tiệm +35%, nổ đơn Online 12s & review 5 sao", cost: 5800, dailyWage: 75, minDay: 21, minRep: 290, icon: "🦉" },
-      { key: "fawn", name: "Nai Fawn (Logistics & Quản Lý Kho)", desc: "Nhập sỉ chiết khấu -15%, tự động restock & thưởng +15% đơn giao", cost: 7500, dailyWage: 85, minDay: 27, minRep: 380, icon: "🦌" },
-      { key: "torto", name: "Cụ Rùa Torto (Kế Toán Trưởng)", desc: "Giảm 50% tiền mặt bằng & sinh 5% lãi két sắt qua đêm", cost: 9500, dailyWage: 90, minDay: 33, minRep: 480, icon: "🐢" },
-      { key: "tora", name: "Bạch Hổ Tora (Vệ Sĩ & An Ninh)", desc: "85% hóa giải khách giận dữ bỏ về, tăng +30 kiên nhẫn", cost: 12000, dailyWage: 110, minDay: 40, minRep: 600, icon: "🐯" },
-      { key: "ryu", name: "Thần Long Ryu (Linh Vật May Mắn)", desc: "Tự động kích hoạt Giờ Vàng FEVER & rơi mưa vàng ngẫu nhiên", cost: 18000, dailyWage: 150, minDay: 50, minRep: 800, icon: "🐉" }
-    ];
-
-    listEl.innerHTML = staffConfig.map(st => {
-      const isHired = !!this.state.staff[st.key];
-      const isDayUnlocked = this.state.day >= st.minDay;
-      const isRepUnlocked = (this.state.reputation || 0) >= st.minRep;
-      const isUnlocked = isDayUnlocked && isRepUnlocked;
-
-      return `
-        <div class="staff-card">
-          <div class="staff-card-info">
-            <div class="staff-card-head">
-              <span class="staff-card-title">${st.icon} ${st.name}</span>
-              <span class="staff-card-wage">Lương: ${st.dailyWage}k/ngày</span>
-            </div>
-            <span class="staff-card-desc">${st.desc}</span>
-            <div class="staff-card-reqs">
-              <span class="req-pill ${isDayUnlocked ? 'req-met' : 'req-unmet'}">📅 Ngày ${st.minDay}+</span>
-              <span class="req-pill ${isRepUnlocked ? 'req-met' : 'req-unmet'}">⭐ ${st.minRep} Danh tiếng</span>
-            </div>
-          </div>
-          <div>
-            ${isHired ? `<span class="staff-badge-working">✨ Đang làm việc</span>` : (
-              !isUnlocked ? `<span class="staff-lock-badge" onclick="window.game.openReputationGuide()" style="cursor: pointer;" title="Bấm xem cách cày điểm">🔒 Ngày ${st.minDay} · ${st.minRep}⭐</span>` : `
-              <button class="btn-menu-action btn-buy-lock" onclick="window.game.hireStaff('${st.key}', ${st.cost}, ${st.minDay}, ${st.minRep})">
-                <span class="btn-price-top">${st.cost}k</span>
-                <span class="btn-action-sub">Ký Hợp Đồng</span>
-              </button>
-            `)}
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  hireStaff(key, cost, minDay = 1, minRep = 0) {
-    if (this.state.day < minDay) {
-      GameUIModal.showToast(`Nhân viên này chỉ nhận hồ sơ từ Ngày ${minDay}!`, "warning", "📅");
-      return;
-    }
-    if ((this.state.reputation || 0) < minRep) {
-      GameUIModal.showToast(`Tiệm cần đạt tối thiểu ${minRep}⭐ Danh tiếng (hiện có: ${this.state.reputation || 30}⭐)! Hãy phục vụ khách 5★ và vào Tab 4 trả lời đánh giá để cày điểm nhé!`, "warning", "⭐", 3500);
-      return;
-    }
-    if (this.state.money < cost) {
-      GameUIModal.showToast(`Cần ${cost}k để ký hợp đồng nhân viên!`, "warning", "🪙");
-      return;
-    }
-
-    this.state.money -= cost;
-    this.state.staff[key] = true;
-    this.sound.playCoinChime();
-
-    let welcomeMsg = `Đã đón chào nhân viên mới về tiệm!`;
-    if (key === "ducky") welcomeMsg = `🦆 Vịt Ducky đã đứng quầy Barista! Sẵn sàng lắc trà sữa & tăng 25% doanh thu nước!`;
-    else if (key === "owl") welcomeMsg = `🦉 Cú Mèo Owl đã lên sóng Marketing! Lượng khách & đơn online sắp bùng nổ!`;
-    else if (key === "fawn") welcomeMsg = `🦌 Nai Fawn đã tiếp quản kho hàng! Toàn bộ nguyên liệu được chiết khấu sỉ 15%!`;
-    else if (key === "torto") welcomeMsg = `🐢 Cụ Rùa Torto đã nhậm chức Kế toán trưởng! Tiền mặt bằng giảm 50% & sinh lãi 5% két sắt!`;
-    else if (key === "tora") welcomeMsg = `🐯 Bạch Hổ Tora đã đứng gác bảo an! 85% khách sắp bực mình sẽ được dỗ dành ở lại!`;
-    else if (key === "ryu") welcomeMsg = `🐉 Thần Long Ryu đã giáng thế tiệm mì! Giờ vàng FEVER sẽ liên tục bùng nổ cùng mưa tiền vàng!`;
-    else welcomeMsg = `Đã ký hợp đồng thành công với nhân sự mới về tiệm mì cay!`;
-
-    GameUIModal.showToast(welcomeMsg, "success", "🐾");
-    this.saveGame();
-    this.renderHeader();
-    this.renderStaffTab();
-    this.renderStaffKitchenBar();
-  }
-
   // Helper: Mở khóa khách hàng trong Bộ sưu tập (từ từ khi gặp hoặc khi phục vụ)
   unlockCustomer(cust, isServed = false) {
     if (!cust || !cust.id) return;
@@ -2718,220 +2453,6 @@ export class SpicyNoodleGame {
   // ==========================================================
   // HỆ THỐNG NGÂN HÀNG TIẾT KIỆM (BOBA SAVINGS BANK)
   // ==========================================================
-  renderBankTab() {
-    const bankSection = document.getElementById("tab-bank");
-    if (!bankSection) return;
-
-    if (!this.state.bank) {
-      this.state.bank = {
-        savings: 0,
-        totalInterestEarned: 0,
-        activePlan: "flexi",
-        termDepositAmount: 0,
-        termDaysRemaining: 0,
-        history: []
-      };
-    }
-
-    const savingsDisplay = document.getElementById("bank-savings-display");
-    const walletDisplay = document.getElementById("bank-current-wallet");
-    const ownerDisplay = document.getElementById("bank-card-owner");
-    const totalEarnedDisplay = document.getElementById("bank-total-earned");
-    const interestSubDisplay = document.getElementById("bank-interest-sub");
-    const plansContainer = document.getElementById("bank-plans-container");
-    const historyList = document.getElementById("bank-history-list");
-
-    if (savingsDisplay) {
-      savingsDisplay.textContent = txaformat.formatVND(this.state.bank.savings || 0);
-    }
-    if (walletDisplay) {
-      walletDisplay.textContent = `Ví: ${txaformat.formatVND(this.state.money || 0)}`;
-    }
-    if (ownerDisplay) {
-      const owner = (this.state.ownerName || "Bếp Trưởng Mèo").toUpperCase();
-      ownerDisplay.textContent = `CHỦ SỔ: ${owner}`;
-    }
-    if (totalEarnedDisplay) {
-      totalEarnedDisplay.textContent = `Tổng lãi nhận: +${txaformat.formatVND(this.state.bank.totalInterestEarned || 0)} 🪙`;
-    }
-
-    // Cập nhật hạn mức tiền gửi tại Ngân Hàng Tiết Kiệm Mì Cay
-    const maxDepositLimit = this.getBankDepositLimit();
-    const limitDisplay = document.getElementById("bank-max-deposit-limit-text");
-    if (limitDisplay) {
-      limitDisplay.textContent = txaformat.formatVND(maxDepositLimit);
-    }
-
-    // Hiển thị Thẻ Bất Động Sản Mặt Bằng Flagship (Sổ Đỏ Vĩnh Viễn)
-    const flagshipContainer = document.getElementById("flagship-real-estate-container");
-    if (flagshipContainer) {
-      const isOwned = Boolean(this.state.ownedFlagship);
-      flagshipContainer.innerHTML = `
-        <div class="flagship-estate-card">
-          <div class="flagship-estate-sub">🏢 BẤT ĐỘNG SẢN & MẶT BẰNG FLAGSHIP</div>
-          <div class="flagship-estate-title">
-            <span>Mặt Bằng Trụ Sở Anime Flagship</span>
-          </div>
-          ${isOwned ? `
-            <div class="flagship-status-pill">
-              <span>✅ ĐÃ SỞ HỮU SỔ ĐỎ CHÍNH CHỦ</span>
-            </div>
-            <div class="flagship-estate-desc">
-              🎉 Bạn đã mua đứt toàn bộ mặt bằng tòa nhà trụ sở! Quán được <b>miễn phí 100% chi phí thuê mặt bằng và điện nước vận hành trọn đời</b>.
-            </div>
-          ` : `
-            <div class="flagship-status-pill pending">
-              <span>⏳ ĐANG THUÊ HÀNG NGÀY</span>
-            </div>
-            <div class="flagship-estate-desc">
-              Sở hữu sổ đỏ vĩnh viễn mặt bằng đắc địa tại ngã tư anime. <b>Miễn phí hoàn toàn 100% tiền thuê nhà và phí điện nước mỗi ngày</b> từ ngày mua trở đi!
-            </div>
-            <button class="btn-buy-flagship" onclick="window.game.buyFlagshipRealEstate()">
-              🏛️ Mua Đứt Mặt Bằng (${txaformat.formatVND(50000)})
-            </button>
-          `}
-        </div>
-      `;
-    }
-
-    const tortoActive = !!this.state.staff.torto;
-    const currentPlan = this.state.bank.activePlan || "flexi";
-
-    if (interestSubDisplay) {
-      let rateDesc = "";
-      if (currentPlan === "flexi") {
-        rateDesc = tortoActive ? "+5.0%/ngày (Linh hoạt · Được Cụ Rùa x2 lãi 🐢)" : "+2.5%/ngày (Linh hoạt mỗi đêm)";
-      } else if (currentPlan === "term3") {
-        rateDesc = tortoActive ? "+6.0%/ngày (Kỳ hạn 3 ngày · Được Cụ Rùa buff 🐢)" : "+4.5%/ngày (Kỳ hạn 3 ngày)";
-      } else {
-        rateDesc = tortoActive ? "+9.0%/ngày (Kỳ hạn 7 ngày VIP · Được Cụ Rùa buff 🐢)" : "+7.0%/ngày (Kỳ hạn 7 ngày VIP)";
-      }
-      interestSubDisplay.innerHTML = `📈 Lãi suất ban đêm: <strong class="text-green">${rateDesc}</strong>`;
-    }
-
-    if (plansContainer) {
-      const plans = [
-        {
-          id: "flexi",
-          icon: "🌱",
-          name: "Tiết Kiệm Linh Hoạt (Không Kỳ Hạn)",
-          baseRate: "2.5%",
-          tortoRate: "5.0%",
-          desc: "Nạp rút bất kỳ lúc nào không lo mất lãi. Tiền gửi tự động sinh lời mỗi khi kết thúc ca bán ban đêm.",
-          termDays: 0
-        },
-        {
-          id: "term3",
-          icon: "🚀",
-          name: "Kỳ Hạn 3 Ngày (Tăng Tốc Vốn)",
-          baseRate: "4.5%",
-          tortoRate: "6.0%",
-          desc: "Khóa tiền gửi 3 ngày. Nhận cả vốn lẫn trọn gói lãi suất cao gấp hơn 2 lần khi đáo hạn.",
-          termDays: 3
-        },
-        {
-          id: "term7",
-          icon: "👑",
-          name: "Kỳ Hạn 7 Ngày VIP (Đại Gia Mì Cay)",
-          baseRate: "7.0%",
-          tortoRate: "9.0%",
-          desc: "Gói tiết kiệm thượng lưu khóa 7 ngày. Lãi suất 7% - 9%/ngày (gần gấp 1.5 lần vốn khi đáo hạn) giúp tiệm bứt phá tài chính!",
-          termDays: 7
-        }
-      ];
-
-      plansContainer.innerHTML = plans.map(p => {
-        const isActive = currentPlan === p.id;
-        const rateShow = tortoActive ? `${p.tortoRate}/ngày 🐢` : `${p.baseRate}/ngày`;
-        let statusBadge = "";
-        let actionBtn = "";
-
-        if (p.id === "flexi") {
-          if (isActive) {
-            statusBadge = `<span class="bank-plan-status-text text-green">● Đang kích hoạt gói này</span>`;
-            actionBtn = `<button class="btn-select-plan is-current" disabled>Đang Dùng</button>`;
-          } else {
-            statusBadge = `<span class="bank-plan-status-text">Không khóa vốn</span>`;
-            actionBtn = `<button class="btn-select-plan" onclick="window.game.selectBankPlan('flexi')">Chuyển Sang</button>`;
-          }
-        } else {
-          if (isActive && this.state.bank.termDepositAmount > 0) {
-            statusBadge = `<span class="bank-plan-status-text text-green">🔒 Đang gửi ${txaformat.formatVND(this.state.bank.termDepositAmount)} (Còn ${this.state.bank.termDaysRemaining} ngày)</span>`;
-            actionBtn = `<button class="btn-select-plan is-current" disabled>Đang Chạy</button>`;
-          } else {
-            statusBadge = `<span class="bank-plan-status-text">Kỳ hạn ${p.termDays} ca ngày</span>`;
-            actionBtn = `<button class="btn-select-plan" onclick="window.game.promptTermDeposit('${p.id}', ${p.termDays})">Mở Sổ Gửi</button>`;
-          }
-        }
-
-        return `
-          <div class="bank-plan-card ${isActive ? 'active-plan' : ''}">
-            <div class="bank-plan-top">
-              <div class="bank-plan-name-wrap">
-                <span class="bank-plan-icon">${p.icon}</span>
-                <span class="bank-plan-name">${p.name}</span>
-              </div>
-              <span class="bank-plan-rate-badge">${rateShow}</span>
-            </div>
-            <div class="bank-plan-desc">${p.desc}</div>
-            <div class="bank-plan-action-row">
-              ${statusBadge}
-              ${actionBtn}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    if (historyList) {
-      const history = this.state.bank.history || [];
-      if (history.length === 0) {
-        historyList.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 12px;">Chưa có giao dịch gửi / nhận lãi nào. Hãy gửi tiền tiết kiệm ngay hôm nay!</div>`;
-      } else {
-        historyList.innerHTML = history.slice(0, 15).map(h => {
-          let icon = "💰";
-          let valClass = "text-green";
-          let sign = "+";
-          if (h.type === "deposit") {
-            icon = "📥";
-            valClass = "text-green";
-            sign = "+";
-          } else if (h.type === "withdraw") {
-            icon = "📤";
-            valClass = "text-red";
-            sign = "-";
-          } else if (h.type === "interest") {
-            icon = "📈";
-            valClass = "text-green";
-            sign = "+";
-          } else if (h.type === "term_payout") {
-            icon = "🎉";
-            valClass = "text-green";
-            sign = "+";
-          }
-          return `
-            <div class="bank-history-row">
-              <div class="bank-history-left">
-                <span>${icon}</span>
-                <span class="bank-history-day">Ngày ${h.day || 1}</span>
-                <span class="bank-history-title">${h.desc || 'Giao dịch'}</span>
-              </div>
-              <span class="bank-history-val ${valClass}">${sign}${txaformat.formatVND(h.amount || 0)}</span>
-            </div>
-          `;
-        }).join("");
-      }
-    }
-  }
-
-  getBankDepositLimit() {
-    // Hạn mức tiền gửi tại Ngân Hàng Tiết Kiệm Mì Cay
-    // Hạn mức cơ sở: 50.000k (50 triệu VNĐ)
-    // Mỗi đánh giá 5 sao ⭐ tích lũy được trong quán mở rộng thêm +1.000k (1 triệu VNĐ) hạn mức
-    const fiveStarCount = (this.state.reviews || []).filter(r => r.stars === 5).length;
-    return 50000 + (fiveStarCount * 1000);
-  }
-
   buyFlagshipRealEstate() {
     if (this.state.ownedFlagship) {
       GameUIModal.showToast("🏛️ Bạn đã sở hữu Sổ Đỏ Vĩnh Viễn của Mặt Bằng Flagship này rồi!", "info", "📜");
@@ -3022,47 +2543,6 @@ export class SpicyNoodleGame {
     this.saveGame();
     this.renderHeader();
     this.renderBankTab();
-  }
-
-  promptTermDeposit(planId, termDays) {
-    if (this.state.dayPhase === "open") {
-      GameUIModal.showToast("Hãy mở sổ kỳ hạn sau giờ đóng cửa quán nhé!", "info", "⏱️");
-      return;
-    }
-
-    if (this.state.bank.termDepositAmount > 0 && this.state.bank.termDaysRemaining > 0) {
-      GameUIModal.showToast(`Bạn đang có một gói kỳ hạn đang chạy (${this.state.bank.termDaysRemaining} ngày nữa mới đáo hạn)!`, "warning", "🔒");
-      return;
-    }
-
-    const availableSavings = this.state.bank.savings || 0;
-    if (availableSavings < 50) {
-      GameUIModal.showToast("Cần tối thiểu 50.000đ trong sổ tiết kiệm để mở gói kỳ hạn!", "warning", "⚠️");
-      return;
-    }
-
-    const depositAmt = Math.floor(availableSavings);
-    this.state.bank.savings -= depositAmt;
-    this.state.bank.termDepositAmount = depositAmt;
-    this.state.bank.termDaysRemaining = termDays;
-    this.state.bank.activePlan = planId;
-
-    const planName = planId === "term7" ? "Kỳ Hạn 7 Ngày VIP" : "Kỳ Hạn 3 Ngày";
-    this.addBankHistory("deposit", depositAmt, `Mở sổ ${planName} (Khóa vốn ${termDays} ngày)`);
-
-    this.sound.playCoinChime();
-    GameUIModal.showToast(`Đã khóa gửi ${txaformat.formatVND(depositAmt)} vào ${planName}! Lãi sẽ tự động tất toán sau ${termDays} ngày!`, "success", "🎉");
-    this.saveGame();
-    this.renderBankTab();
-  }
-
-  selectBankPlan(planId) {
-    if (planId === "flexi") {
-      this.state.bank.activePlan = "flexi";
-      GameUIModal.showToast("Đã chuyển về gói Tiết Kiệm Linh Hoạt (Rút nạp tự do)! ✨", "info", "🌱");
-      this.saveGame();
-      this.renderBankTab();
-    }
   }
 
   addBankHistory(type, amount, desc) {
@@ -5713,7 +5193,7 @@ export class SpicyNoodleGame {
     // 4. Vòng lặp làm việc thực tế của nhân viên (Kenji, Usagi, Shiba, Ducky, Fawn, Ryu)
     // Nâng cấp Bếp Gas (stoveSpeed) & Bếp Niêu Đôi (dualStove) giúp thao tác nhanh vượt trội
     const stoveLv = (this.state.upgrades.stoveSpeed || 1) + ((this.state.upgrades.dualStove || 0) * 1.5);
-    const autoIntervalMs = Math.max(850, 2200 - (stoveLv - 1) * 320);
+    const autoIntervalMs = Math.max(850, 2200 - (stoveLv - 1) * 320) / this.getStaffEfficiency();
 
     this.staffAutomationInterval = setInterval(() => {
       this.runStaffAutomation();
@@ -5793,13 +5273,7 @@ export class SpicyNoodleGame {
       ];
       for (const item of allWarehouseItems) {
         if ((item.stock || 0) <= 1) {
-          const wholesaleCost = Math.round((item.unitCost * 5) * 0.85 * 10) / 10;
-          if (this.state.money >= wholesaleCost) {
-            this.state.money -= wholesaleCost;
-            item.stock = (item.stock || 0) + 5;
-            this.state.todaySupplySpent = (this.state.todaySupplySpent || 0) + wholesaleCost;
-            this.sound.playCoinChime();
-            GameUIModal.showToast(`🦌 Nai Fawn đã tự động nhập sỉ +5 ${item.name} (-${txaformat.formatVND(wholesaleCost)}, giảm sỉ 15%)!`, "success", "📦");
+          if (this.marketBuy(item.id, 5)) {
             this.renderHeader();
             this.renderKhoTab();
             break;
@@ -6656,99 +6130,9 @@ export class SpicyNoodleGame {
     if (prepView) prepView.style.display = "block";
     if (openView) openView.style.display = "none";
 
-    // 1. Tính toán chi phí lương nhân viên phục vụ trong ngày
-    const staffWagesList = {
-      mochi: { name: "Mèo Mochi", wage: 35 },
-      usagi: { name: "Thỏ Usagi", wage: 45 },
-      shiba: { name: "Cún Shiba", wage: 45 },
-      kenji: { name: "Gấu Kenji", wage: 65 },
-      shiro: { name: "Cáo Shiro", wage: 60 },
-      ducky: { name: "Vịt Ducky", wage: 60 },
-      owl: { name: "Cú Mèo Owl", wage: 75 },
-      fawn: { name: "Nai Fawn", wage: 85 },
-      torto: { name: "Cụ Rùa Torto", wage: 90 },
-      tora: { name: "Bạch Hổ Tora", wage: 110 },
-      ryu: { name: "Thần Long Ryu", wage: 150 }
-    };
-
-    let totalPayroll = 0;
-    const activeStaffNames = [];
-    Object.keys(this.state.staff).forEach(k => {
-      if (this.state.staff[k] && staffWagesList[k]) {
-        totalPayroll += staffWagesList[k].wage;
-        activeStaffNames.push(staffWagesList[k].name);
-      }
-    });
-    this.state.todayStaffWages = totalPayroll;
-
-    // 2. Chi phí mặt bằng & điện nước vận hành (từ Ngày 2 trở đi để game có độ thử thách thực tế)
-    let rentCost = this.state.day === 1 ? 0 : Math.min(180, 25 + (this.state.day - 1) * 12);
-    // Nếu đã mua đứt Mặt Bằng Flagship (Sổ Đỏ Vĩnh Viễn) -> Miễn phí hoàn toàn tiền thuê mặt bằng!
-    if (this.state.ownedFlagship) {
-      rentCost = 0;
-    } else if (this.state.staff.torto && rentCost > 0) {
-      // Cụ Rùa Torto (Kế toán trưởng): Giảm 50% tiền thuê mặt bằng
-      rentCost = Math.round(rentCost * 0.5);
-    }
-    this.state.todayRentCost = rentCost;
-
-    // Cụ Rùa Torto sinh lãi két sắt 5% trên số tiền nhàn rỗi
-    let interestEarned = 0;
-    if (this.state.staff.torto && this.state.money > 0) {
-      interestEarned = Math.round(this.state.money * 0.05);
-      this.state.money += interestEarned;
-      this.state.todayEarnings += interestEarned;
-      this.state.todayTortoInterest = interestEarned;
-    } else {
-      this.state.todayTortoInterest = 0;
-    }
-
-    // 3. Tính lãi Ngân Hàng Tiết Kiệm Boba Savings Bank
-    if (!this.state.bank) {
-      this.state.bank = { savings: 0, totalInterestEarned: 0, activePlan: "flexi", termDepositAmount: 0, termDaysRemaining: 0, history: [] };
-    }
-
-    let dailyBankInterest = 0;
-    // Gói tiết kiệm linh hoạt không kỳ hạn (Flexi)
-    if (this.state.bank.savings > 0) {
-      const tortoBonus = this.state.staff.torto ? 0.025 : 0;
-      const flexiRate = 0.025 + tortoBonus;
-      const flexiInterest = Math.max(1, Math.round(this.state.bank.savings * flexiRate));
-      this.state.bank.savings += flexiInterest;
-      this.state.bank.totalInterestEarned = (this.state.bank.totalInterestEarned || 0) + flexiInterest;
-      dailyBankInterest += flexiInterest;
-      this.addBankHistory("interest", flexiInterest, `Lãi tiết kiệm linh hoạt (+${(flexiRate * 100).toFixed(1)}%/ngày)`);
-    }
-
-    // Gói tiết kiệm kỳ hạn (Term 3 hoặc Term 7)
-    if (this.state.bank.termDepositAmount > 0 && this.state.bank.termDaysRemaining > 0) {
-      this.state.bank.termDaysRemaining -= 1;
-      if (this.state.bank.termDaysRemaining <= 0) {
-        const isTerm7 = this.state.bank.activePlan === "term7";
-        // v1.7.0 cân bằng: gói 7 ngày cũ trả +84% vốn/tuần làm kinh tế vỡ trận
-        const tortoRateBonus = this.state.staff.torto ? (isTerm7 ? 0.02 : 0.015) : 0;
-        const dailyRate = (isTerm7 ? 0.07 : 0.045) + tortoRateBonus;
-        const totalDays = isTerm7 ? 7 : 3;
-        const termInterest = Math.round(this.state.bank.termDepositAmount * dailyRate * totalDays);
-        const totalPayout = this.state.bank.termDepositAmount + termInterest;
-
-        this.state.bank.savings += totalPayout;
-        this.state.bank.totalInterestEarned = (this.state.bank.totalInterestEarned || 0) + termInterest;
-        dailyBankInterest += termInterest;
-
-        this.addBankHistory("term_payout", totalPayout, `Tất toán ${isTerm7 ? 'Kỳ Hạn 7 Ngày VIP' : 'Kỳ Hạn 3 Ngày'} (Gốc + Lãi ${txaformat.formatVND(termInterest)})`);
-        this.state.bank.termDepositAmount = 0;
-        this.state.bank.activePlan = "flexi";
-      }
-    }
-    this.state.todayBankInterest = dailyBankInterest;
-
-    const totalDailyExpenses = rentCost + totalPayroll;
-    this.state.todayExpenses = totalDailyExpenses;
-
-    if (totalDailyExpenses > 0) {
-      this.state.money = Math.max(0, this.state.money - totalDailyExpenses);
-    }
+    // Chốt sổ cuối ngày: hàng hỏng, thuế, lãi tiết kiệm, tiền thuê, điện nước, lương, trả góp...
+    const bills = this.settleDayFinance();
+    const activeStaffNames = bills.staffNames;
 
     // Nhiệm vụ đã xong mà chưa bấm nhận thì tự cộng thưởng trước khi sang ngày mới
     this.state.todayQuestReward = this.autoClaimPendingQuests();
@@ -6822,7 +6206,7 @@ export class SpicyNoodleGame {
           <div class="receipt-section-title">DOANH THU THU VÀO</div>
           <div class="receipt-row">
             <span>🍜 Bán mỳ & đồ uống:</span>
-            <strong class="receipt-val-green">+${txaformat.formatVND(Math.max(0, grossRevenue - this.state.todayTips - (this.state.todayTortoInterest || 0)))}</strong>
+            <strong class="receipt-val-green">+${txaformat.formatVND(Math.max(0, grossRevenue - this.state.todayTips))}</strong>
           </div>
           <div class="receipt-row">
             <span>💖 Tiền tip thực khách:</span>
@@ -6832,12 +6216,6 @@ export class SpicyNoodleGame {
             <div class="receipt-row">
               <span>🌟 Thưởng Món Đặc Biệt (${this.state.todaySpecialBowlsSold || 0} tô):</span>
               <strong class="receipt-val-gold">+${txaformat.formatVND(this.state.todaySpecialBonus)}</strong>
-            </div>
-          ` : ''}
-          ${this.state.todayTortoInterest > 0 ? `
-            <div class="receipt-row">
-              <span>🐢 Lãi kép Cụ Rùa (+5% két sắt):</span>
-              <strong class="receipt-val-gold">+${txaformat.formatVND(this.state.todayTortoInterest)}</strong>
             </div>
           ` : ''}
           ${this.state.todayQuestReward > 0 ? `
@@ -6855,35 +6233,7 @@ export class SpicyNoodleGame {
 
           <div class="receipt-divider-dash"></div>
 
-          <div class="receipt-section-title">CHI PHÍ VẬN HÀNH</div>
-          ${this.state.ownedFlagship ? `
-            <div class="receipt-row">
-              <span>🏛️ Thuê mặt bằng & điện nước:</span>
-              <span class="receipt-val-free" style="color:#059669; font-weight:800;">0đ (Sổ Đỏ Flagship Vĩnh Viễn 📜)</span>
-            </div>
-          ` : (rentCost > 0 ? `
-            <div class="receipt-row">
-              <span>⚡ Điện nước & mặt bằng${this.state.staff.torto ? ' (Giảm 50% 🐢)' : ''}:</span>
-              <strong class="receipt-val-red">-${txaformat.formatVND(rentCost)}</strong>
-            </div>
-          ` : `
-            <div class="receipt-row">
-              <span>⚡ Mặt bằng:</span>
-              <span class="receipt-val-free">Miễn phí khai trương ✨</span>
-            </div>
-          `)}
-          ${staffWages > 0 ? `
-            <div class="receipt-row">
-              <span>👥 Lương nhân viên (${activeStaffNames.length} bạn):</span>
-              <strong class="receipt-val-red">-${txaformat.formatVND(staffWages)}</strong>
-            </div>
-            <div class="receipt-sub-staff">${activeStaffNames.join(", ")}</div>
-          ` : `
-            <div class="receipt-row">
-              <span>👥 Lương nhân viên:</span>
-              <span class="receipt-val-free">Tự quản (Chưa thuê) 🐾</span>
-            </div>
-          `}
+          ${this.buildExpenseReceiptHtml()}
 
           <div class="receipt-divider-double"></div>
 
@@ -7140,3 +6490,6 @@ export class SpicyNoodleGame {
     }
   }
 }
+
+// Kinh tế thật (v2.3.0): chợ nguyên liệu, nhân sự, tài chính được tách ra module riêng
+Object.assign(SpicyNoodleGame.prototype, MarketMethods, HrMethods, FinanceMethods);

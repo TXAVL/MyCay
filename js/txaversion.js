@@ -10,36 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.2.0 - Giao Hàng Online Như Thật)
+  // Khai báo phiên bản hiện tại của game (Bản 2.3.0 - Kinh Tế Thật)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.2.0",
-      220,
+      "2.3.0",
+      230,
       "29/10/2026",
       [
         {
-          title: "Giao Hàng Online Như Ngoài Đời",
-          desc: "Đơn GrabFood, ShopeeFood, BeFood, Baemin: nhận hoặc từ chối đơn trong 15s, nấu niêu, ép màng, đóng túi, kèm đũa sốt, dán tem, báo món xong rồi giao cho tài xế đọc mã lấy hàng.",
-          icon: "🛵",
+          title: "Chợ Nguyên Liệu Có Giá & Hạn Dùng",
+          desc: "Giá chợ đổi mỗi ngày, có mưa bão, khuyến mãi; chợ bán số lượng có hạn, nhập sỉ được giảm giá. Hàng tươi có hạn dùng, để quá hạn là hỏng phải đổ bỏ.",
+          icon: "🏪",
           badge: "Đại Trùng Tu ✨",
           badgeType: "hot"
         },
         {
-          title: "Phí Nền Tảng & Tỉ Lệ Nhận Đơn",
-          desc: "Mỗi app thu phí riêng (15-20%). Có đơn COD: tài xế thu tiền mặt, đối soát cuối ca, khách có thể bom hàng nên nhớ gọi xác nhận. Ép màng niêu là miết tay quanh miệng niêu thật.",
-          icon: "💸",
-          badge: "Nâng Cấp 🌟",
-          badgeType: "star"
+          title: "Tuyển Dụng Phỏng Vấn & Tâm Trạng",
+          desc: "Ứng viên có tay nghề, mức lương và tính cách riêng, thử việc 2 ngày. Nhân viên có tâm trạng, xin tăng lương, nghỉ việc nếu bị nợ lương. Có thể thưởng nóng hoặc sa thải.",
+          icon: "🧑‍🍳",
+          badge: "Mới ✨",
+          badgeType: "hot"
         },
         {
-          title: "Đánh Giá Theo Đúng Chuyến Giao",
-          desc: "Khách chấm sao theo thực tế: giao trễ hẹn, mì nguội, đổ nước dùng, thiếu đũa ống hút, đóng gói ẩu. Cáo Shiro tự nhận đơn, đóng gói và giao tài xế.",
-          icon: "⭐",
-          badge: "Tối Ưu 🛠️",
-          badgeType: "manage"
+          title: "Vay Vốn, Thuế & Hóa Đơn Thật",
+          desc: "Vay trả góp có lãi, điểm tín dụng, nợ xấu bị trích sổ. Tiền thuê, điện, nước, gas tính theo lượng khách; thuế khoán 2% nộp mỗi 7 ngày. Lãi tiết kiệm sát thực tế hơn.",
+          icon: "🏦",
+          badge: "Nâng Cấp 🌟",
+          badgeType: "star"
         }
       ],
-      "Giao Hàng Online Như Thật"
+      "Kinh Tế Thật"
     );
   }
 
@@ -47,6 +47,35 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.2.0",
+        220,
+        "29/10/2026",
+        [
+          {
+            title: "Giao Hàng Online Như Ngoài Đời",
+            desc: "Đơn GrabFood, ShopeeFood, BeFood, Baemin: nhận hoặc từ chối đơn trong 15s, nấu niêu, ép màng, đóng túi, kèm đũa sốt, dán tem, báo món xong rồi giao cho tài xế đọc mã lấy hàng.",
+            icon: "🛵",
+            badge: "Đại Trùng Tu ✨",
+            badgeType: "hot"
+          },
+          {
+            title: "Phí Nền Tảng & Tỉ Lệ Nhận Đơn",
+            desc: "Mỗi app thu phí riêng (15-20%). Có đơn COD: tài xế thu tiền mặt, đối soát cuối ca, khách có thể bom hàng nên nhớ gọi xác nhận. Ép màng niêu là miết tay quanh miệng niêu thật.",
+            icon: "💸",
+            badge: "Nâng Cấp 🌟",
+            badgeType: "star"
+          },
+          {
+            title: "Đánh Giá Theo Đúng Chuyến Giao",
+            desc: "Khách chấm sao theo thực tế: giao trễ hẹn, mì nguội, đổ nước dùng, thiếu đũa ống hút, đóng gói ẩu. Cáo Shiro tự nhận đơn, đóng gói và giao tài xế.",
+            icon: "⭐",
+            badge: "Tối Ưu 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Giao Hàng Online Như Thật"
+      ),
       new txaversion(
         "2.1.0",
         210,

@@ -18,15 +18,15 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=2.2.0" />
+  <link rel="stylesheet" href="styles/main.css?v=2.3.0" />
   <!-- Lớp giao diện game (HUD, khung cảnh tiệm, dock nút tròn, nút 3D) -->
-  <link rel="stylesheet" href="styles/game-skin.css?v=2.2.0" />
+  <link rel="stylesheet" href="styles/game-skin.css?v=2.3.0" />
 
   <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
-  <script src="js/security-shield.js?v=2.2.0"></script>
+  <script src="js/security-shield.js?v=2.3.0"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -347,19 +347,8 @@
               </div>
             </div>
 
-            <!-- Banner Cam Kết Bảo Quản Nguyên Liệu VÔ HẠN (Giải đáp thắc mắc người chơi) -->
-            <div class="kho-storage-banner">
-              <div class="storage-banner-icon-box">❄️</div>
-              <div class="storage-banner-body">
-                <div class="storage-banner-title">
-                  <span>Kho Lạnh Vô Trùng · Hạn Dùng VÔ HẠN</span>
-                  <span class="storage-banner-pill">Bảo Quản 100% ⏳</span>
-                </div>
-                <div class="storage-banner-desc">
-                  Toàn bộ mì sợi, nước dùng và topping đã mua được <strong>bảo quản tươi ngon vĩnh viễn</strong> qua các ngày (không bị mất hay hư hỏng). Bạn yên tâm gom trữ nhé!
-                </div>
-              </div>
-            </div>
+            <!-- Bảng tin chợ nguyên liệu: giá hôm nay, biến cố, hàng sắp hỏng (render qua JS) -->
+            <div class="kho-storage-banner" id="kho-market-banner"></div>
 
             <!-- Hướng dẫn Tutorial Tooltip (chuẩn screenshot 1) -->
             <div id="tutorial-tooltip-kho" class="tutorial-popover-box">
@@ -576,7 +565,7 @@
                 <span class="bank-balance-label">Tổng Số Dư Tiết Kiệm Sinh Lời</span>
                 <div class="bank-balance-num" id="bank-savings-display">0đ</div>
                 <div class="bank-interest-sub" id="bank-interest-sub">
-                  📈 Lãi suất ban đêm: <strong class="text-green">+2.5%/ngày</strong>
+                  📈 Lãi tiết kiệm: <strong class="text-green">+0.2%/ngày</strong>
                 </div>
                 <div class="bank-deposit-limit-banner" id="bank-deposit-limit-banner" style="margin-top: 8px; font-size: 11px; background: rgba(0,0,0,0.15); border-radius: 10px; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; border: 1px dashed rgba(255,255,255,0.2);">
                   <span>🛡️ Hạn mức gửi: <strong id="bank-max-deposit-limit-text" style="color: #FDE68A;">50.000.000đ</strong></span>
@@ -594,6 +583,12 @@
             <div id="flagship-real-estate-container">
               <!-- Render động thẻ Bất Động Sản Flagship -->
             </div>
+
+            <!-- VAY VỐN & ĐIỂM TÍN DỤNG -->
+            <div id="bank-loan-container"></div>
+
+            <!-- THUẾ & CHI PHÍ CỐ ĐỊNH -->
+            <div id="bank-finance-container"></div>
 
             <!-- Giao dịch gửi / rút tiền mặt -->
             <div class="bank-section-box">
@@ -1581,6 +1576,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=2.2.0"></script>
+  <script type="module" src="js/app.js?v=2.3.0"></script>
 </body>
 </html>

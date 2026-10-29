@@ -1,6 +1,6 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.2.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.3.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
 [![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-29%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
@@ -89,6 +89,12 @@
 - **Phí nền tảng**: Mỗi app thu phí 15-20%, giá trên app cao hơn tại quán ~12%. Tiền về ví sau khi giao xong.
 - **Tỉ lệ nhận đơn**: Từ chối / bỏ lỡ nhiều đơn thì app đẩy ít đơn cho quán. Tài xế chờ quá 30s không có hàng sẽ hủy chuyến.
 - **Đánh giá theo thực tế**: Giao trễ hẹn, mì nguội, đổ nước dùng, thiếu đũa sốt, đóng gói ẩu đều ảnh hưởng số sao. Cáo Shiro tự nhận đơn, đóng gói và giao tài xế.
+
+### 10. 🏦 Kinh Tế Thật (v2.3.0)
+- **Chợ nguyên liệu**: giá chợ đổi mỗi ngày (mưa bão, khuyến mãi...), chợ bán số lượng có hạn, nhập sỉ từ 10 phần giảm 5%, từ 20 phần giảm 10%. Hàng có hạn dùng riêng, quá hạn là hỏng phải đổ bỏ (Tủ đông kéo dài hạn). Chỉ trả lại hàng mua trong ngày.
+- **Nhân sự**: phỏng vấn ứng viên (tay nghề, lương đề nghị, tính cách), thử việc 2 ngày, tâm trạng nhân viên, xin tăng lương, thưởng nóng, sa thải có đền bù, nợ lương 2 ngày là nghỉ việc.
+- **Ngân hàng**: lãi tiết kiệm thực tế (0,2–0,8%/ngày), gửi kỳ hạn tự chọn số tiền, rút trước hạn mất lãi. Vay vốn trả góp có lãi, điểm tín dụng, phạt trả trễ, nợ xấu bị trích sổ và chặn vay.
+- **Thuế & chi phí**: thuê mặt bằng, điện, nước, gas tính theo lượng khách; thuế khoán 2% doanh thu (miễn 5 ngày đầu) nộp mỗi 7 ngày; thiếu tiền thì ghi nợ hóa đơn và chịu phí chậm trả.
 
 ---
 
