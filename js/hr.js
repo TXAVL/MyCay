@@ -5,7 +5,8 @@
 // - Nhân viên có tâm trạng: lương trễ, bị bỏ rơi thì chán việc, xin tăng lương, thậm chí nghỉ việc
 // - Có thể thưởng nóng, sa thải (phải đền 2 ngày lương)
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.3.4";
+import { GameUIModal } from "./modal.js?v=2.4.0";
+import { txaformat } from "./txaformat.js?v=2.4.0";
 
 export const STAFF_ROSTER = [
   { key: "mochi", name: "Bé Mèo Mochi", role: "Tiếp tân", desc: "Chào đón khách nồng hậu & tăng +25% tiền tip", cost: 450, wage: 35, minDay: 2, minRep: 25, icon: "🐱" },
@@ -33,9 +34,15 @@ const TRAIT_KEYS = Object.keys(TRAITS);
 const PROBATION_DAYS = 2;
 const PROBATION_WAGE = 0.7;
 const MAX_REROLLS = 2;
+// Quyết toán KPI: kỳ 7 ngày, mỗi cấp đào tạo giúp nhân viên làm nhanh hơn 3%
+export const KPI_PERIOD = 7;
+const KPI_MAX_LEVEL = 10;
+const KPI_SPEED_PER_LEVEL = 0.03;
 
 const stars = n => "★".repeat(n) + "☆".repeat(5 - n);
 const rosterOf = key => STAFF_ROSTER.find(s => s.key === key);
+const money = v => txaformat.formatVND(v);
+const esc = str => String(str == null ? "" : str).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 
 function rollSkill() {
   const r = Math.random();
@@ -84,7 +91,8 @@ export const HrMethods = {
       const base = 0.7 + info.skill * 0.1;
       const trait = (TRAITS[info.trait] || TRAITS.steady).eff;
       const mood = info.morale < 35 ? 0.8 : (info.morale >= 80 ? 1.05 : 1);
-      return s + base * trait * mood;
+      const training = 1 + (info.level || 0) * KPI_SPEED_PER_LEVEL;
+      return s + base * trait * mood * training;
     }, 0);
     return Math.max(0.6, sum / keys.length);
   },
@@ -245,6 +253,8 @@ export const HrMethods = {
   hrSettleDay(paidRatio) {
     const notes = [];
     const day = this.state.day;
+    // Chấm công: ai đang làm thì được tính 1 ca bán hôm nay cho kỳ KPI
+    this.recordKpiShift(STAFF_ROSTER.map(r => r.key).filter(k => this.state.staff[k]), this.state.todayEarnings || 0, this.state.todayBowlsSold || 0);
     STAFF_ROSTER.forEach(r => {
       if (!this.state.staff[r.key]) return;
       const info = this.ensureStaffInfo(r.key);
@@ -283,6 +293,207 @@ export const HrMethods = {
     return notes;
   },
 
+  // ---------- QUYẾT TOÁN KPI 7 NGÀY & ĐÌNH CÔNG (issue #8) ----------
+  // Mỗi ca làm (ca bán trong ngày hoặc ca trông tiệm offline) được chấm công. Cuối mỗi kỳ 7 ngày,
+  // chủ quán phải trả thưởng KPI: thưởng nóng + chia % doanh thu kỳ theo số ca & cấp đào tạo.
+  // Trả đủ: nhân viên lên cấp đào tạo (làm nhanh hơn). Từ chối / không trả nổi: đình công, vơ vét két.
+  ensureKpi() {
+    const eco = this.state.eco;
+    if (!eco.kpi || typeof eco.kpi !== "object") eco.kpi = { startDay: this.state.day, revenue: 0, bowls: 0 };
+    return eco.kpi;
+  },
+
+  // Ghi công cho nhân viên đã làm một ca, cộng doanh thu vào kỳ KPI
+  recordKpiShift(keys, revenue, bowls) {
+    const kpi = this.ensureKpi();
+    kpi.revenue = Math.round((kpi.revenue + (revenue || 0)) * 10) / 10;
+    kpi.bowls += bowls || 0;
+    keys.forEach(k => {
+      if (!this.state.staff[k]) return;
+      const info = this.ensureStaffInfo(k);
+      info.shifts = (info.shifts || 0) + 1;
+    });
+  },
+
+  getKpiLevel(key) {
+    return (this.state.eco.staffInfo[key] && this.state.eco.staffInfo[key].level) || 0;
+  },
+
+  // Cuối ngày thứ 7, 14, 21...: chốt bảng KPI chờ chủ quán quyết toán
+  prepareKpiSettlement() {
+    const eco = this.state.eco;
+    const kpi = this.ensureKpi();
+    const keys = STAFF_ROSTER.map(r => r.key).filter(k => this.state.staff[k]);
+    if (!keys.length) {
+      eco.kpi = { startDay: this.state.day + 1, revenue: 0, bowls: 0 };
+      return null;
+    }
+    const entries = keys.map(k => {
+      const r = rosterOf(k);
+      const info = this.ensureStaffInfo(k);
+      const shifts = info.shifts || 0;
+      const level = info.level || 0;
+      const sharePct = Math.round((1 + level * 0.5 + (info.skill - 3) * 0.25) * 100) / 100;
+      const attendance = Math.min(1, shifts / KPI_PERIOD);
+      const hot = shifts > 0 ? this.getStaffWage(k) : 0;
+      const share = Math.round(kpi.revenue * (sharePct / 100) * attendance);
+      const grade = shifts >= KPI_PERIOD && info.morale >= 60 ? "excellent" : (shifts >= 5 ? "pass" : "fail");
+      return { key: k, name: r.name, role: r.role, icon: r.icon, shifts, level, sharePct, hot, share, bonus: hot + share, grade };
+    });
+    const report = {
+      day: this.state.day,
+      revenue: kpi.revenue,
+      bowls: kpi.bowls,
+      entries,
+      total: entries.reduce((s, e) => s + e.bonus, 0)
+    };
+    eco.kpiPending = report;
+    eco.kpi = { startDay: this.state.day + 1, revenue: 0, bowls: 0 };
+    keys.forEach(k => { this.ensureStaffInfo(k).shifts = 0; });
+    return report;
+  },
+
+  // Hiện bảng quyết toán đang chờ (sau khi đóng hóa đơn ngày, hoặc khi mở lại game)
+  showPendingKpi() {
+    const rep = this.state.eco.kpiPending;
+    if (!rep || document.getElementById("kpi-overlay")) return;
+    // Còn nhân viên nào đâu thì bỏ qua bảng này
+    if (!rep.entries.some(e => this.state.staff[e.key])) {
+      this.state.eco.kpiPending = null;
+      this.saveGame();
+      return;
+    }
+    // Có Kế toán trưởng Torto: tự quyết toán công tâm nếu két đủ tiền
+    if (this.state.staff.torto && this.canAffordKpi(rep.total)) {
+      this.payKpi(true);
+      return;
+    }
+    const canPay = this.canAffordKpi(rep.total);
+    const lack = Math.max(0, rep.total - this.state.money - (this.state.bank.savings || 0));
+    this.openKpiOverlay(`
+      <div class="kpi-hero">🧑‍💼 ⭐ 🎖️</div>
+      <h2 class="kpi-title">QUYẾT TOÁN KPI KỲ 7 NGÀY</h2>
+      <p class="kpi-lead">Đến hạn trả thưởng KPI cho <b>${rep.entries.length} nhân viên</b> theo đúng số ca đi làm thực tế.<br>
+        💰 Doanh thu kỳ: <b class="cp-text-warn">${money(rep.revenue)}</b> · 🍜 ${rep.bowls} tô · 💸 Tổng phải trả: <b class="cp-text-good">${money(rep.total)}</b></p>
+      <div class="kpi-list">${rep.entries.map(e => this.kpiEntryHtml(e, false)).join("")}</div>
+      <p class="kpi-warn">⚠️ Trả lấy từ ví trước, thiếu thì trích sổ tiết kiệm. Từ chối trả, hoặc không đủ tiền, cả đội sẽ <b>đình công nghỉ việc tập thể và vơ vét sạch két</b>!</p>
+      <div class="kpi-actions">
+        <button class="kpi-btn kpi-btn-pay" ${canPay ? "" : "disabled"} onclick="window.game.payKpi()">${canPay ? `💸 Thanh toán thưởng KPI (−${money(rep.total)})` : `Không đủ tiền (thiếu ${money(lack)})`}</button>
+        <button class="kpi-btn kpi-btn-refuse" onclick="window.game.refuseKpi()">🙅 Từ chối trả</button>
+      </div>`);
+  },
+
+  kpiEntryHtml(e, paid) {
+    const gradeText = { excellent: "Xuất sắc", pass: "Đạt", fail: "Chưa đạt" }[e.grade];
+    const levelUp = paid && e.grade !== "fail" && e.level < KPI_MAX_LEVEL;
+    return `
+      <div class="kpi-row is-${e.grade}">
+        <b>${e.grade === "fail" ? "▫️" : "🌟"} ${esc(e.name)} (${esc(e.role)}) (🎓 Lv.${e.level}${levelUp ? ` → ${e.level + 1}` : ""}):</b>
+        Đi làm ${e.shifts}/${KPI_PERIOD} ca · ${gradeText} | Thưởng nóng ${money(e.hot)} + chia ${e.sharePct}% DT = <b>+${money(e.bonus)}</b>
+        ${levelUp ? ` | Nhanh hơn ${KPI_SPEED_PER_LEVEL * 100}% mỗi cấp` : ""}
+      </div>`;
+  },
+
+  canAffordKpi(total) {
+    return this.state.money + (this.state.bank.savings || 0) >= total;
+  },
+
+  payKpi(byTorto = false) {
+    const st = this.state;
+    const rep = st.eco.kpiPending;
+    if (!rep) return;
+    if (!this.canAffordKpi(rep.total)) {
+      GameUIModal.showToast("Không đủ tiền để quyết toán KPI!", "warning", "🪙");
+      return;
+    }
+    let need = rep.total;
+    const fromWallet = Math.min(st.money, need);
+    st.money = Math.round((st.money - fromWallet) * 10) / 10;
+    need -= fromWallet;
+    if (need > 0) {
+      st.bank.savings = Math.round((st.bank.savings - need) * 10) / 10;
+      this.addBankHistory("withdraw", need, "Trích sổ tiết kiệm trả thưởng KPI nhân viên");
+    }
+    // Trả đủ: nhân viên vui, ai đạt KPI được lên cấp đào tạo
+    rep.entries.forEach(e => {
+      if (!st.staff[e.key]) return;
+      const info = this.ensureStaffInfo(e.key);
+      info.morale = Math.min(100, info.morale + (e.grade === "excellent" ? 20 : 12));
+      if (e.grade !== "fail") info.level = Math.min(KPI_MAX_LEVEL, (info.level || 0) + 1);
+      if (e.grade === "excellent") st.reputation = Math.min(1000, st.reputation + 2);
+    });
+    st.eco.kpiPending = null;
+    this.sound.playCoinChime();
+    this.closeKpiOverlay();
+    this.openKpiOverlay(`
+      <div class="kpi-hero">🧑‍💼 ⭐ 🎖️</div>
+      <h2 class="kpi-title">${byTorto ? "KẾ TOÁN TORTO QUYẾT TOÁN KPI CÔNG TÂM!" : "QUYẾT TOÁN KPI THÀNH CÔNG!"}</h2>
+      <p class="kpi-lead">${byTorto ? "🐢 Cụ Rùa Torto đã tự động xét duyệt KPI kỳ 7 ngày" : "Đã trả thưởng KPI kỳ 7 ngày"} cho <b>${rep.entries.length} nhân viên</b> theo đúng ngày công.<br>
+        💰 Doanh thu kỳ: <b class="cp-text-warn">${money(rep.revenue)}</b> · 💸 Tổng chi trả: <b class="cp-text-good">${money(rep.total)}</b></p>
+      <div class="kpi-list">${rep.entries.map(e => this.kpiEntryHtml(e, true)).join("")}</div>
+      <p class="kpi-ok">✨ Nhân viên hài lòng, tính lương chuẩn xác công tâm. Ai đạt KPI được lên cấp đào tạo, làm việc nhanh hơn!</p>
+      <div class="kpi-actions"><button class="kpi-btn kpi-btn-pay" onclick="window.game.closeKpiOverlay()">Tuyệt vời, tiếp tục kinh doanh!</button></div>`);
+    this.saveGame();
+    this.renderHeader();
+    this.renderStaffTab();
+    this.renderBankTab();
+  },
+
+  refuseKpi() {
+    GameUIModal.confirm({
+      title: "Từ chối trả thưởng KPI?",
+      icon: "⚠️",
+      message: "Nhân viên đã làm đủ ca cả kỳ. Từ chối trả sẽ khiến <b>cả đội đình công nghỉ việc và vơ vét sạch tiền trong két</b>. Chắc chắn chưa?",
+      confirmText: "Vẫn từ chối",
+      cancelText: "Thôi, để tôi trả",
+      onConfirm: () => this.triggerStrike(true)
+    });
+  },
+
+  // Đình công: cả đội nghỉ việc tập thể, lấy sạch tiền mặt trong két, mất toàn bộ cấp đào tạo
+  triggerStrike(refused) {
+    const st = this.state;
+    const rep = st.eco.kpiPending;
+    const leaving = STAFF_ROSTER.filter(r => st.staff[r.key]);
+    const stolen = Math.max(0, Math.round(st.money * 10) / 10);
+    st.money = 0;
+    leaving.forEach(r => this.removeStaff(r.key));
+    st.reputation = Math.max(5, st.reputation - 10);
+    st.eco.kpiPending = null;
+    st.eco.hrNotes = [`🚨 Cả đội đình công vì không được trả thưởng KPI, đã nghỉ việc tập thể và lấy ${money(stolen)} trong két.`];
+    this.sound.playReviewChime();
+    this.closeKpiOverlay();
+    const owed = rep ? money(rep.total) : "";
+    this.openKpiOverlay(`
+      <div class="kpi-hero">🚨 😡 💥</div>
+      <h2 class="kpi-title is-bad">ĐÌNH CÔNG: NHÂN VIÊN ĐỒNG LOẠT NGHỈ VIỆC &amp; VƠ VÉT KÉT TIỀN!</h2>
+      <p class="kpi-lead">Đến hạn chót ngày thứ ${rep ? rep.day : st.day} mà chủ quán <b>${refused ? "từ chối thanh toán" : "không trả nổi"} thưởng KPI${owed ? ` ${owed}` : ""}</b> cho nhân viên!</p>
+      <div class="kpi-quote">"Làm lụng vất vả cả kỳ ${KPI_PERIOD} ca mà chủ quán không chịu trả thưởng! Tụi em quyết định <b>nghỉ việc tập thể đồng loạt</b> và <b>lấy sạch ${money(stolen)} trong két</b> để cấn trừ nợ lương!"</div>
+      <div class="kpi-damage">
+        <b>⚠️ Hậu quả nghiêm trọng:</b><br>
+        • Tiền trong két bị lấy sạch: <b>${money(stolen)} → 0đ</b> (sổ tiết kiệm ngân hàng không bị đụng tới).<br>
+        • <b>${leaving.map(r => esc(r.name)).join(", ") || "Toàn bộ nhân viên"}</b> đã tháo tạp dề bỏ đi.<br>
+        • Mất sạch cấp đào tạo tích lũy và uy tín tiệm giảm 10 ⭐. Phải vào tab <b>Nhân Viên</b> phỏng vấn tuyển người mới!
+      </div>
+      <div class="kpi-actions"><button class="kpi-btn kpi-btn-refuse" onclick="window.game.closeKpiOverlay()">Đã nhận bài học quản trị xương máu</button></div>`);
+    this.saveGame();
+    this.renderAll();
+  },
+
+  openKpiOverlay(inner) {
+    this.closeKpiOverlay();
+    const overlay = document.createElement("div");
+    overlay.id = "kpi-overlay";
+    overlay.className = "kpi-overlay";
+    overlay.innerHTML = `<div class="kpi-card anime-bounce-in">${inner}</div>`;
+    document.body.appendChild(overlay);
+  },
+
+  closeKpiOverlay() {
+    const el = document.getElementById("kpi-overlay");
+    if (el) el.remove();
+  },
+
   renderStaffTab() {
     const listEl = document.getElementById("staff-list");
     if (!listEl) return;
@@ -303,7 +514,8 @@ export const HrMethods = {
           </div>
           <button class="btn-rep-guide-action" type="button">Cách Cày ⭐</button>
         </div>
-        ${payroll.items.length ? `<div class="hr-summary">👥 Quỹ lương: <b>${payroll.total}k/ngày</b> · Hiệu suất đội ngũ: <b>${eff}%</b> · Lương trả trễ 2 ngày là nhân viên nghỉ việc</div>` : ""}
+        ${payroll.items.length ? `<div class="hr-summary">👥 Quỹ lương: <b>${payroll.total}k/ngày</b> · Hiệu suất đội ngũ: <b>${eff}%</b> · Lương trả trễ 2 ngày là nhân viên nghỉ việc<br>
+          📅 Quyết toán thưởng KPI cuối <b>Ngày ${Math.ceil(this.state.day / KPI_PERIOD) * KPI_PERIOD}</b> · doanh thu kỳ này ${money(this.ensureKpi().revenue)}. Không trả là cả đội đình công!</div>` : ""}
         ${notes.length ? `<div class="hr-notes">${notes.map(n => `<div>${n}</div>`).join("")}</div>` : ""}
       `;
     }
@@ -323,6 +535,7 @@ export const HrMethods = {
             <span class="hr-stars" title="Tay nghề">${stars(info.skill)}</span>
             <span>${t.label}</span>
             <span>Lương ${wage}k${info.probation > 0 ? ` (thử việc còn ${info.probation} ngày)` : ""}</span>
+            <span>🎓 Lv.${info.level || 0} · ${info.shifts || 0}/${KPI_PERIOD} ca kỳ này</span>
           </div>
           <div class="hr-mood" title="Tâm trạng ${info.morale}%"><i class="${info.morale < 35 ? "is-low" : ""}" style="width:${info.morale}%"></i></div>
           ${info.raise ? `

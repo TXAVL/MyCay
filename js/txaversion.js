@@ -10,29 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.3.4 - Sửa lỗi & cập nhật menu Mod)
+  // Khai báo phiên bản hiện tại của game (Bản 2.4.0 - Quyết Toán KPI & Đình Công)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.3.4",
-      234,
-      "29/10/2026",
+      "2.4.0",
+      240,
+      "03/11/2026",
       [
         {
-          title: "Sửa Lỗi",
-          desc: "Màn hình đang bán trên máy tính giờ dùng hết chiều ngang, không còn bị hẹp. Sửa giao diện hướng dẫn ở bước cuối bị bóp chữ.",
-          icon: "🛠️",
-          badge: "Sửa Lỗi 🛠️",
-          badgeType: "manage"
+          title: "Quyết Toán KPI 7 Ngày",
+          desc: "Nhân viên được chấm công từng ca (cả ca offline). Cuối mỗi kỳ 7 ngày phải trả thưởng nóng và chia % doanh thu theo số ca. Ai đạt KPI được lên cấp đào tạo, làm nhanh hơn. Có Cụ Rùa Torto thì tự quyết toán.",
+          icon: "🎖️",
+          badge: "Mới ✨",
+          badgeType: "hot"
         },
         {
-          title: "Cập Nhật Menu Mod",
-          desc: "Menu trợ lực chia nhóm theo hệ thống, thêm lệnh cho chợ, nhân sự, vay vốn, thuế, đơn online và ca offline.",
-          icon: "👑",
-          badge: "Cập Nhật 🌟",
-          badgeType: "star"
+          title: "Đình Công",
+          desc: "Từ chối hoặc không trả nổi thưởng KPI, cả đội nghỉ việc tập thể, vơ vét sạch tiền trong két và mất toàn bộ cấp đào tạo.",
+          icon: "🚨",
+          badge: "Mới ✨",
+          badgeType: "hot"
+        },
+        {
+          title: "Sao Lưu Đầy Đủ Hơn",
+          desc: "File sao lưu giờ mang theo cả theme, cài đặt âm thanh và cấp HUD, khôi phục là y như cũ.",
+          icon: "💾",
+          badge: "Tối Ưu 🛠️",
+          badgeType: "manage"
         }
       ],
-      "Sửa Lỗi & Menu Mod"
+      "Quyết Toán KPI & Đình Công"
     );
   }
 
@@ -40,6 +47,28 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.3.4",
+        234,
+        "29/10/2026",
+        [
+          {
+            title: "Sửa Lỗi",
+            desc: "Màn hình đang bán trên máy tính giờ dùng hết chiều ngang, không còn bị hẹp. Sửa giao diện hướng dẫn ở bước cuối bị bóp chữ.",
+            icon: "🛠️",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          },
+          {
+            title: "Cập Nhật Menu Mod",
+            desc: "Menu trợ lực chia nhóm theo hệ thống, thêm lệnh cho chợ, nhân sự, vay vốn, thuế, đơn online và ca offline.",
+            icon: "👑",
+            badge: "Cập Nhật 🌟",
+            badgeType: "star"
+          }
+        ],
+        "Sửa Lỗi & Menu Mod"
+      ),
       new txaversion(
         "2.3.3",
         233,

@@ -4,9 +4,22 @@
 // Bất kỳ thay đổi nào (dù chỉ 1 ký tự) trong file đều khiến chữ ký sai -> chặn khôi phục.
 // ==========================================================
 
-import { GameIntegrity } from "./integrity.js?v=2.3.4";
+import { GameIntegrity } from "./integrity.js?v=2.4.0";
 
 const SAVE_KEY = "mycay_save_data";
+// Cài đặt người chơi lưu riêng ngoài bản lưu game: đi kèm file sao lưu để khôi phục đầy đủ như cũ
+const PREF_KEYS = ["mycay_theme", "mycay_sound_settings", "mycay_hud_level"];
+
+function collectPrefs() {
+  const prefs = {};
+  PREF_KEYS.forEach(k => {
+    try {
+      const v = localStorage.getItem(k);
+      if (v != null) prefs[k] = v;
+    } catch (e) {}
+  });
+  return prefs;
+}
 const BACKUP_FORMAT = "TMC-BACKUP";
 const GAME_NAME = "Tiệm Mỳ Cay";
 const BACKUP_VERSION = 2;
@@ -134,7 +147,8 @@ export class GameBackup {
     const stateJson = JSON.stringify(cleanState);
     const inner = JSON.stringify({
       state: cleanState,
-      stateHash: await sha256B64(stateJson)
+      stateHash: await sha256B64(stateJson),
+      prefs: collectPrefs()
     });
 
     const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -655,7 +669,7 @@ export class GameBackup {
     }
     pass("Kiểm tra hợp lệ dữ liệu game");
 
-    return { state, preview: buildPreview(state), createdAt: file.createdAt, gameVersion: file.gameVersion, checks };
+    return { state, prefs: inner.prefs || null, preview: buildPreview(state), createdAt: file.createdAt, gameVersion: file.gameVersion, checks };
   }
 
   // ---------------- KHÔI PHỤC TIẾN TRÌNH ----------------
@@ -895,12 +909,12 @@ export class GameBackup {
       `,
       buttons: [
         { text: "Hủy Bỏ" },
-        { text: "Khôi Phục Ngay ✨", primary: true, onClick: () => this.applyRestore(result.state) }
+        { text: "Khôi Phục Ngay ✨", primary: true, onClick: () => this.applyRestore(result.state, result.prefs) }
       ]
     });
   }
 
-  static applyRestore(state) {
+  static applyRestore(state, prefs = null) {
     try {
       // Chặn mọi lần tự lưu của game đang chạy ghi đè lên bản vừa khôi phục
       window.__mycayRestoring = true;
@@ -924,6 +938,10 @@ export class GameBackup {
       GameIntegrity.sign(rawRestored);
       localStorage.setItem("mycay_first_name_set", "true");
       localStorage.setItem("mycay_coachmark_seen", "true");
+      // Theme, âm thanh, cấp HUD đã lưu kèm (bản sao lưu cũ không có thì giữ cài đặt hiện tại)
+      if (prefs && typeof prefs === "object") {
+        PREF_KEYS.forEach(k => { if (typeof prefs[k] === "string") localStorage.setItem(k, prefs[k]); });
+      }
     } catch (e) {
       window.__mycayRestoring = false;
       this.showErrorScreen({ title: "Không Thể Khôi Phục", message: "Bộ nhớ trình duyệt bị đầy hoặc bị chặn." });

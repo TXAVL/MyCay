@@ -4,19 +4,19 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.3.4";
-import { txaformat } from "./txaformat.js?v=2.3.4";
-import { NameValidator } from "./filter.js?v=2.3.4";
-import { SoundManager } from "./audio.js?v=2.3.4";
-import { GameUIModal } from "./modal.js?v=2.3.4";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.3.4";
-import { GameIntegrity } from "./integrity.js?v=2.3.4";
-import { MarketMethods } from "./market.js?v=2.3.4";
-import { HrMethods } from "./hr.js?v=2.3.4";
-import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.3.4";
-import { DevMenuMethods } from "./devmenu.js?v=2.3.4";
-import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.3.4";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.3.4";
+import { txaversion } from "./txaversion.js?v=2.4.0";
+import { txaformat } from "./txaformat.js?v=2.4.0";
+import { NameValidator } from "./filter.js?v=2.4.0";
+import { SoundManager } from "./audio.js?v=2.4.0";
+import { GameUIModal } from "./modal.js?v=2.4.0";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.4.0";
+import { GameIntegrity } from "./integrity.js?v=2.4.0";
+import { MarketMethods } from "./market.js?v=2.4.0";
+import { HrMethods, KPI_PERIOD } from "./hr.js?v=2.4.0";
+import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.4.0";
+import { DevMenuMethods } from "./devmenu.js?v=2.4.0";
+import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.4.0";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.4.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -5955,6 +5955,8 @@ export class SpicyNoodleGame {
     // Chốt sổ cuối ngày: hàng hỏng, thuế, lãi tiết kiệm, tiền thuê, điện nước, lương, trả góp...
     const bills = this.settleDayFinance();
     const activeStaffNames = bills.staffNames;
+    // Hết kỳ 7 ngày: chốt bảng thưởng KPI, hiện ra sau khi đóng hóa đơn ngày
+    if (this.state.day % KPI_PERIOD === 0) this.prepareKpiSettlement();
 
     // Nhiệm vụ đã xong mà chưa bấm nhận thì tự cộng thưởng trước khi sang ngày mới
     this.state.todayQuestReward = this.autoClaimPendingQuests();

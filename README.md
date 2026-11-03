@@ -1,7 +1,7 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.3.4-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
-[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-29%2F10%2F2026-blue)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.4.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-03%2F11%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
 
@@ -97,6 +97,12 @@
 - **Nhân sự**: phỏng vấn ứng viên (tay nghề, lương đề nghị, tính cách), thử việc 2 ngày, tâm trạng nhân viên, xin tăng lương, thưởng nóng, sa thải có đền bù, nợ lương 2 ngày là nghỉ việc.
 - **Ngân hàng**: lãi tiết kiệm thực tế (0,2–0,8%/ngày), gửi kỳ hạn tự chọn số tiền, rút trước hạn mất lãi. Vay vốn trả góp có lãi, điểm tín dụng, phạt trả trễ, nợ xấu bị trích sổ và chặn vay.
 - **Thuế & chi phí**: thuê mặt bằng, điện, nước, gas tính theo lượng khách; thuế khoán 2% doanh thu (miễn 5 ngày đầu) nộp mỗi 7 ngày; thiếu tiền thì ghi nợ hóa đơn và chịu phí chậm trả.
+
+### 11. 🎖️ Quyết Toán KPI 7 Ngày & Đình Công (v2.4.0)
+- Mỗi ca nhân viên đi làm (ca bán trong ngày hoặc ca trông tiệm offline) đều được chấm công.
+- Cuối mỗi kỳ 7 ngày phải trả thưởng KPI: thưởng nóng 1 ngày lương + chia % doanh thu kỳ theo số ca và cấp đào tạo. Ai đạt KPI được lên cấp đào tạo (mỗi cấp làm nhanh hơn 3%). Có Cụ Rùa Torto thì tự quyết toán.
+- Từ chối hoặc không đủ tiền trả: cả đội đình công nghỉ việc tập thể, vơ vét sạch tiền trong két (sổ tiết kiệm không bị đụng), mất cấp đào tạo và 10 ⭐ uy tín.
+- File sao lưu mang theo toàn bộ dữ liệu game cùng theme, âm thanh, cấp HUD.
 
 ---
 

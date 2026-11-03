@@ -7,8 +7,8 @@
 // - Mỗi giờ trông tiệm một mình, tâm trạng tụt dần; chán đời quá sẽ nghỉ việc ngay giữa ca
 // - Doanh thu offline cũng chịu thuế, điện nước, hao kho như ca thường
 // ==========================================================
-import { txaformat } from "./txaformat.js?v=2.3.4";
-import { STAFF_ROSTER } from "./hr.js?v=2.3.4";
+import { txaformat } from "./txaformat.js?v=2.4.0";
+import { STAFF_ROSTER } from "./hr.js?v=2.4.0";
 
 export const OFFLINE_UNLOCK_DAY = 30; // từ Ngày 30 mới mở được ca treo offline
 export const OFFLINE_DAILY_CAP_MIN = 480; // tối đa 8 giờ bán offline mỗi ngày thực tế
@@ -172,6 +172,8 @@ export const OfflineMethods = {
       });
     }
     r.tax = this.accrueTax(gross);
+    // Ca trông tiệm offline cũng được chấm công cho kỳ KPI
+    if (r.openMinutes > 0) this.recordKpiShift((r.crew || []).filter(c => !c.quit).map(c => c.key), gross, r.bowls);
     r.unpaid = unpaid;
     r.netProfit = round1(gross - due);
 

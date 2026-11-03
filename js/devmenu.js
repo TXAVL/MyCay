@@ -3,8 +3,8 @@
 // Danh sách nút nhóm theo hệ thống: tài chính, chợ & kho, nhân sự, giao hàng & offline, tiến trình.
 // Mọi lệnh đều đi qua đúng các hệ thống thật (chợ, nhân sự, vay vốn, đơn online) để dùng thử nhanh các tính năng mới.
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.3.4";
-import { STAFF_ROSTER } from "./hr.js?v=2.3.4";
+import { GameUIModal } from "./modal.js?v=2.4.0";
+import { STAFF_ROSTER } from "./hr.js?v=2.4.0";
 
 const DEV_SECTIONS = [
   {
@@ -35,7 +35,9 @@ const DEV_SECTIONS = [
       { id: "hire_all_staff", icon: "👥", title: "Thuê Toàn Bộ 11 Nhân Viên", sub: "Tay nghề 4★, vào làm chính thức" },
       { id: "morale_max", icon: "😄", title: "Tâm Trạng Cả Đội 100%", sub: "Mọi nhân viên đang hứng khởi" },
       { id: "morale_low", icon: "😞", title: "Cả Đội Chán Đời (12%)", sub: "Thử nhân viên nghỉ việc khi qua ngày / offline" },
-      { id: "raise_all", icon: "💬", title: "Mọi Người Xin Tăng Lương", sub: "Hiện đề nghị tăng lương ở tab Nhân Viên" }
+      { id: "raise_all", icon: "💬", title: "Mọi Người Xin Tăng Lương", sub: "Hiện đề nghị tăng lương ở tab Nhân Viên" },
+      { id: "kpi_now", icon: "🎖️", title: "Quyết Toán KPI Ngay", sub: "Chấm đủ 7 ca rồi mở bảng thưởng KPI" },
+      { id: "strike_now", icon: "🚨", title: "Thử Đình Công", sub: "Cả đội nghỉ việc và vơ vét két" }
     ]
   },
   {
@@ -196,6 +198,21 @@ export const DevMenuMethods = {
         });
         toast("💬 Mọi nhân viên đang xin tăng lương 10%, xem ở tab Nhân Viên.", "info", "💬");
         break;
+
+      case "kpi_now":
+        if (!this.getHiredStaffKeys().length) { toast("Cần có nhân viên mới quyết toán KPI được!", "warning", "🎖️"); break; }
+        this.ensureKpi().revenue = Math.max(this.ensureKpi().revenue, 3000);
+        STAFF_ROSTER.forEach(r => { if (st.staff[r.key]) this.ensureStaffInfo(r.key).shifts = 7; });
+        this.prepareKpiSettlement();
+        setTimeout(() => this.showPendingKpi(), 300);
+        break;
+      case "strike_now":
+        if (!this.getHiredStaffKeys().length) { toast("Không có nhân viên nào để đình công.", "info", "🚨"); break; }
+        if (!eco.kpiPending) this.prepareKpiSettlement();
+        GameUIModal.closeDialogs();
+        document.getElementById("modal-dev-buff").style.display = "none";
+        this.triggerStrike(true);
+        return;
 
       // ----- Giao hàng & offline -----
       case "spawn_orders": {
