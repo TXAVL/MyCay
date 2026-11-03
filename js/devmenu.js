@@ -3,8 +3,8 @@
 // Danh sách nút nhóm theo hệ thống: tài chính, chợ & kho, nhân sự, giao hàng & offline, tiến trình.
 // Mọi lệnh đều đi qua đúng các hệ thống thật (chợ, nhân sự, vay vốn, đơn online) để dùng thử nhanh các tính năng mới.
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.4.0";
-import { STAFF_ROSTER } from "./hr.js?v=2.4.0";
+import { GameUIModal } from "./modal.js?v=2.4.1";
+import { STAFF_ROSTER } from "./hr.js?v=2.4.1";
 
 const DEV_SECTIONS = [
   {

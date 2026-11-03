@@ -472,40 +472,42 @@ class SecurityShield {
     }, true);
   }
 
-  // 8. Vòng lặp phát hiện DevTools đang mở (Timing & Window Resize & Debugger Trap)
+  // 8. Phát hiện DevTools đang mở bằng thư viện devtools-detector (AEPKILL/devtools-detector)
+  // Trước đây so outerWidth - innerWidth: mở sidebar của trình duyệt, extension, danh sách đọc...
+  // cũng làm cửa sổ hẹp lại và bị tính nhầm là mở DevTools. Thư viện kiểm tra chính DevTools
+  // (console, debugger, toString của phần tử khi DevTools soi...) nên không còn bắt nhầm sidebar.
   setupDevToolsDetector() {
     let strikes = parseInt(localStorage.getItem("mycay_sec_strikes") || "0", 10);
     this.strikeCount = isNaN(strikes) ? 0 : strikes;
 
-    // A. Kiểm tra kích thước cửa sổ chênh lệch (Docked DevTools - CHỈ ÁP DỤNG TRÊN DESKTOP)
-    const checkWindowSize = () => {
-      if (this.isAdminDevMode) return; // BYPASS CHO ADMIN
-      if (this.isMobileOrTablet()) return; // BỎ QUA MOBILE/TABLET (Thanh địa chỉ URL tự nhiên gây chênh lệch kích thước)
-
-      const widthDiff = window.outerWidth - window.innerWidth;
-      const heightDiff = window.outerHeight - window.innerHeight;
-      if (widthDiff > 180 || heightDiff > 180) {
-        this.handleViolationAttempt("DevTools Docked Detection");
-      }
-    };
-
-    // B. Kiểm tra Debugger Timing Trap (CHỈ ÁP DỤNG TRÊN DESKTOP)
-    const runDebuggerTrap = () => {
+    const lib = window.devtoolsDetector;
+    if (!lib || typeof lib.DevtoolsDetector !== "function" || !lib.checkers) {
+      console.warn("[Security] Không nạp được devtools-detector, bỏ qua phát hiện DevTools.");
+      return;
+    }
+    // Bỏ 2 checker đo thời gian chạy (performance, worker-performance): máy chậm, game đang vẽ nặng
+    // hoặc extension can thiệp console làm chúng báo nhầm. Chỉ giữ các checker soi trực tiếp DevTools.
+    const c = lib.checkers;
+    const detector = new lib.DevtoolsDetector({
+      checkers: [
+        c.debuggerChecker,
+        c.elementIdChecker,
+        c.regToStringChecker,
+        c.depRegToStringChecker,
+        c.functionToStringChecker,
+        c.dateToStringChecker,
+        c.devtoolsFormatterChecker,
+        c.erudaChecker
+      ].filter(Boolean)
+    });
+    detector.addListener((isOpen, detail) => {
+      if (!isOpen) return;
       if (this.isAdminDevMode || this.isLocked || this.isPermanentBan) return; // BYPASS CHO ADMIN
-      if (this.isMobileOrTablet()) return; // Bỏ qua mobile (tránh giật lag CPU hoặc ngắt luồng tải trang)
-
-      const start = performance.now();
-      /* eslint-disable no-debugger */
-      debugger;
-      /* eslint-enable no-debugger */
-      const duration = performance.now() - start;
-      if (duration > 150) {
-        this.handleViolationAttempt("Debugger Halt Detected");
-      }
-    };
-
-    setInterval(checkWindowSize, 1500);
-    setInterval(runDebuggerTrap, 2500);
+      if (this.isMobileOrTablet()) return; // Mobile/tablet không có DevTools gắn liền, tránh bắt nhầm
+      this.handleViolationAttempt(`DevTools Detected (${(detail && detail.checkerName) || "detector"})`);
+    });
+    detector.setDetectDelay(1500);
+    detector.launch();
   }
 
   // 9. Xử lý khi phát hiện hành vi vi phạm (TÁI PHẠM LẦN 2 = BAN VĨNH VIỄN)
@@ -532,6 +534,10 @@ class SecurityShield {
       this.triggerPermanentBan(reason);
       return;
     }
+
+    // Thư viện báo liên tục khi DevTools còn mở: chỉ tính 1 lần cho tới khi trang tải lại
+    if (this.violationPending) return;
+    this.violationPending = true;
 
     // Nếu chưa từng bị khóa (Chu kỳ vi phạm đầu tiên)
     this.strikeCount++;
