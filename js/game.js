@@ -4,19 +4,21 @@
 // Có đầy đủ chế độ Nấu Mì Tương Tác chuẩn 100% screenshot thực tế
 // ==========================================================
 
-import { txaversion } from "./txaversion.js?v=2.4.1";
-import { txaformat } from "./txaformat.js?v=2.4.1";
-import { NameValidator } from "./filter.js?v=2.4.1";
-import { SoundManager } from "./audio.js?v=2.4.1";
-import { GameUIModal } from "./modal.js?v=2.4.1";
-import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.4.1";
-import { GameIntegrity } from "./integrity.js?v=2.4.1";
-import { MarketMethods } from "./market.js?v=2.4.1";
-import { HrMethods, KPI_PERIOD } from "./hr.js?v=2.4.1";
-import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.4.1";
-import { DevMenuMethods } from "./devmenu.js?v=2.4.1";
-import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.4.1";
-import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.4.1";
+import { txaversion } from "./txaversion.js?v=2.5.0";
+import { txaformat } from "./txaformat.js?v=2.5.0";
+import { NameValidator } from "./filter.js?v=2.5.0";
+import { SoundManager } from "./audio.js?v=2.5.0";
+import { GameUIModal } from "./modal.js?v=2.5.0";
+import { rollDailyQuests, dailyChestReward, ACHIEVEMENTS, achievementStatus } from "./quests.js?v=2.5.0";
+import { GameIntegrity } from "./integrity.js?v=2.5.0";
+import { MarketMethods } from "./market.js?v=2.5.0";
+import { HrMethods, KPI_PERIOD } from "./hr.js?v=2.5.0";
+import { FinanceMethods, createEcoState, mergeEco } from "./finance.js?v=2.5.0";
+import { DevMenuMethods } from "./devmenu.js?v=2.5.0";
+import { ShippingMethods, timelineHtml, driverCardHtml, makeWaybill, randomAddress } from "./shipping.js?v=2.5.0";
+import { SupplierMethods } from "./supplier.js?v=2.5.0";
+import { OfflineMethods, emptyOfflineResult, OFFLINE_UNLOCK_DAY, OFFLINE_DAILY_CAP_MIN, OFFLINE_MIN_MINUTES, BOWL_SUPPLIES, DRINK_SUPPLIES } from "./offline.js?v=2.5.0";
+import { rateDineIn, rateOnline, analyzeOwnerReply, composeCustomerResponse, inferIssues, getPersona, ISSUE_TEXT } from "./reviews.js?v=2.5.0";
 
 // Hằng số kinh tế dùng chung (v1.7.0): mọi chỗ hiển thị & tính tiền đều đọc từ đây để không lệch nhau
 const FEVER_MULT = 1.5; // Giờ Vàng FEVER RUSH nhân doanh thu
@@ -27,11 +29,18 @@ const MAX_REVIEWS = 60; // Giữ 60 đánh giá gần nhất: sao trung bình ph
 
 // Giao hàng online: mỗi app thu phí nền tảng khác nhau, giá trên app cao hơn giá tại quán
 const DELIVERY_APPS = {
-  GrabFood: { commission: 0.2, cls: "app-grab" },
-  ShopeeFood: { commission: 0.18, cls: "app-shopee" },
-  BeFood: { commission: 0.15, cls: "app-befood" },
-  Baemin: { commission: 0.17, cls: "app-baemin" }
+  GrabFood: { commission: 0.2, cls: "app-grab", waybill: "GRAB", wallet: "Ví GrabPay", color: "#00B14F" },
+  ShopeeFood: { commission: 0.18, cls: "app-shopee", waybill: "SPXVN", wallet: "Ví ShopeePay", color: "#EE4D2D" },
+  BeFood: { commission: 0.15, cls: "app-befood", waybill: "BEVN", wallet: "Ví beFood", color: "#FDB813" },
+  Baemin: { commission: 0.17, cls: "app-baemin", waybill: "BMVN", wallet: "Ví Baemin", color: "#2AC1C1" }
 };
+const ONLINE_ARCHIVE_MAX = 30; // giữ 30 đơn online gần nhất để xem lại dòng thời gian
+const REGULARS_MAX = 8; // số khách quen tối đa hay đặt lại
+const ONLINE_CUSTOMERS = [
+  "Quỳnh Anh Foodie", "Hoàng Long Review", "Thảo Vy Mê Trà Sữa", "Minh Trí Coder",
+  "Bảo Ngọc Sống Ảo", "Tuấn Kiệt Ăn Cay", "Khánh Linh Sinh Viên", "Đức Huy Văn Phòng",
+  "Gia Hân Cú Đêm", "Nhật Nam Gymer", "Phương Thảo Kế Toán", "Quang Vinh Game Thủ"
+];
 const DELIVERY_MENU_MARKUP = 1.12;
 const DELIVERY_COD_SHARE = 0.3; // Tỉ lệ đơn trả tiền mặt khi nhận hàng (COD)
 const DELIVERY_COD_FEE_DISCOUNT = 0.05; // Đơn COD không qua cổng thanh toán nên phí nền tảng thấp hơn 5 điểm %
@@ -520,7 +529,7 @@ export class SpicyNoodleGame {
     this.customerInterval = null;
     this.onlineOrderInterval = null;
     this.staffAutomationInterval = null;
-    this.onlineHistory = []; // Nhật ký đơn online gần nhất (chỉ trong phiên chơi)
+    this.onlineFilter = "active"; // Tab con của tab Online: active | delivered | failed
     this.onlineRenderSig = "";
     this.onlineSeq = 100 + Math.floor(Math.random() * 600);
     this.mobileOpenTab = "cockpit"; // "cockpit" (Bếp nấu 0-cuộn) | "dining" (Sảnh ăn 3 bàn)
@@ -558,6 +567,8 @@ export class SpicyNoodleGame {
 
   init() {
     this.loadGame();
+    // Đơn nhập hàng hỏa tốc chạy theo thời gian thật, kể cả lúc đang chuẩn bị
+    if (!this.supplyTimer) this.supplyTimer = setInterval(() => this.tickSupplyOrders(), 1000);
     this.ensureDailyQuests();
     this.initTables();
     this.renderAll();
@@ -4769,7 +4780,6 @@ export class SpicyNoodleGame {
     this.orderSlots = [null, null, null];
     this.settleCodPending(true); // Tiền COD còn sót từ phiên trước (nếu có)
     this.state.onlineOrders = [];
-    this.onlineHistory = [];
     this.serveStreak = 0;
     this.bestServeStreak = 0;
     this.clearCurrentPot(true);
@@ -5139,9 +5149,83 @@ export class SpicyNoodleGame {
     if (idx >= 0) this.state.onlineOrders.splice(idx, 1);
   }
 
-  pushOnlineHistory(text, tone = "ok") {
-    this.onlineHistory.unshift({ text, tone });
-    if (this.onlineHistory.length > 6) this.onlineHistory.pop();
+  // Đơn kết thúc (giao xong / bom / hủy / từ chối / lỡ): lưu lại để xem dòng thời gian như app giao hàng thật
+  archiveOnlineOrder(o, status, note, extra = {}) {
+    const eco = this.state.eco;
+    if (!Array.isArray(eco.onlineArchive)) eco.onlineArchive = [];
+    const cfg = DELIVERY_APPS[o.app] || DELIVERY_APPS.GrabFood;
+    eco.onlineArchive.unshift(Object.assign({
+      id: o.id,
+      code: o.code,
+      waybill: o.waybill,
+      app: o.app,
+      status,
+      note,
+      day: this.state.day,
+      itemsText: o.itemsText,
+      gross: o.gross,
+      commission: o.commission,
+      price: o.price,
+      isCod: o.isCod,
+      wallet: cfg.wallet,
+      customer: o.customer,
+      address: o.address,
+      driver: o.stage === "new" ? null : { name: o.shipper.name, vehicle: o.shipper.vehicle },
+      timeline: o.timeline || [],
+      pod: null,
+      stars: null
+    }, extra));
+    if (eco.onlineArchive.length > ONLINE_ARCHIVE_MAX) eco.onlineArchive.length = ONLINE_ARCHIVE_MAX;
+  }
+
+  // Khách quen: ai hài lòng có thể quay lại đặt đúng món cũ
+  rememberRegular(o, stars) {
+    if (!o.customer || stars < 4 || Math.random() > (o.customer.regular ? 0.8 : 0.3)) return;
+    const eco = this.state.eco;
+    if (!Array.isArray(eco.regulars)) eco.regulars = [];
+    let r = eco.regulars.find(x => x.name === o.customer.name);
+    if (!r) {
+      r = { name: o.customer.name, address: o.address, noodleId: o.noodleId, drinkId: o.drinkId, spicyLevel: o.spicyLevel, orders: 0 };
+      eco.regulars.unshift(r);
+      if (eco.regulars.length > REGULARS_MAX) eco.regulars.length = REGULARS_MAX;
+    }
+    r.orders += 1;
+  }
+
+  // Gọi tài xế: hối lúc đang tới quán (gọi nhiều quá tài xế bực), hỏi vị trí lúc đang giao
+  callOnlineDriver(id) {
+    const o = this.findOnlineOrder(id);
+    if (!o || o.stage === "new") return;
+    o.calls = (o.calls || 0) + 1;
+    const name = o.shipper.name;
+    let text;
+    if (o.stage === "delivering") {
+      text = `Gọi tài xế: ${name} báo còn khoảng ${Math.max(1, o.deliverLeft)}s nữa tới ${o.address}.`;
+    } else if (o.arrived) {
+      text = `Gọi tài xế: ${name} đang đứng ở quầy chờ lấy đơn mã ${o.code}.`;
+    } else if (o.calls === 1) {
+      o.etaLeft = Math.max(1, Math.ceil(o.etaLeft * 0.7));
+      text = `Gọi tài xế: ${name} nói "Em tới liền!" và chạy nhanh hơn (còn ${o.etaLeft}s).`;
+    } else if (o.calls === 2) {
+      o.etaLeft = Math.max(1, Math.ceil(o.etaLeft * 0.85));
+      text = `Gọi tài xế lần 2: ${name} hơi khó chịu nhưng vẫn cố chạy nhanh (còn ${o.etaLeft}s).`;
+    } else {
+      this.state.reputation = Math.max(5, this.state.reputation - 1);
+      text = `Gọi tài xế lần ${o.calls}: ${name} bực vì bị gọi liên tục, báo cáo quán lên app (−1 ⭐).`;
+    }
+    this.logShip(o, "📞", text, o.calls >= 3 && o.stage !== "delivering" && !o.arrived ? "bad" : "");
+    GameUIModal.showToast(`📞 ${text}`, o.calls >= 3 ? "warning" : "info", "📞");
+    this.renderOnlineBoards();
+  }
+
+  setOnlineFilter(filter) {
+    this.onlineFilter = filter;
+    this.renderOnlineBoards();
+  }
+
+  showOnlinePod(id, day) {
+    const rec = (this.state.eco.onlineArchive || []).find(r => r.id === Number(id) && r.day === Number(day));
+    if (rec && rec.pod) this.showPod(rec.pod);
   }
 
   // Đơn mới từ ứng dụng giao đồ ăn
@@ -5159,14 +5243,19 @@ export class SpicyNoodleGame {
     // Chỉ đặt món còn hàng (đã trừ phần các đơn tại quán đang chờ)
     const activeNoodles = Object.values(this.state.noodles).filter(n => n.unlocked && n.inMenu && n.stock > this.countReserved("noodleId", n.id));
     if (activeNoodles.length === 0) return;
-    const chosenNoodle = this.pickRandom(activeNoodles);
-    const noodlePrice = chosenNoodle.price;
-
     const activeDrinks = Object.values(this.state.drinks).filter(d => d.unlocked && d.inMenu && d.stock > this.countReserved("drinkId", d.id));
-    const chosenDrink = activeDrinks.length > 0 ? this.pickRandom(activeDrinks) : null;
+
+    // Khách quen (từng hài lòng) có thể quay lại đặt đúng món cũ nếu quán còn bán
+    const regulars = (this.state.eco.regulars || []).filter(r => activeNoodles.some(n => n.id === r.noodleId));
+    const regular = regulars.length && Math.random() < 0.25 ? this.pickRandom(regulars) : null;
+    const chosenNoodle = regular ? activeNoodles.find(n => n.id === regular.noodleId) : this.pickRandom(activeNoodles);
+    const noodlePrice = chosenNoodle.price;
+    const chosenDrink = regular
+      ? (activeDrinks.find(d => d.id === regular.drinkId) || null)
+      : (activeDrinks.length > 0 ? this.pickRandom(activeDrinks) : null);
     const drinkPrice = chosenDrink ? chosenDrink.price : 0;
 
-    const spicyLevel = Math.floor(Math.random() * 4) + 1;
+    const spicyLevel = regular && regular.spicyLevel ? regular.spicyLevel : Math.floor(Math.random() * 4) + 1;
     const itemsText = `1 ${chosenNoodle.name} (Cấp ${spicyLevel}) [${noodlePrice}k]` +
       (chosenDrink ? ` + 1 ${chosenDrink.name} [${drinkPrice}k]` : "");
 
@@ -5202,9 +5291,17 @@ export class SpicyNoodleGame {
       note: this.pickRandom(DELIVERY_NOTES),
       distanceKm: Math.round((0.8 + Math.random() * 2.7) * 10) / 10,
       shipper,
+      spicyLevel,
+      customer: { name: regular ? regular.name : this.pickRandom(ONLINE_CUSTOMERS), regular: Boolean(regular), visits: regular ? regular.orders + 1 : 1 },
+      address: regular ? regular.address : randomAddress(),
+      waybill: makeWaybill(cfg.waybill),
+      timeline: [],
+      calls: 0,
       offerLeft: DELIVERY_OFFER_SECONDS,
       offerAge: 0
     };
+    this.logShip(order, regular ? "🔁" : "🛒",
+      `${order.customer.name} ${regular ? `(khách quen, lần ${order.customer.visits}) đặt lại` : "đặt"} đơn qua ${app}, thanh toán ${isCod ? "COD tiền mặt" : cfg.wallet}. Giao tới: ${order.address}.`);
     orders.push(order);
     this.sound.playDoorBell();
     GameUIModal.showToast(`🔔 Đơn ${app} #${order.id} vừa đổ về! Nhận trong ${DELIVERY_OFFER_SECONDS}s nhé.`, "info", "🛵");
@@ -5219,7 +5316,8 @@ export class SpicyNoodleGame {
     const noodle = this.state.noodles[o.noodleId];
     if (!noodle || noodle.stock <= this.countReserved("noodleId", o.noodleId)) {
       this.removeOnlineOrder(o);
-      this.pushOnlineHistory(`❌ #${o.id} ${o.app}: hết ${noodle ? noodle.name : "mì"}, app tự hủy đơn`, "bad");
+      this.logShip(o, "❌", `Kho hết ${noodle ? noodle.name : "mì"}, app tự hủy đơn.`, "bad");
+      this.archiveOnlineOrder(o, "cancelled", `Hết ${noodle ? noodle.name : "mì"}, app tự hủy đơn`);
       GameUIModal.showToast(`📦 Kho đã hết ${noodle ? noodle.name : "mì"}, app tự hủy đơn #${o.id}.`, "warning", "⚠️");
       this.renderOnlineBoards();
       return;
@@ -5259,6 +5357,7 @@ export class SpicyNoodleGame {
       autoSealed
     });
     if (autoSealed) o.price += 20; // Máy ép màng tự động: +20k/đơn
+    this.logShip(o, "✅", `Quán xác nhận đơn, bếp bắt đầu nấu. App gán tài xế ${o.shipper.name} (${o.shipper.vehicle}), cách quán ${o.distanceKm}km.`);
 
     this.sound.playCoinChime();
     if (byShiro) GameUIModal.showToast(`🦊 Cáo Shiro đã nhận đơn ${o.app} #${o.id}!`, "success", "📲");
@@ -5270,7 +5369,8 @@ export class SpicyNoodleGame {
     if (!o || o.stage !== "new") return;
     this.state.stats.onlineRejected = (this.state.stats.onlineRejected || 0) + 1;
     this.removeOnlineOrder(o);
-    this.pushOnlineHistory(`🚫 #${o.id} ${o.app}: quán từ chối đơn`, "warn");
+    this.logShip(o, "🚫", "Quán từ chối đơn.", "bad");
+    this.archiveOnlineOrder(o, "rejected", "Quán từ chối đơn");
     GameUIModal.showToast(`Đã từ chối đơn #${o.id}. Từ chối nhiều sẽ làm tỉ lệ nhận đơn tụt, app đẩy ít đơn hơn.`, "info", "🚫");
     this.renderOnlineBoards();
   }
@@ -5422,6 +5522,8 @@ export class SpicyNoodleGame {
       return;
     }
     o.ready = true;
+    const packedList = DELIVERY_PACK_ITEMS.filter(it => o.packed[it.key]).map(it => it.label.toLowerCase());
+    this.logShip(o, "📦", `Đã đóng gói (${packedList.length ? packedList.join(", ") : "chưa đóng gói gì"}) và báo món xong trên app.`);
     if (!byShiro) {
       const missing = DELIVERY_PACK_ITEMS.filter(it => !o.packed[it.key]).map(it => it.label);
       if (missing.length) GameUIModal.showToast(`⚠️ Đơn #${o.id} chưa đóng gói đủ: thiếu ${missing.join(", ")}. Khách dễ chê!`, "warning", "📦");
@@ -5442,11 +5544,13 @@ export class SpicyNoodleGame {
       return;
     }
     o.stage = "delivering";
+    this.logShip(o, "🛵", `Quán giao túi cho ${o.shipper.name} (mã ${o.code} khớp). Tài xế đang giao tới ${o.address}.`);
     // Trời mưa / tắc đường: tài xế đi chậm hơn
     if (Math.random() < 0.25) {
       o.rain = true;
       o.deliverLeft += 10;
       o.deliverTotal += 10;
+      this.logShip(o, "🌧️", "Trời đổ mưa, tài xế trú mưa và đi chậm hơn.", "warn");
     }
     this.sound.playDoorBell();
     const who = byShiro ? "🦊 Cáo Shiro" : "Bạn";
@@ -5488,7 +5592,8 @@ export class SpicyNoodleGame {
         } else if (o.offerLeft <= 0) {
           this.state.stats.onlineMissed = (this.state.stats.onlineMissed || 0) + 1;
           this.removeOnlineOrder(o);
-          this.pushOnlineHistory(`⌛ #${o.id} ${o.app}: quán không kịp nhận đơn`, "warn");
+          this.logShip(o, "⌛", "Quán không nhận đơn kịp, app chuyển đơn cho quán khác.", "bad");
+          this.archiveOnlineOrder(o, "missed", "Quán không kịp nhận đơn");
           GameUIModal.showToast(`⌛ Đơn ${o.app} #${o.id} hết hạn vì quán không nhận kịp.`, "warning", "📲");
         }
         return;
@@ -5512,6 +5617,7 @@ export class SpicyNoodleGame {
             o.cookDone = true;
             o.cooking = false;
             o.cookDoneAge = o.age;
+            this.logShip(o, "🍲", "Niêu mì đã chín.");
             this.sound.playCoinChime();
             GameUIModal.showToast(`🍲 Niêu mì đơn #${o.id} đã chín! Mau ép màng, đóng gói rồi báo món xong.`, "success", "🔥");
           }
@@ -5529,6 +5635,7 @@ export class SpicyNoodleGame {
         o.etaLeft -= 1;
         if (o.etaLeft <= 0) {
           o.arrived = true;
+          this.logShip(o, "📍", `${o.shipper.name} đã tới quán, đọc mã lấy hàng ${o.code}.${o.ready ? "" : " Món chưa xong, tài xế đang chờ."}`);
           this.sound.playDoorBell();
           GameUIModal.showToast(`🛵 ${o.shipper.name} đã tới quán lấy đơn #${o.id}!${o.ready ? "" : " Món chưa xong, tài xế đang chờ."}`, "info", "📍");
         }
@@ -5560,7 +5667,8 @@ export class SpicyNoodleGame {
       customer: "khách chờ quá lâu nên hủy đơn",
       closing: "quán đóng cửa khi chưa giao kịp"
     }[reason];
-    this.pushOnlineHistory(`❌ #${o.id} ${o.app}: ${reasonText} (-${lossRep} ⭐)`, "bad");
+    this.logShip(o, "❌", `Đơn bị hủy: ${reasonText} (−${lossRep} ⭐).`, "bad");
+    this.archiveOnlineOrder(o, "cancelled", reasonText);
     this.sound.playReviewChime();
     GameUIModal.showToast(`❌ Đơn ${o.app} #${o.id}: ${reasonText}. Mất đơn & nguyên liệu (-${lossRep} ⭐ uy tín).`, "warning", "💨");
     this.renderHeader();
@@ -5573,7 +5681,8 @@ export class SpicyNoodleGame {
     if (o.isCod && Math.random() < (o.codConfirmed ? DELIVERY_BOM_CONFIRMED : DELIVERY_BOM_CHANCE)) {
       this.removeOnlineOrder(o);
       this.state.stats.onlineBombed = (this.state.stats.onlineBombed || 0) + 1;
-      this.pushOnlineHistory(`💥 #${o.id} ${o.app}: khách COD bom hàng, quán mất cả món lẫn tiền`, "bad");
+      this.logShip(o, "📵", `${o.customer.name} không nghe máy, không nhận hàng. Tài xế chụp ảnh POD tại cửa rồi mang túi về.`, "bad");
+      this.archiveOnlineOrder(o, "bombed", "Khách COD bom hàng", { pod: this.makeOnlinePod(o, true) });
       this.sound.playReviewChime();
       GameUIModal.showToast(`💥 Khách đơn COD #${o.id} bom hàng! ${o.shipper.name} mang túi mì về. Lần sau nhớ gọi xác nhận trước.`, "warning", "😭");
       this.saveGame();
@@ -5615,9 +5724,11 @@ export class SpicyNoodleGame {
     if (issues.includes("late")) this.state.stats.onlineLate = (this.state.stats.onlineLate || 0) + 1;
     this.state.deliveredOnlineCount++;
 
-    if (Math.random() < (issues.length ? 0.9 : 0.6)) this.generateOnlineReview(o);
+    const stars = Math.random() < (issues.length ? 0.9 : 0.6) ? this.generateOnlineReview(o) : null;
+    this.rememberRegular(o, stars == null ? (issues.length ? 3 : 5) : stars);
 
     this.removeOnlineOrder(o);
+    this.logShip(o, "📸", `Giao thành công tại ${o.address}. Tài xế ${o.shipper.name} đã tải lên ảnh POD xác nhận.${issues.includes("late") ? " (trễ hẹn)" : ""}`, issues.length ? "warn" : "ok");
     this.trackProgress("online", { earned });
 
     const card = document.querySelector(`[data-oid="${o.id}"]`);
@@ -5626,17 +5737,33 @@ export class SpicyNoodleGame {
 
     const bad = issues.map(k => ISSUE_TEXT[k]).filter(Boolean);
     const fawnTxt = fawnBonus > 0 ? ` + 🦌 Nai Fawn thưởng sỉ +${fawnBonus}k` : "";
+    this.archiveOnlineOrder(o, "delivered", bad.length ? `Khách phàn nàn: ${bad.join(", ")}` : "Giao đúng hẹn, đóng gói tốt", {
+      price: earned, stars, issues, pod: this.makeOnlinePod(o, false)
+    });
     if (bad.length) {
-      this.pushOnlineHistory(`⚠️ #${o.id} ${o.app}: +${earned}k nhưng bị chê (${bad.join(", ")})`, "warn");
       GameUIModal.showToast(`🛵 Đơn #${o.id} đã tới khách, +${earned}k${fawnTxt}. Nhưng có vấn đề: ${bad.join(", ")}.`, "warning", "📦");
     } else {
-      this.pushOnlineHistory(`✅ #${o.id} ${o.app}: +${earned}k, giao đúng hẹn & đóng gói tốt`, "ok");
       GameUIModal.showToast(`✅ Đơn #${o.id} giao thành công! +${earned}k (đã trừ phí ${o.app})${fawnTxt}`, "success", "🛵");
     }
 
     this.saveGame();
     this.renderHeader();
     this.renderOnlineBoards();
+  }
+
+  makeOnlinePod(o, failed) {
+    const cfg = DELIVERY_APPS[o.app] || DELIVERY_APPS.GrabFood;
+    return {
+      code: o.waybill,
+      failed,
+      color: cfg.color,
+      houseNo: 1 + (o.id % 250),
+      stamp: `Ngày ${this.state.day} ${this.getGameClock()}`,
+      driver: o.shipper.name,
+      caption: failed
+        ? `${o.shipper.name} đã tới ${o.address} nhưng ${o.customer.name} không nghe máy, không nhận hàng.`
+        : `${o.shipper.name} đã giao túi ${o.app} tới ${o.address}, ${o.customer.name} đã nhận hàng.`
+    };
   }
 
   // Đối soát COD: tài xế nộp lại tiền mặt đã thu hộ trong ca
@@ -5647,7 +5774,6 @@ export class SpicyNoodleGame {
     this.state.money += amount;
     this.state.todayEarnings += amount;
     this.state.stats.totalRevenue = (this.state.stats.totalRevenue || 0) + amount;
-    this.pushOnlineHistory(`💵 Đối soát COD: tài xế nộp lại ${amount}k tiền mặt`, "ok");
     if (!silent) GameUIModal.showToast(`💵 Đối soát COD cuối ca: nhận ${amount}k tiền mặt từ các tài xế!`, "success", "🧾");
   }
 
@@ -5665,7 +5791,7 @@ export class SpicyNoodleGame {
   // ---------- Giao diện bảng đơn online (dùng chung cho tab Online và trong ca bán) ----------
   getOnlineSig() {
     return this.state.onlineOrders.map(o => [
-      o.id, o.stage, o.codConfirmed ? 1 : 0, o.cooking ? 1 : 0, o.cookDone ? 1 : 0, o.ready ? 1 : 0, o.arrived ? 1 : 0, o.rain ? 1 : 0,
+      o.id, o.stage, o.calls || 0, (o.timeline || []).length, o.codConfirmed ? 1 : 0, o.cooking ? 1 : 0, o.cookDone ? 1 : 0, o.ready ? 1 : 0, o.arrived ? 1 : 0, o.rain ? 1 : 0,
       o.packed ? DELIVERY_PACK_ITEMS.map(it => (o.packed[it.key] ? 1 : 0)).join("") : "", o.price
     ].join(":")).join("|");
   }
@@ -5693,13 +5819,30 @@ export class SpicyNoodleGame {
     const countEl = document.getElementById("online-total-delivered");
     if (countEl) countEl.textContent = `Đã giao: ${this.state.deliveredOnlineCount} đơn`;
 
+    // Tab Online chia như app giao hàng: Đang xử lý / Đã giao / Hủy & bom (đơn cũ lưu lại kèm dòng thời gian)
+    const archive = this.state.eco.onlineArchive || [];
+    const delivered = archive.filter(r => r.status === "delivered");
+    const failed = archive.filter(r => r.status !== "delivered");
+    const filter = this.onlineFilter || "active";
+    const tabsEl = document.getElementById("online-filter-tabs");
+    if (tabsEl) {
+      const tab = (id, label, n) => `<button class="shp-tab ${filter === id ? "is-active" : ""}" onclick="window.game.setOnlineFilter('${id}')">${label}${n ? ` <span class="shp-tab-count">${n}</span>` : ""}</button>`;
+      tabsEl.innerHTML = tab("active", "🛵 Đang xử lý", orders.length) + tab("delivered", "✅ Đã giao", delivered.length) + tab("failed", "❌ Hủy & bom", failed.length);
+    }
     const listEl = document.getElementById("online-orders-list");
     if (listEl) {
-      listEl.innerHTML = orders.length
-        ? orders.map(o => this.buildOnlineCard(o, false)).join("")
-        : `<div class="dlv-empty">${this.state.dayPhase === "open"
-          ? "🛵 Đang chờ khách đặt mỳ cay qua GrabFood, ShopeeFood, BeFood, Baemin..."
-          : "🌙 Quán đang đóng cửa. Mở cửa bán để bật ứng dụng & nhận đơn online."}</div>`;
+      if (filter === "active") {
+        listEl.innerHTML = orders.length
+          ? orders.map(o => this.buildOnlineCard(o, false)).join("")
+          : `<div class="dlv-empty">${this.state.dayPhase === "open"
+            ? "🛵 Đang chờ khách đặt mỳ cay qua GrabFood, ShopeeFood, BeFood, Baemin..."
+            : "🌙 Quán đang đóng cửa. Mở cửa bán để bật ứng dụng & nhận đơn online."}</div>`;
+      } else {
+        const list = filter === "delivered" ? delivered : failed;
+        listEl.innerHTML = list.length
+          ? list.map(r => this.buildArchiveCard(r)).join("")
+          : `<div class="dlv-empty">Chưa có đơn nào ở mục này.</div>`;
+      }
     }
 
     const s = this.state.stats;
@@ -5714,13 +5857,40 @@ export class SpicyNoodleGame {
         <span class="dlv-stat" title="Tiền mặt tài xế thu hộ, nhận lại khi đóng ca">💵 COD chờ đối soát ${this.state.codPending || 0}k</span>
         <span class="dlv-stat">💸 Phí app đã trả ${s.onlineCommissionPaid || 0}k</span>`;
     }
-    const histEl = document.getElementById("online-history-list");
-    if (histEl) {
-      histEl.innerHTML = this.onlineHistory.length
-        ? this.onlineHistory.map(h => `<div class="dlv-log is-${h.tone}">${h.text}</div>`).join("")
-        : `<div class="dlv-log">Chưa có đơn nào hôm nay.</div>`;
-    }
     this.patchOnlineTimers();
+  }
+
+  // Thẻ đơn đã kết thúc: mã đơn, mã vận đơn, thanh toán, tài xế + ảnh POD, dòng thời gian, thành tiền, đánh giá
+  buildArchiveCard(r) {
+    const cfg = DELIVERY_APPS[r.app] || DELIVERY_APPS.GrabFood;
+    const statusMap = {
+      delivered: ["✅ Giao hàng thành công", "ok"],
+      bombed: ["📵 Khách không nhận hàng (bom)", "bad"],
+      cancelled: ["❌ Đơn đã hủy", "bad"],
+      rejected: ["🚫 Quán từ chối đơn", "bad"],
+      missed: ["⌛ Quán không nhận kịp", "bad"]
+    };
+    const [statusText, tone] = statusMap[r.status] || ["Đơn đã kết thúc", "bad"];
+    const customer = r.customer ? `${r.customer.name}${r.customer.regular ? ` · 🔁 khách quen lần ${r.customer.visits}` : ""}` : "";
+    const rating = r.status !== "delivered" ? "" : (r.stars ? `<span class="shp-stars">⭐ Đã đánh giá ${r.stars} sao</span>` : `<span class="shp-stars is-none">Khách chưa đánh giá</span>`);
+    return `
+      <div class="shp-card">
+        <div class="shp-head">
+          <span class="shipper-app-badge ${cfg.cls}">${r.app}</span>
+          <b>Mã đơn: #${r.id}</b>
+          <span class="shp-day">Ngày ${r.day}</span>
+        </div>
+        <div class="shp-status is-${tone}">${statusText}${r.note ? ` · ${r.note}` : ""}</div>
+        <div class="shp-meta">Mã vận đơn: <b>${r.waybill || "—"}</b> · Thanh toán: <b>${r.isCod ? "COD tiền mặt" : r.wallet}</b></div>
+        <div class="shp-meta">👤 ${customer} · 📍 ${r.address || ""}</div>
+        <div class="dlv-items">${r.itemsText}</div>
+        ${driverCardHtml(r.driver, { podAction: r.pod ? `window.game.showOnlinePod(${r.id}, ${r.day})` : "" })}
+        ${timelineHtml(r.timeline)}
+        <div class="shp-foot">
+          <span>Thành tiền: <b class="shp-money">${r.status === "delivered" ? `+${r.price}k` : "0đ"}</b></span>
+          ${rating}
+        </div>
+      </div>`;
   }
 
   buildOnlineCard(o, compact) {
@@ -5777,6 +5947,7 @@ export class SpicyNoodleGame {
           </div>
           <span class="dlv-eta" data-ofield="eta"></span>
         </div>
+        <button class="dlv-chip" onclick="window.game.callOnlineDriver(${o.id})">📞 Gọi tài xế${o.calls ? ` (${o.calls})` : ""}</button>
         ${cook}
         <div class="dlv-chips">${chips}</div>
         ${wait}
@@ -5786,8 +5957,10 @@ export class SpicyNoodleGame {
         <div class="dlv-route"><span>🏮</span>
           <div class="dlv-bar dlv-road"><i data-ofield="delBar"></i><em data-ofield="delBike">🛵</em></div>
         <span>🏠</span></div>
-        <div class="dlv-sub">${o.shipper.name} đang giao tới khách · còn <b data-ofield="delTxt"></b>${o.rain ? " · 🌧️ trời mưa, đi chậm hơn" : ""}</div>`;
+        <div class="dlv-sub">${o.shipper.name} đang giao tới ${o.address} · còn <b data-ofield="delTxt"></b>${o.rain ? " · 🌧️ trời mưa, đi chậm hơn" : ""}</div>
+        <button class="dlv-chip" onclick="window.game.callOnlineDriver(${o.id})">📞 Gọi hỏi vị trí</button>`;
     }
+    if (!compact && o.timeline && o.timeline.length) body += timelineHtml(o.timeline, 4);
 
     const age = o.stage === "new" ? "" : `<div class="dlv-age" data-ofield="age"></div>`;
     return `
@@ -5795,6 +5968,7 @@ export class SpicyNoodleGame {
         <div class="dlv-top">
           <span class="shipper-app-badge ${cfg.cls}">${o.app}</span>
           <b class="dlv-id">#${o.id}</b>
+          ${o.customer && o.customer.regular ? `<span class="dlv-regular">🔁 Khách quen</span>` : ""}
           <span class="dlv-net">+${o.price}k</span>
         </div>
         <div class="dlv-steps">${stepper}</div>
@@ -5835,11 +6009,7 @@ export class SpicyNoodleGame {
     const shipperName = order.shipper ? order.shipper.name : "Bác Tài Shipper";
     const app = order.app || "GrabFood";
 
-    const customerNames = [
-      "Quỳnh Anh Foodie", "Hoàng Long Review", "Thảo Vy Mê Trà Sữa", "Minh Trí Coder",
-      "Bảo Ngọc Sống Ảo", "Tuấn Kiệt Ăn Cay", "Khánh Linh Sinh Viên", "Đức Huy Văn Phòng"
-    ];
-    const custName = customerNames[Math.floor(Math.random() * customerNames.length)];
+    const custName = order.customer ? order.customer.name : this.pickRandom(ONLINE_CUSTOMERS);
     const rating = rateOnline({
       customerName: custName, isPacked, shipperName, app, owl: Boolean(this.state.staff.owl),
       issues: order.issues, fullPack: order.fullPack, fast: order.fast
@@ -5871,6 +6041,7 @@ export class SpicyNoodleGame {
     };
 
     this.addReview(newReview);
+    return stars;
   }
 
   // Sinh ngẫu nhiên phương tiện và biển số xe Việt Nam chân thực cho Shipper mỗi chuyến giao
@@ -5963,6 +6134,8 @@ export class SpicyNoodleGame {
 
     this.showDaySummaryModal(activeStaffNames);
     this.state.day += 1;
+    this.prepClockSince = Date.now(); // sáng ngày mới bắt đầu lại từ 07:00
+    this.deliverSavingOrders(); // đơn nhập hàng gói tiết kiệm tới tiệm vào sáng hôm sau
     this.pendingAudit = GameIntegrity.rollAudit();
     this.ensureDailyQuests();
     this.rollDailySpecialCombo(true); // Chuẩn bị Món Đặc Biệt mới cho ngày tiếp theo ở bảng chuẩn bị
@@ -6187,4 +6360,4 @@ export class SpicyNoodleGame {
 }
 
 // Kinh tế thật (v2.3.0): chợ nguyên liệu, nhân sự, tài chính được tách ra module riêng
-Object.assign(SpicyNoodleGame.prototype, MarketMethods, HrMethods, FinanceMethods, OfflineMethods, DevMenuMethods);
+Object.assign(SpicyNoodleGame.prototype, MarketMethods, HrMethods, FinanceMethods, OfflineMethods, DevMenuMethods, ShippingMethods, SupplierMethods);

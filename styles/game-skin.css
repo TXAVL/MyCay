@@ -5109,3 +5109,105 @@ html.pixel-ui .dlv-card { background: var(--bg-card); }
 .kpi-btn-pay { background: #15803D; color: #FFF; }
 .kpi-btn-refuse { background: color-mix(in srgb, var(--accent-berry) 78%, #000); color: #FFF; }
 .kpi-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ==========================================================
+   v2.5.0 · VẬN ĐƠN NHƯ APP GIAO HÀNG THẬT (issue #9)
+   ========================================================== */
+.shp-tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.shp-tab {
+  flex: 1;
+  min-width: 110px;
+  border: 2px solid var(--border-card);
+  background: var(--bg-card);
+  color: var(--text-title);
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.shp-tab.is-active { background: var(--cp-warn-bg); color: var(--cp-warn-fg); border-color: var(--cp-warn-fg); }
+.shp-tab-count { display: inline-block; min-width: 18px; padding: 0 5px; background: #B5301F; color: #FFF; font-size: 11px; }
+.shp-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-card);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text-main);
+}
+.shp-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--text-title); }
+.shp-day { margin-left: auto; font-size: 11.5px; color: var(--text-muted); }
+.shp-tag { font-size: 11px; font-weight: 800; padding: 2px 8px; color: var(--cp-bad-fg); background: var(--cp-bad-bg); }
+.shp-status { font-size: 13px; font-weight: 800; }
+.shp-status.is-ok { color: var(--cp-text-good); }
+.shp-status.is-warn { color: var(--cp-text-warn); }
+.shp-status.is-bad { color: var(--cp-text-bad); }
+.shp-meta { font-size: 12px; color: var(--text-muted); }
+.shp-meta b { color: var(--text-title); }
+.shp-items { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12.5px; color: var(--text-title); }
+.shp-driver { border: 1.5px solid var(--border-subtle); background: var(--bg-card-subtle); padding: 8px 10px; }
+.shp-driver-name { font-size: 13px; color: var(--text-title); }
+.shp-driver-sub { font-size: 12px; color: var(--text-muted); margin: 2px 0 6px; }
+.shp-driver-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.shp-btn {
+  border: 1.5px solid var(--border-card);
+  background: var(--bg-card);
+  color: var(--text-title);
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.shp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.shp-btn-primary { background: #C23A1C; color: #FFF; border-color: #8E2410; }
+.shp-timeline { list-style: none; margin: 2px 0 0; padding: 0 0 0 14px; border-left: 2px solid var(--border-subtle); display: flex; flex-direction: column; gap: 6px; }
+.shp-timeline li { position: relative; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+.shp-timeline li::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  background: var(--border-card);
+}
+.shp-timeline li.is-latest { color: var(--text-title); font-weight: 700; }
+.shp-timeline li.is-latest::before { background: #15803D; box-shadow: 0 0 0 3px var(--cp-good-bg); }
+.shp-timeline li.is-ok.is-latest { color: var(--cp-text-good); }
+.shp-timeline li.is-bad { color: var(--cp-text-bad); }
+.shp-timeline li.is-bad::before { background: #B5301F; }
+.shp-timeline li.is-warn { color: var(--cp-text-warn); }
+.shp-time { font-weight: 800; }
+.shp-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; border-top: 1px dashed var(--border-subtle); padding-top: 6px; font-size: 13px; }
+.shp-money { color: var(--cp-text-bad); }
+.shp-stars { font-size: 12.5px; font-weight: 800; color: var(--cp-text-good); }
+.shp-stars.is-none { color: var(--text-muted); font-weight: 600; }
+.shp-pod-card { width: min(420px, 100%); }
+.shp-pod-canvas { width: 100%; height: auto; image-rendering: pixelated; border: 3px solid var(--border-card); margin: 6px 0; }
+.dlv-regular { font-size: 11px; font-weight: 800; padding: 1px 6px; color: var(--cp-good-fg); background: var(--cp-good-bg); }
+#kho-supply-orders .category-header-wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+
+/* Chợ Sỉ Online */
+.sup-card { width: min(620px, 100%); text-align: left; }
+.sup-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; font-size: 16px; color: var(--text-title); }
+.sup-sub { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.sup-list { max-height: 42vh; overflow-y: auto; margin: 10px 0; border: 2px solid var(--border-subtle); }
+.sup-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-bottom: 1px dashed var(--border-subtle); }
+.sup-row.is-picked { background: var(--cp-good-bg); }
+.sup-icon { font-size: 20px; }
+.sup-name { flex: 1; font-size: 13px; font-weight: 800; color: var(--text-title); display: flex; flex-direction: column; }
+.sup-name small { font-weight: 600; color: var(--text-muted); font-size: 11.5px; }
+.sup-qty { display: flex; align-items: center; gap: 4px; }
+.sup-qty b { min-width: 28px; text-align: center; color: var(--text-title); }
+.sup-ship { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sup-method { border: 2px solid var(--border-card); background: var(--bg-card); color: var(--text-title); padding: 8px; text-align: left; font-family: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+.sup-method small { font-size: 11.5px; color: var(--text-muted); }
+.sup-method.is-active { border-color: var(--cp-good-fg); background: var(--cp-good-bg); }
+.sup-insure { display: flex; gap: 8px; align-items: center; font-size: 12.5px; margin: 10px 0; color: var(--text-main); }
+.sup-sum { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--text-main); }
+.sup-sum b { color: var(--cp-text-bad); font-size: 15px; }
+@media (max-width: 520px) { .sup-ship { grid-template-columns: 1fr; } .sup-row { flex-wrap: wrap; } }

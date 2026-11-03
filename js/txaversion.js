@@ -10,22 +10,36 @@ export class txaversion {
     this.themeName = themeName || (features[0] ? features[0].title : "Bản Cập Nhật Mới");
   }
 
-  // Khai báo phiên bản hiện tại của game (Bản 2.4.1 - Sửa lỗi)
+  // Khai báo phiên bản hiện tại của game (Bản 2.5.0 - Vận Đơn Như App Giao Hàng)
   static get CURRENT_VERSION() {
     return new txaversion(
-      "2.4.1",
-      241,
+      "2.5.0",
+      250,
       "03/11/2026",
       [
         {
-          title: "Sửa Lỗi",
-          desc: "Sửa lỗi mở sidebar của trình duyệt, extension hay danh sách đọc bị tính nhầm là mở DevTools.",
-          icon: "🛠️",
-          badge: "Sửa Lỗi 🛠️",
-          badgeType: "manage"
+          title: "Đơn Online Có Vận Đơn Thật",
+          desc: "Mỗi đơn có mã vận đơn, tên khách, địa chỉ, dòng thời gian theo giờ trong game. Tab Online chia Đang xử lý / Đã giao / Hủy & bom, xem lại được 30 đơn gần nhất.",
+          icon: "🛵",
+          badge: "Mới ✨",
+          badgeType: "hot"
+        },
+        {
+          title: "Gọi Tài Xế, Ảnh POD & Khách Quen",
+          desc: "Gọi hối tài xế (gọi nhiều quá tài xế bực), xem ảnh POD lúc giao xong hoặc lúc khách bom hàng. Khách hài lòng có thể thành khách quen và đặt lại đúng món cũ.",
+          icon: "📸",
+          badge: "Mới ✨",
+          badgeType: "hot"
+        },
+        {
+          title: "Chợ Sỉ Online",
+          desc: "Đặt nguyên liệu online rẻ hơn chợ 8%: chọn Hỏa tốc 2H hoặc Tiết kiệm sáng mai, theo dõi bưu tá, ảnh POD, bảo hiểm khi hàng dập, và nút Mua lại.",
+          icon: "🛒",
+          badge: "Mới ✨",
+          badgeType: "hot"
         }
       ],
-      "Sửa Lỗi"
+      "Vận Đơn Như App Giao Hàng"
     );
   }
 
@@ -33,6 +47,21 @@ export class txaversion {
   static get VERSION_HISTORY() {
     return [
       txaversion.CURRENT_VERSION,
+      new txaversion(
+        "2.4.1",
+        241,
+        "03/11/2026",
+        [
+          {
+            title: "Sửa Lỗi",
+            desc: "Sửa lỗi mở sidebar của trình duyệt, extension hay danh sách đọc bị tính nhầm là mở DevTools.",
+            icon: "🛠️",
+            badge: "Sửa Lỗi 🛠️",
+            badgeType: "manage"
+          }
+        ],
+        "Sửa Lỗi"
+      ),
       new txaversion(
         "2.4.0",
         240,

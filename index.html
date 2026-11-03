@@ -18,17 +18,17 @@
   <link rel="manifest" href="manifest.json" />
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles/main.css?v=2.4.1" />
+  <link rel="stylesheet" href="styles/main.css?v=2.5.0" />
   <!-- Lớp giao diện game (HUD, khung cảnh tiệm, dock nút tròn, nút 3D) -->
-  <link rel="stylesheet" href="styles/game-skin.css?v=2.4.1" />
+  <link rel="stylesheet" href="styles/game-skin.css?v=2.5.0" />
 
   <!-- Supabase SDK cho Realtime Presence & Lượt Xem Thực Tế (defer để đảm bảo chạy mượt offline 100% không block) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Hệ Thống Bảo Mật & Phòng Hộ An Ninh (Chặn DevTools, F12 & Khóa Thiết Bị 15 Phút) -->
   <!-- Phát hiện DevTools: devtools-detector (MIT, AEPKILL) - lưu bản cục bộ để chạy được offline -->
-  <script src="js/vendor/devtools-detector.js?v=2.4.1"></script>
-  <script src="js/security-shield.js?v=2.4.1"></script>
+  <script src="js/vendor/devtools-detector.js?v=2.5.0"></script>
+  <script src="js/security-shield.js?v=2.5.0"></script>
 
   <script>
     // Fallback toàn cục sẵn sàng ngay lập tức cho Console Admin & Dashboard
@@ -352,6 +352,9 @@
             <!-- Bảng tin chợ nguyên liệu: giá hôm nay, biến cố, hàng sắp hỏng (render qua JS) -->
             <div class="kho-storage-banner" id="kho-market-banner"></div>
 
+            <!-- Đơn nhập hàng online: đặt rẻ hơn chợ, chờ bưu tá giao, có dòng thời gian & ảnh POD (render qua JS) -->
+            <div class="category-block" id="kho-supply-orders"></div>
+
             <!-- Hướng dẫn Tutorial Tooltip (chuẩn screenshot 1) -->
             <div id="tutorial-tooltip-kho" class="tutorial-popover-box">
               <span class="tooltip-text">Bấm <strong>+</strong> để mua Mì sợi Hàn Quốc</span>
@@ -470,11 +473,10 @@
                 <span id="online-total-delivered" class="online-stat-pill">Đã giao: 0 đơn</span>
               </div>
               <div class="dlv-stats" id="online-stats-row"></div>
+              <div class="shp-tabs" id="online-filter-tabs"></div>
               <div id="online-orders-list" class="online-orders-list">
                 <!-- Render động các đơn hàng ship mỳ cay -->
               </div>
-              <h4 class="dlv-log-title">📜 Nhật ký đơn hôm nay</h4>
-              <div class="dlv-logs" id="online-history-list"></div>
             </div>
           </section>
 
@@ -1479,6 +1481,6 @@
   </div>
 
   <!-- File Module Chính -->
-  <script type="module" src="js/app.js?v=2.4.1"></script>
+  <script type="module" src="js/app.js?v=2.5.0"></script>
 </body>
 </html>

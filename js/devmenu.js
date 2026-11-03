@@ -3,8 +3,8 @@
 // Danh sách nút nhóm theo hệ thống: tài chính, chợ & kho, nhân sự, giao hàng & offline, tiến trình.
 // Mọi lệnh đều đi qua đúng các hệ thống thật (chợ, nhân sự, vay vốn, đơn online) để dùng thử nhanh các tính năng mới.
 // ==========================================================
-import { GameUIModal } from "./modal.js?v=2.4.1";
-import { STAFF_ROSTER } from "./hr.js?v=2.4.1";
+import { GameUIModal } from "./modal.js?v=2.5.0";
+import { STAFF_ROSTER } from "./hr.js?v=2.5.0";
 
 const DEV_SECTIONS = [
   {
@@ -45,6 +45,7 @@ const DEV_SECTIONS = [
     items: [
       { id: "spawn_orders", icon: "🔔", title: "Bắn 3 Đơn Online", sub: "Chỉ khi đang mở bán, gồm cả đơn COD" },
       { id: "fast_orders", icon: "⚡", title: "Tua Nhanh Đơn Đang Làm", sub: "Món chín ngay, tài xế tới ngay" },
+      { id: "supply_now", icon: "📦", title: "Giao Ngay Đơn Nhập Hàng", sub: "Mọi đơn nguyên liệu online tới tiệm ngay" },
       { id: "offline_5h", icon: "🌙", title: "Giả Lập Vắng Mặt 5 Giờ", sub: "Chạy ca offline do nhân viên trông (từ Ngày 30)" }
     ]
   },
@@ -234,6 +235,13 @@ export const DevMenuMethods = {
         });
         toast("⚡ Đơn đang làm sẽ chín và tài xế tới sau 1 giây.", "info", "🛵");
         break;
+      case "supply_now": {
+        const orders = this.ensureSupply().orders.filter(o => o.status !== "delivered");
+        if (!orders.length) { toast("Không có đơn nhập hàng nào đang giao.", "info", "📦"); break; }
+        orders.forEach(o => this.advanceSupplyOrder(o, 1));
+        toast(`📦 Đã giao ngay ${orders.length} đơn nhập hàng.`, "success", "🚚");
+        break;
+      }
       case "offline_5h": {
         if (st.dayPhase !== "prep") { toast("Hãy kết thúc ca bán trước khi giả lập vắng mặt!", "info", "🌙"); break; }
         if (!this.getHiredStaffKeys().length) { toast("Cần có ít nhất một nhân viên để trông tiệm hộ!", "warning", "🌙"); break; }

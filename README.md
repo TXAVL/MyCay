@@ -1,6 +1,6 @@
 # 🍜 Tiệm Mỳ Cay
 
-[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.4.1-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
+[![Phiên Bản](https://img.shields.io/badge/Phi%C3%AAn%20B%E1%BA%A3n-v2.5.0-F59E0B?logo=github)](https://github.com/TXAVL/MyCay)
 [![Phát Hành](https://img.shields.io/badge/Ph%C3%A1t%20H%C3%A0nh-03%2F11%2F2026-blue)](https://github.com/TXAVL/MyCay)
 [![Nền Tảng](https://img.shields.io/badge/N%E1%BB%81n%20T%E1%BA%A3ng-Web%20%7C%20PWA%20Offline-2ECC71)](https://github.com/TXAVL/MyCay)
 [![Chế Độ Chơi](https://img.shields.io/badge/Ch%E1%BA%BF%20%C4%90%E1%BB%99-Cozy%20Anime%20Simulation-purple)](https://github.com/TXAVL/MyCay)
@@ -103,6 +103,12 @@
 - Cuối mỗi kỳ 7 ngày phải trả thưởng KPI: thưởng nóng 1 ngày lương + chia % doanh thu kỳ theo số ca và cấp đào tạo. Ai đạt KPI được lên cấp đào tạo (mỗi cấp làm nhanh hơn 3%). Có Cụ Rùa Torto thì tự quyết toán.
 - Từ chối hoặc không đủ tiền trả: cả đội đình công nghỉ việc tập thể, vơ vét sạch tiền trong két (sổ tiết kiệm không bị đụng), mất cấp đào tạo và 10 ⭐ uy tín.
 - File sao lưu mang theo toàn bộ dữ liệu game cùng theme, âm thanh, cấp HUD.
+
+### 12. 🛵 Vận Đơn Như App Giao Hàng Thật (v2.5.0)
+- **Đơn khách đặt qua app**: mỗi đơn có mã vận đơn, tên khách, địa chỉ, cách thanh toán và dòng thời gian theo giờ trong game (ca bán 10:00 → 22:00). Tab Online chia Đang xử lý / Đã giao / Hủy & bom, lưu 30 đơn gần nhất.
+- **Gọi tài xế**: hối tài xế tới nhanh hơn (gọi từ lần 3 tài xế bực, −1 ⭐) hoặc hỏi vị trí lúc đang giao. **Ảnh POD** chụp túi hàng trước cửa khách, hoặc cửa đóng khi khách bom hàng.
+- **Khách quen**: khách hài lòng có thể quay lại đặt đúng món cũ.
+- **Chợ Sỉ Online** (tab Kho): đặt nguyên liệu rẻ hơn chợ 8%, chọn Hỏa tốc 2H hoặc Tiết kiệm sáng mai, có bưu tá, dòng thời gian, ảnh POD, bảo hiểm khi hàng dập và nút Mua lại. Hàng tới mới vào kho và mới tính hạn dùng.
 
 ---
 
