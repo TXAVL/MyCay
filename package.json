@@ -12,6 +12,6 @@
     "deploy": "npx -y wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^3.100.0"
+    "wrangler": "^4.157.0"
   }
 }
